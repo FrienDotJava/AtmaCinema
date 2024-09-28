@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tubes/register.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -25,7 +26,7 @@ class _LoginPageState extends State<LoginPage> {
           image: const AssetImage("images/bg2.jpg"),
           fit: BoxFit.cover,
           colorFilter:
-          ColorFilter.mode(myColor.withOpacity(0.2), BlendMode.dstATop),
+              ColorFilter.mode(myColor.withOpacity(0.2), BlendMode.dstATop),
         ),
       ),
       child: Scaffold(
@@ -34,7 +35,7 @@ class _LoginPageState extends State<LoginPage> {
           children: [
             Positioned(top: 80, child: _buildTop()),
             Positioned(bottom: 0, child: _buildBottom()),
-          ]
+          ],
         ),
       ),
     );
@@ -70,9 +71,9 @@ class _LoginPageState extends State<LoginPage> {
       child: Card(
         shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(30),
-              topRight: Radius.circular(30),
-            )),
+          topLeft: Radius.circular(30),
+          topRight: Radius.circular(30),
+        )),
         child: Padding(
           padding: const EdgeInsets.all(32.0),
           child: _buildForm(),
@@ -103,6 +104,8 @@ class _LoginPageState extends State<LoginPage> {
         _buildLoginButton(),
         const SizedBox(height: 20),
         _buildOtherLogin(),
+        const SizedBox(height: 20),
+        _buildRegisterLink(), // Tambahkan widget ini untuk navigasi ke register
       ],
     );
   }
@@ -159,7 +162,10 @@ class _LoginPageState extends State<LoginPage> {
         shadowColor: Colors.black,
         minimumSize: const Size.fromHeight(60),
       ),
-      child: const Text("LOGIN", style: TextStyle(color: Colors.black),),
+      child: const Text(
+        "LOGIN",
+        style: TextStyle(color: Colors.black),
+      ),
     );
   }
 
@@ -178,6 +184,24 @@ class _LoginPageState extends State<LoginPage> {
             ],
           )
         ],
+      ),
+    );
+  }
+
+  // Tambahkan TextButton untuk navigasi ke RegisterPage
+  Widget _buildRegisterLink() {
+    return Center(
+      child: TextButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const RegisterPage()),
+          );
+        },
+        child: const Text(
+          "Don't have an account? Register here",
+          style: TextStyle(color: Colors.blue),
+        ),
       ),
     );
   }
