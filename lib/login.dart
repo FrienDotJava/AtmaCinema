@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tubes/register.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -101,6 +102,8 @@ class _LoginPageState extends State<LoginPage> {
         _buildLoginButton(),
         const SizedBox(height: 20),
         _buildOtherLogin(),
+        const SizedBox(height: 20),
+        _buildRegisterLink(), // Tambahkan widget ini untuk navigasi ke register
       ],
     );
   }
@@ -180,6 +183,24 @@ class _LoginPageState extends State<LoginPage> {
             ],
           )
         ],
+      ),
+    );
+  }
+
+  // Tambahkan TextButton untuk navigasi ke RegisterPage
+  Widget _buildRegisterLink() {
+    return Center(
+      child: TextButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const RegisterPage()),
+          );
+        },
+        child: const Text(
+          "Don't have an account? Register here",
+          style: TextStyle(color: Colors.blue),
+        ),
       ),
     );
   }
