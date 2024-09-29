@@ -25,17 +25,15 @@ class _LoginPageState extends State<LoginPage> {
           image: const AssetImage("images/bg2.jpg"),
           fit: BoxFit.cover,
           colorFilter:
-          ColorFilter.mode(myColor.withOpacity(0.2), BlendMode.dstATop),
+              ColorFilter.mode(myColor.withOpacity(0.2), BlendMode.dstATop),
         ),
       ),
       child: Scaffold(
         backgroundColor: Colors.transparent,
-        body: Stack(
-          children: [
-            Positioned(top: 80, child: _buildTop()),
-            Positioned(bottom: 0, child: _buildBottom()),
-          ]
-        ),
+        body: Stack(children: [
+          Positioned(top: 80, child: _buildTop()),
+          Positioned(bottom: 0, child: _buildBottom()),
+        ]),
       ),
     );
   }
@@ -52,7 +50,7 @@ class _LoginPageState extends State<LoginPage> {
             color: Colors.white,
           ),
           Text(
-            "Tix App",
+            "Atma Cinema",
             style: TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.bold,
@@ -70,9 +68,9 @@ class _LoginPageState extends State<LoginPage> {
       child: Card(
         shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(30),
-              topRight: Radius.circular(30),
-            )),
+          topLeft: Radius.circular(30),
+          topRight: Radius.circular(30),
+        )),
         child: Padding(
           padding: const EdgeInsets.all(32.0),
           child: _buildForm(),
@@ -91,13 +89,13 @@ class _LoginPageState extends State<LoginPage> {
               color: Colors.black, fontSize: 32, fontWeight: FontWeight.w500),
         ),
         _buildGreyText("Please login with your information"),
-        const SizedBox(height: 60),
+        const SizedBox(height: 40),
         _buildGreyText("Email address"),
         _buildInputField(emailController),
-        const SizedBox(height: 40),
+        const SizedBox(height: 20),
         _buildGreyText("Password"),
         _buildInputField(passwordController, isPassword: true),
-        const SizedBox(height: 20),
+        const SizedBox(height: 50),
         _buildRememberForgot(),
         const SizedBox(height: 20),
         _buildLoginButton(),
@@ -155,11 +153,15 @@ class _LoginPageState extends State<LoginPage> {
       },
       style: ElevatedButton.styleFrom(
         shape: const StadiumBorder(),
+        backgroundColor: Colors.blue,
         elevation: 20,
         shadowColor: Colors.black,
         minimumSize: const Size.fromHeight(60),
       ),
-      child: const Text("LOGIN", style: TextStyle(color: Colors.black),),
+      child: const Text(
+        "LOGIN",
+        style: TextStyle(color: Colors.black),
+      ),
     );
   }
 
