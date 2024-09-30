@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:tubes/register.dart';
+import 'package:tubes/register_email.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -9,6 +9,7 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  bool isPasswordVisible = false;
   late Color myColor;
   late Size mediaSize;
   TextEditingController emailController = TextEditingController();
@@ -90,20 +91,20 @@ class _LoginPageState extends State<LoginPage> {
               color: Colors.black, fontSize: 32, fontWeight: FontWeight.w500),
         ),
         _buildGreyText("Please login with your information"),
-        const SizedBox(height: 40),
+        const SizedBox(height: 20),
         _buildGreyText("Email address"),
         _buildInputField(emailController),
         const SizedBox(height: 20),
         _buildGreyText("Password"),
-        _buildInputField(passwordController, isPassword: true),
-        const SizedBox(height: 50),
+        _buildPasswordField(passwordController),
+        const SizedBox(height: 20),
         _buildRememberForgot(),
         const SizedBox(height: 20),
         _buildLoginButton(),
         const SizedBox(height: 20),
         _buildOtherLogin(),
         const SizedBox(height: 20),
-        _buildRegisterLink(), // Tambahkan widget ini untuk navigasi ke register
+        _buildRegisterLink(),
       ],
     );
   }
@@ -187,7 +188,6 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  // Tambahkan TextButton untuk navigasi ke RegisterPage
   Widget _buildRegisterLink() {
     return Center(
       child: TextButton(
@@ -200,6 +200,25 @@ class _LoginPageState extends State<LoginPage> {
         child: const Text(
           "Don't have an account? Register here",
           style: TextStyle(color: Colors.blue),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPasswordField(TextEditingController controller) {
+    return TextField(
+      controller: controller,
+      obscureText: !isPasswordVisible,
+      decoration: InputDecoration(
+        suffixIcon: IconButton(
+          icon: Icon(
+            isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+          ),
+          onPressed: () {
+            setState(() {
+              isPasswordVisible = !isPasswordVisible;
+            });
+          },
         ),
       ),
     );
