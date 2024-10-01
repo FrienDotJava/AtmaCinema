@@ -26,15 +26,24 @@ class _LoginPageState extends State<LoginPage> {
         image: DecorationImage(
           image: const AssetImage("images/bg2.jpg"),
           fit: BoxFit.cover,
-          colorFilter:
-              ColorFilter.mode(myColor.withOpacity(0.2), BlendMode.dstATop),
         ),
       ),
       child: Scaffold(
         backgroundColor: Colors.transparent,
         body: Stack(children: [
-          Positioned(top: 80, child: _buildTop()),
-          Positioned(bottom: 0, child: _buildBottom()),
+          Container(
+            width: mediaSize.width,
+            height: mediaSize.height,
+            color: Colors.black.withOpacity(0.6),
+          ),
+          Positioned(
+            top: 80,
+            child: _buildTop(),
+          ),
+          Positioned(
+            bottom: 0,
+            child: _buildBottom(),
+          ),
         ]),
       ),
     );
@@ -52,12 +61,13 @@ class _LoginPageState extends State<LoginPage> {
             color: Colors.white,
           ),
           Text(
-            "Atma Cinema",
+            "ATMA Cinema",
             style: TextStyle(
                 color: Colors.white,
+                fontFamily: 'Poppins-Semibold',
                 fontWeight: FontWeight.bold,
-                fontSize: 40,
-                letterSpacing: 2),
+                fontSize: 36,
+                letterSpacing: 0),
           )
         ],
       ),
@@ -68,6 +78,7 @@ class _LoginPageState extends State<LoginPage> {
     return SizedBox(
       width: mediaSize.width,
       child: Card(
+        color: Colors.black.withOpacity(0.75),
         shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.only(
           topLeft: Radius.circular(30),
@@ -88,9 +99,11 @@ class _LoginPageState extends State<LoginPage> {
         Text(
           "Welcome",
           style: TextStyle(
-              color: Colors.black, fontSize: 32, fontWeight: FontWeight.w500),
+              color: Colors.white,
+              fontFamily: 'Poppins-SemiBold',
+              fontSize: 32),
         ),
-        _buildGreyText("Please login with your information"),
+        _buildWhiteText("Please login with your information"),
         const SizedBox(height: 20),
         _buildGreyText("Email address"),
         _buildInputField(emailController),
@@ -113,6 +126,13 @@ class _LoginPageState extends State<LoginPage> {
     return Text(
       text,
       style: const TextStyle(color: Colors.grey),
+    );
+  }
+
+  Widget _buildWhiteText(String text) {
+    return Text(
+      text,
+      style: const TextStyle(color: Colors.white),
     );
   }
 
@@ -156,15 +176,21 @@ class _LoginPageState extends State<LoginPage> {
         debugPrint("Password : ${passwordController.text}");
       },
       style: ElevatedButton.styleFrom(
-        shape: const StadiumBorder(),
-        backgroundColor: Colors.blue,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(18),
+        ),
+        backgroundColor: Colors.white,
         elevation: 20,
-        shadowColor: Colors.black,
-        minimumSize: const Size.fromHeight(60),
+        shadowColor: Colors.white30,
+        minimumSize: const Size.fromHeight(50),
       ),
       child: const Text(
         "LOGIN",
-        style: TextStyle(color: Colors.black),
+        style: TextStyle(
+          color: Colors.black,
+          fontFamily: 'Poppins-Semibold',
+          fontSize: 16,
+        ),
       ),
     );
   }
@@ -178,9 +204,9 @@ class _LoginPageState extends State<LoginPage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
+              Tab(icon: Image.asset("images/google.png")),
               Tab(icon: Image.asset("images/facebook.png")),
               Tab(icon: Image.asset("images/twitter.png")),
-              Tab(icon: Image.asset("images/github.png")),
             ],
           )
         ],
@@ -197,9 +223,25 @@ class _LoginPageState extends State<LoginPage> {
             MaterialPageRoute(builder: (context) => const RegisterPage()),
           );
         },
-        child: const Text(
-          "Don't have an account? Register here",
-          style: TextStyle(color: Colors.blue),
+        child: RichText(
+          text: TextSpan(
+            text: "Don't have an account? ",
+            style: const TextStyle(
+              color: Colors.white,
+              fontFamily: 'Poppins-Regular',
+              fontSize: 14,
+            ),
+            children: [
+              TextSpan(
+                text: "Register",
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'Poppins-Semibold',
+                  fontSize: 16,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'login.dart';
+import 'package:tubes/loading_screen.dart';
+import 'package:tubes/login.dart';
 
 void main() {
   runApp(const MyApp());
@@ -12,7 +13,10 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
-      home: LoginPage(),
+      home: LoadingScreen(),
+      routes: {
+        '/home': (context) => LoginPage(),
+      },
     );
   }
 }

@@ -34,7 +34,7 @@ class _RegisterPageState extends State<RegisterPage> {
       child: Scaffold(
         backgroundColor: Colors.transparent,
         appBar: AppBar(
-          backgroundColor: Colors.transparent,
+          backgroundColor: Colors.black,
           elevation: 0,
           leading: IconButton(
             icon: Icon(Icons.arrow_back, color: Colors.white),
@@ -45,6 +45,11 @@ class _RegisterPageState extends State<RegisterPage> {
         ),
         body: Stack(
           children: [
+            Container(
+              width: mediaSize.width,
+              height: mediaSize.height,
+              color: Colors.black.withOpacity(0.5),
+            ),
             Positioned(bottom: 0, child: _buildBottom()),
           ],
         ),
@@ -56,13 +61,15 @@ class _RegisterPageState extends State<RegisterPage> {
     return SizedBox(
       width: mediaSize.width,
       child: Card(
+        // color: Color(0xFF000435),
+        color: Colors.black.withOpacity(0.75),
         shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.only(
           topLeft: Radius.circular(30),
           topRight: Radius.circular(30),
         )),
         child: Padding(
-          padding: const EdgeInsets.all(32.0),
+          padding: const EdgeInsets.all(30.0),
           child: _buildInputRegister(),
         ),
       ),
@@ -71,7 +78,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
   Widget _buildInputRegister() {
     return Padding(
-      padding: const EdgeInsets.all(8.0),
+      padding: const EdgeInsets.all(10.0),
       child: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -80,25 +87,25 @@ class _RegisterPageState extends State<RegisterPage> {
               "Register Account",
               textAlign: TextAlign.center,
               style: TextStyle(
-                color: Colors.black,
+                color: Colors.white,
+                fontFamily: 'Poppins-Semibold',
                 fontSize: 32,
-                fontWeight: FontWeight.bold,
               ),
             ),
             Text(
               "Enjoy Movie With Us",
               textAlign: TextAlign.center,
               style: TextStyle(
-                color: Colors.black,
-                fontSize: 20,
-                fontWeight: FontWeight.w500,
+                color: Colors.white,
+                fontFamily: 'Poppins-Regular',
+                fontSize: 18,
               ),
             ),
-            const SizedBox(height: 30),
+            const SizedBox(height: 35),
             _emailInput(emailController),
-            const SizedBox(height: 20),
+            const SizedBox(height: 25),
             _buildContinueButton(),
-            const SizedBox(height: 300),
+            const SizedBox(height: 350),
           ],
         ),
       ),
@@ -113,18 +120,19 @@ class _RegisterPageState extends State<RegisterPage> {
         keyboardType: TextInputType.emailAddress,
         decoration: InputDecoration(
           labelText: "Input Your Email Address",
-          labelStyle: const TextStyle(color: Colors.grey),
-          suffixIcon: const Icon(Icons.email),
+          labelStyle: const TextStyle(
+              color: Colors.grey, fontFamily: 'Poppins-Regular'),
+          suffixIcon: const Icon(Icons.email, color: Colors.grey),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.zero,
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.zero,
-            borderSide: const BorderSide(color: Colors.grey, width: 2.0),
+            borderSide: const BorderSide(color: Colors.grey, width: 1.5),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.zero,
-            borderSide: const BorderSide(color: Colors.blue, width: 2.0),
+            borderSide: const BorderSide(color: Colors.white, width: 2.0),
           ),
         ),
       ),
@@ -141,15 +149,21 @@ class _RegisterPageState extends State<RegisterPage> {
         );
       },
       style: ElevatedButton.styleFrom(
-        shape: const StadiumBorder(),
-        backgroundColor: Colors.blue,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(18),
+        ),
+        backgroundColor: Colors.white,
         elevation: 20,
-        shadowColor: Colors.black,
-        minimumSize: const Size.fromHeight(60),
+        shadowColor: Colors.white30,
+        minimumSize: const Size.fromHeight(50),
       ),
       child: const Text(
-        "Continue",
-        style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+        "CONTINUE",
+        style: TextStyle(
+          color: Colors.black,
+          fontFamily: 'Poppins-Semibold',
+          fontSize: 16,
+        ),
       ),
     );
   }
