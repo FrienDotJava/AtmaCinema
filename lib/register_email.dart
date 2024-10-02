@@ -32,6 +32,7 @@ class _RegisterPageState extends State<RegisterPage> {
         ),
       ),
       child: Scaffold(
+        resizeToAvoidBottomInset: false,
         backgroundColor: Colors.transparent,
         appBar: AppBar(
           backgroundColor: Colors.black,
@@ -116,6 +117,9 @@ class _RegisterPageState extends State<RegisterPage> {
     return SizedBox(
       width: double.infinity,
       child: TextField(
+        style: TextStyle(
+          color: Colors.white,
+        ),
         controller: emailController,
         keyboardType: TextInputType.emailAddress,
         decoration: InputDecoration(

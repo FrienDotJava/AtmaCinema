@@ -29,6 +29,7 @@ class _LoginPageState extends State<LoginPage> {
         ),
       ),
       child: Scaffold(
+        resizeToAvoidBottomInset: false,
         backgroundColor: Colors.transparent,
         body: Stack(children: [
           Container(
@@ -140,6 +141,9 @@ class _LoginPageState extends State<LoginPage> {
       {isPassword = false}) {
     return TextField(
       controller: controller,
+      style: TextStyle(
+        color: Colors.white,
+      ),
       decoration: InputDecoration(
         suffixIcon: isPassword ? Icon(Icons.remove_red_eye) : Icon(Icons.done),
       ),
@@ -250,6 +254,9 @@ class _LoginPageState extends State<LoginPage> {
   Widget _buildPasswordField(TextEditingController controller) {
     return TextField(
       controller: controller,
+      style: TextStyle(
+        color: Colors.white,
+      ),
       obscureText: !isPasswordVisible,
       decoration: InputDecoration(
         suffixIcon: IconButton(

@@ -1,2 +1,0 @@
-Apa susahnya modul Git dan Github?
-- belum susah sekali, namun awalnya sedikit bingung karena pertama kali menggunakan git dan github

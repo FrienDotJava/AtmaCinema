@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+
+enum Gender { man, female }
 
 class RegisterData extends StatefulWidget {
   const RegisterData({super.key});
@@ -15,6 +18,8 @@ class _RegisterDataState extends State<RegisterData> {
   TextEditingController nameController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   TextEditingController phoneController = TextEditingController();
+  TextEditingController dobController = TextEditingController();
+  Gender? _selectedGender;
 
   @override
   Widget build(BuildContext context) {
@@ -30,6 +35,7 @@ class _RegisterDataState extends State<RegisterData> {
         ),
       ),
       child: Scaffold(
+        resizeToAvoidBottomInset: false,
         backgroundColor: Colors.transparent,
         appBar: AppBar(
           backgroundColor: Colors.black,
@@ -90,18 +96,22 @@ class _RegisterDataState extends State<RegisterData> {
               ),
             ),
             const SizedBox(height: 30),
-            _buildGreyText("Username"),
-            _buildInputField(usernameController),
-            const SizedBox(height: 20),
-            _buildGreyText("Nama"),
+            _buildGreyText("Full Name"),
             _buildInputField(nameController),
             const SizedBox(height: 20),
             _buildGreyText("Password"),
             _buildPasswordField(passwordController),
             const SizedBox(height: 20),
-            _buildGreyText("Nomor Telepon"),
+            _buildGreyText("Phone Number"),
             _buildInputField(phoneController, isPhone: true),
-            const SizedBox(height: 70),
+            const SizedBox(height: 20),
+            _buildGreyText("Date of Birth"),
+            _buildDobField(dobController),
+            const SizedBox(height: 20),
+            _buildGreyText("Gender"),
+            const SizedBox(height: 10),
+            _buildGenderField(),
+            const SizedBox(height: 50),
             _buildRegisterButton(),
           ],
         ),
@@ -120,6 +130,9 @@ class _RegisterDataState extends State<RegisterData> {
       {bool isEmail = false, bool isPhone = false}) {
     return TextField(
       controller: controller,
+      style: TextStyle(
+        color: Colors.white,
+      ),
       keyboardType: isEmail
           ? TextInputType.emailAddress
           : isPhone
@@ -138,6 +151,9 @@ class _RegisterDataState extends State<RegisterData> {
   Widget _buildPasswordField(TextEditingController controller) {
     return TextField(
       controller: controller,
+      style: TextStyle(
+        color: Colors.white,
+      ),
       obscureText: !isPasswordVisible,
       decoration: InputDecoration(
         suffixIcon: IconButton(
@@ -151,6 +167,92 @@ class _RegisterDataState extends State<RegisterData> {
           },
         ),
       ),
+    );
+  }
+
+  Widget _buildDobField(TextEditingController controller) {
+    return TextField(
+      controller: controller,
+      style: TextStyle(
+        color: Colors.white,
+      ),
+      readOnly: true,
+      decoration: InputDecoration(
+        suffixIcon: IconButton(
+          icon: Icon(Icons.calendar_today),
+          onPressed: () {
+            _selectDate(context, controller);
+          },
+        ),
+      ),
+    );
+  }
+
+  Future<void> _selectDate(
+      BuildContext context, TextEditingController controller) async {
+    DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(1900),
+      lastDate: DateTime(2100),
+    );
+    if (pickedDate != null) {
+      String formattedDate = DateFormat('dd-MM-yyyy').format(pickedDate);
+      setState(() {
+        controller.text = formattedDate;
+      });
+    }
+  }
+
+  Widget _buildGenderField() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Radio<Gender>(
+                  value: Gender.man,
+                  groupValue: _selectedGender,
+                  onChanged: (Gender? value) {
+                    setState(() {
+                      _selectedGender = value;
+                    });
+                  },
+                ),
+                Text(
+                  "Man",
+                  style: TextStyle(
+                    color: Colors.white,
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(width: 20),
+            Row(
+              children: [
+                Radio<Gender>(
+                  value: Gender.female,
+                  groupValue: _selectedGender,
+                  onChanged: (Gender? value) {
+                    setState(() {
+                      _selectedGender = value;
+                    });
+                  },
+                ),
+                Text(
+                  "Female",
+                  style: TextStyle(
+                    color: Colors.white,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ],
     );
   }
 
