@@ -32,7 +32,7 @@ class _RegisterDataState extends State<RegisterData> {
       child: Scaffold(
         backgroundColor: Colors.transparent,
         appBar: AppBar(
-          backgroundColor: Colors.transparent,
+          backgroundColor: Colors.black,
           elevation: 0,
           leading: IconButton(
             icon: Icon(Icons.arrow_back, color: Colors.white),
@@ -43,6 +43,11 @@ class _RegisterDataState extends State<RegisterData> {
         ),
         body: Stack(
           children: [
+            Container(
+              width: mediaSize.width,
+              height: mediaSize.height,
+              color: Colors.black.withOpacity(0.5),
+            ),
             Positioned(bottom: 0, child: _buildBottom()),
           ],
         ),
@@ -54,6 +59,7 @@ class _RegisterDataState extends State<RegisterData> {
     return SizedBox(
       width: mediaSize.width,
       child: Card(
+        color: Colors.black.withOpacity(0.75),
         shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.only(
           topLeft: Radius.circular(30),
@@ -78,9 +84,9 @@ class _RegisterDataState extends State<RegisterData> {
               "Input Your Data",
               textAlign: TextAlign.center,
               style: TextStyle(
-                color: Colors.black,
+                color: Colors.white,
+                fontFamily: 'Poppins-SemiBold',
                 fontSize: 32,
-                fontWeight: FontWeight.bold,
               ),
             ),
             const SizedBox(height: 30),
@@ -158,14 +164,18 @@ class _RegisterDataState extends State<RegisterData> {
       },
       style: ElevatedButton.styleFrom(
         shape: const StadiumBorder(),
-        backgroundColor: Colors.blue,
+        backgroundColor: Colors.white,
         elevation: 20,
         shadowColor: Colors.black,
-        minimumSize: const Size.fromHeight(60),
+        minimumSize: const Size.fromHeight(50),
       ),
       child: const Text(
         "REGISTER",
-        style: TextStyle(color: Colors.black),
+        style: TextStyle(
+          color: Colors.black,
+          fontFamily: 'Poppins-Semibold',
+          fontSize: 16,
+        ),
       ),
     );
   }
