@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tubes/register_data.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -145,8 +146,9 @@ class _RegisterPageState extends State<RegisterPage> {
 
   Widget _buildContinueButton() {
     return ElevatedButton(
-      onPressed: () {
+      onPressed: () async {
         debugPrint("Email : ${emailController.text}");
+        await _saveUserData();
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => const RegisterData()),
@@ -170,5 +172,10 @@ class _RegisterPageState extends State<RegisterPage> {
         ),
       ),
     );
+  }
+
+  Future<void> _saveUserData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('email', emailController.text);
   }
 }
