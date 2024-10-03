@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:tubes/profile.dart';
+import 'package:tubes/home.dart';
 import 'package:tubes/register_email.dart';
 
 class LoginPage extends StatefulWidget {
@@ -181,7 +181,7 @@ class _LoginPageState extends State<LoginPage> {
         debugPrint("Password : ${passwordController.text}");
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => const ProfilePage()),
+          MaterialPageRoute(builder: (context) => const homePage()),
         );
       },
       style: ElevatedButton.styleFrom(
