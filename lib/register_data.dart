@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:tubes/profile.dart';
 
 enum Gender { man, female }
 
@@ -258,11 +260,18 @@ class _RegisterDataState extends State<RegisterData> {
 
   Widget _buildRegisterButton() {
     return ElevatedButton(
-      onPressed: () {
+      onPressed: () async {
         debugPrint("Username : ${usernameController.text}");
         debugPrint("Nama : ${nameController.text}");
         debugPrint("Password : ${passwordController.text}");
         debugPrint("Nomor Telepon : ${phoneController.text}");
+
+        await _saveUserData();
+
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const ProfilePage()),
+        );
       },
       style: ElevatedButton.styleFrom(
         shape: const StadiumBorder(),
@@ -280,5 +289,15 @@ class _RegisterDataState extends State<RegisterData> {
         ),
       ),
     );
+  }
+
+  Future<void> _saveUserData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('full_name', nameController.text);
+    await prefs.setString('phone_number', phoneController.text);
+    await prefs.setString('email', usernameController.text);
+    await prefs.setString('dob', dobController.text);
+    await prefs.setString(
+        'gender', _selectedGender == Gender.man ? 'Man' : 'Female');
   }
 }
