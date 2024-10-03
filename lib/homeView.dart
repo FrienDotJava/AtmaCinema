@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tubes/profile.dart';
 
 class MyHomeView extends StatefulWidget {
   const MyHomeView({super.key});
@@ -16,8 +17,13 @@ class _MyHomeViewState extends State<MyHomeView> {
           backgroundColor: Colors.black,
           actions: [
             IconButton(
-              icon: Icon(Icons.person_2_rounded),
-              onPressed: () {},
+              icon: const Icon(Icons.person_2_rounded),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const ProfilePage()),
+                );
+              },
               color: Colors.white,
               iconSize: 40,
             ),
@@ -49,10 +55,7 @@ class _MyHomeViewState extends State<MyHomeView> {
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [
-                Color(0xFF000000), // Warna awal
-                Color(0xFF000B6D) // Warna akhir
-              ],
+              colors: [Color(0xFF000000), Color(0xFF000B6D)],
               stops: [0.3, 0.7],
             ),
           ),
@@ -82,6 +85,125 @@ class _MyHomeViewState extends State<MyHomeView> {
                   fit: BoxFit.cover,
                   width: 350,
                 ),
+                const Text(
+                  'AVENGER END GAME',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8.0, vertical: 4.0),
+                      decoration: BoxDecoration(
+                        color: Colors.grey,
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                      child: const Text(
+                        '1h 20m',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8.0, vertical: 4.0),
+                      decoration: BoxDecoration(
+                        color: Colors.grey,
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                      child: const Text(
+                        '17+',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8.0, vertical: 4.0),
+                      decoration: BoxDecoration(
+                        color: Colors.grey,
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                      child: const Text(
+                        '2D',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                Column(
+                  children: [
+                    const SizedBox(height: 40),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(50.0),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF333333),
+                            borderRadius: BorderRadius.circular(20.0),
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.all(50.0),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF444444),
+                            borderRadius: BorderRadius.circular(20.0),
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.all(50.0),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF555555),
+                            borderRadius: BorderRadius.circular(20.0),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(50.0),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF333333),
+                            borderRadius: BorderRadius.circular(20.0),
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.all(50.0),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF444444),
+                            borderRadius: BorderRadius.circular(20.0),
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.all(50.0),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF555555),
+                            borderRadius: BorderRadius.circular(20.0),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                )
               ],
             ),
           ),
