@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:tubes/profile.dart';
 import 'package:tubes/homeView.dart';
+import 'package:tubes/movie_list.dart';
 
 class homePage extends StatefulWidget {
   const homePage({super.key});
@@ -23,9 +24,7 @@ class _homePageState extends State<homePage> {
       child: MyHomeView(),
     ),
     Center(
-      child: Text(
-        'Index 2 Apalah Gatau',
-      ),
+      child: ListMovieView(),
     ),
     Center(
       child: ProfilePage(),
