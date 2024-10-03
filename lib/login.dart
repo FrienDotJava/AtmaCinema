@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:tubes/profile.dart';
+import 'package:tubes/home.dart';
 import 'package:tubes/register_email.dart';
 
 class LoginPage extends StatefulWidget {
@@ -140,7 +140,7 @@ class _LoginPageState extends State<LoginPage> {
 
   Widget _buildInputField(TextEditingController controller,
       {isPassword = false}) {
-    return TextField(
+    return TextFormField(
       controller: controller,
       style: TextStyle(
         color: Colors.white,
@@ -177,12 +177,16 @@ class _LoginPageState extends State<LoginPage> {
   Widget _buildLoginButton() {
     return ElevatedButton(
       onPressed: () {
-        debugPrint("Email : ${emailController.text}");
-        debugPrint("Password : ${passwordController.text}");
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const ProfilePage()),
-        );
+        if (emailController.text.isEmpty || passwordController.text.isEmpty) {
+          _showErrorDialog();
+        } else {
+          debugPrint("Email : ${emailController.text}");
+          debugPrint("Password : ${passwordController.text}");
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const homePage()),
+          );
+        }
       },
       style: ElevatedButton.styleFrom(
         shape: RoundedRectangleBorder(
@@ -201,6 +205,26 @@ class _LoginPageState extends State<LoginPage> {
           fontSize: 16,
         ),
       ),
+    );
+  }
+
+  void _showErrorDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Error"),
+          content: const Text("Email and Password fields cannot be empty."),
+          actions: <Widget>[
+            TextButton(
+              child: const Text("OK"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 

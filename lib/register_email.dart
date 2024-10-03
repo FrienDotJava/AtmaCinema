@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tubes/register_data.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -9,6 +10,7 @@ class RegisterPage extends StatefulWidget {
 }
 
 class _RegisterPageState extends State<RegisterPage> {
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   bool isPasswordVisible = false;
   late Color myColor;
   late Size mediaSize;
@@ -81,33 +83,36 @@ class _RegisterPageState extends State<RegisterPage> {
     return Padding(
       padding: const EdgeInsets.all(10.0),
       child: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Text(
-              "Register Account",
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: Colors.white,
-                fontFamily: 'Poppins-Semibold',
-                fontSize: 32,
+        child: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text(
+                "Register Account",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontFamily: 'Poppins-Semibold',
+                  fontSize: 32,
+                ),
               ),
-            ),
-            Text(
-              "Enjoy Movie With Us",
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: Colors.white,
-                fontFamily: 'Poppins-Regular',
-                fontSize: 18,
+              Text(
+                "Enjoy Movie With Us",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontFamily: 'Poppins-Regular',
+                  fontSize: 18,
+                ),
               ),
-            ),
-            const SizedBox(height: 35),
-            _emailInput(emailController),
-            const SizedBox(height: 25),
-            _buildContinueButton(),
-            const SizedBox(height: 350),
-          ],
+              const SizedBox(height: 35),
+              _emailInput(emailController),
+              const SizedBox(height: 25),
+              _buildContinueButton(),
+              const SizedBox(height: 350),
+            ],
+          ),
         ),
       ),
     );
@@ -116,41 +121,51 @@ class _RegisterPageState extends State<RegisterPage> {
   Widget _emailInput(TextEditingController controller) {
     return SizedBox(
       width: double.infinity,
-      child: TextField(
-        style: TextStyle(
-          color: Colors.white,
-        ),
-        controller: emailController,
-        keyboardType: TextInputType.emailAddress,
-        decoration: InputDecoration(
-          labelText: "Input Your Email Address",
-          labelStyle: const TextStyle(
-              color: Colors.grey, fontFamily: 'Poppins-Regular'),
-          suffixIcon: const Icon(Icons.email, color: Colors.grey),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.zero,
+      child: TextFormField(
+          style: TextStyle(
+            color: Colors.white,
           ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.zero,
-            borderSide: const BorderSide(color: Colors.grey, width: 1.5),
+          controller: emailController,
+          keyboardType: TextInputType.emailAddress,
+          decoration: InputDecoration(
+            labelText: "Input Your Email Address",
+            labelStyle: const TextStyle(
+                color: Colors.grey, fontFamily: 'Poppins-Regular'),
+            suffixIcon: const Icon(Icons.email, color: Colors.grey),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.zero,
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.zero,
+              borderSide: const BorderSide(color: Colors.grey, width: 1.5),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.zero,
+              borderSide: const BorderSide(color: Colors.white, width: 2.0),
+            ),
           ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.zero,
-            borderSide: const BorderSide(color: Colors.white, width: 2.0),
-          ),
-        ),
-      ),
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'Email cannot be empty';
+            } else if (!value.contains('@')) {
+              return 'Enter a valid email address';
+            }
+            return null;
+          }),
     );
   }
 
   Widget _buildContinueButton() {
     return ElevatedButton(
-      onPressed: () {
+      onPressed: () async {
         debugPrint("Email : ${emailController.text}");
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const RegisterData()),
-        );
+        if (_formKey.currentState!.validate()) {
+          await _saveUserData();
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const RegisterData()),
+          );
+        }
       },
       style: ElevatedButton.styleFrom(
         shape: RoundedRectangleBorder(
@@ -170,5 +185,10 @@ class _RegisterPageState extends State<RegisterPage> {
         ),
       ),
     );
+  }
+
+  Future<void> _saveUserData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('email', emailController.text);
   }
 }
