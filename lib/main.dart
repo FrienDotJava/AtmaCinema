@@ -1,20 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:tubes/loading_screen.dart';
+import 'package:tubes/login.dart';
 
 void main() {
-  runApp(const MainApp());
+  runApp(const MyApp());
 }
 
-class MainApp extends StatelessWidget {
-  const MainApp({super.key});
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: Scaffold(
-        body: Center(
-          child: Text('Frendy-220711608'),
-        ),
-      ),
+    return MaterialApp(
+      title: 'Flutter Demo',
+      home: LoadingScreen(),
+      routes: {
+        '/home': (context) => LoginPage(),
+      },
     );
   }
 }
