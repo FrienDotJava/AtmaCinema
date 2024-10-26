@@ -111,6 +111,12 @@ class _RegisterDataState extends State<RegisterData> {
             _buildGreyText("Gender"),
             const SizedBox(height: 10),
             _buildGenderField(),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pushNamed(context, '/camera');
+              },
+              child: Text('Open Camera'),
+            ),
             const SizedBox(height: 50),
             _buildRegisterButton(),
           ],
