@@ -14,7 +14,6 @@ class _ProfilePageState extends State<ProfilePage> {
   String? phoneNumber;
   String? gender;
   String? dob;
-  String? password;
 
   @override
   void initState() {
@@ -25,115 +24,135 @@ class _ProfilePageState extends State<ProfilePage> {
   _loadUserData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
-      fullName = prefs.getString('full_name');
-      email = prefs.getString('email');
-      phoneNumber = prefs.getString('phone_number');
-      gender = prefs.getString('gender');
-      dob = prefs.getString('dob');
-      password = prefs.getString('password');
+      fullName = prefs.getString('full_name') ?? '-';
+      email = prefs.getString('email') ?? '-';
+      phoneNumber = prefs.getString('phone_number') ?? '-';
+      gender = prefs.getString('gender') ?? '-';
+      dob = prefs.getString('dob') ?? '-';
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    Size mediaSize = MediaQuery.of(context).size;
-
-    return Container(
-      decoration: BoxDecoration(
-        image: DecorationImage(
-          image: const AssetImage("images/bg5.jpg"),
-          fit: BoxFit.cover,
-        ),
+    return Scaffold(
+      backgroundColor: Colors.black,
+      appBar: AppBar(
+        backgroundColor: Colors.black,
+        elevation: 0,
+        title: const Text('Profile', style: TextStyle(color: Colors.white)),
+        centerTitle: true,
       ),
-      child: Scaffold(
-        backgroundColor: Colors.transparent,
-        appBar: AppBar(
-          backgroundColor: Colors.black,
-          elevation: 0,
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.white),
-            onPressed: () {
-              Navigator.pop(context);
-            },
-          ),
-        ),
-        body: Stack(
-          children: [
-            Container(
-              width: mediaSize.width,
-              height: mediaSize.height,
-              color: Colors.black.withOpacity(0.5),
-            ),
-            Positioned(
-              bottom: 0,
-              child: _buildProfileCard(mediaSize),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildProfileCard(Size mediaSize) {
-    return SizedBox(
-      width: mediaSize.width,
-      child: Card(
-        color: Colors.black.withOpacity(0.75),
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(30),
-            topRight: Radius.circular(30),
-          ),
-        ),
+      body: Center(
         child: Padding(
-          padding: const EdgeInsets.all(32.0),
-          child: _buildProfileDetails(),
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CircleAvatar(
+                radius: 50,
+                backgroundColor: Colors.white,
+                child: const Icon(
+                  Icons.person,
+                  size: 50,
+                  color: Colors.black,
+                ),
+              ),
+              const SizedBox(height: 20),
+              Text(
+                fullName ?? '',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 10),
+              _buildProfileDetails(),
+              const SizedBox(height: 30),
+              _buildActionButtons(),
+            ],
+          ),
         ),
       ),
     );
   }
 
   Widget _buildProfileDetails() {
+    return Container(
+      padding: const EdgeInsets.all(20.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          _buildProfileDetail('Email', email),
+          _buildProfileDetail('Phone Number', phoneNumber),
+          _buildProfileDetail('Date of Birth', dob),
+          _buildProfileDetail('Gender', gender),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildProfileDetail(String title, String? value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Column(
+        children: [
+          Text(
+            title,
+            style: const TextStyle(
+              color: Colors.white70,
+              fontSize: 16,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            value ?? '-',
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 18,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildActionButtons() {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        CircleAvatar(
-          radius: 50,
-          backgroundImage: const AssetImage('images/profile_placeholder.png'),
-        ),
-        const SizedBox(height: 20),
-        _buildGreyText('Full Name'),
-        _buildWhiteText(fullName),
+        _buildProfileButton(Icons.edit, 'Edit Profile', Colors.grey[850]),
         const SizedBox(height: 10),
-        _buildGreyText('Email'),
-        _buildWhiteText(email),
+        _buildProfileButton(Icons.lock, 'Change Password', Colors.grey[850]),
         const SizedBox(height: 10),
-        _buildGreyText('Phone Number'),
-        _buildWhiteText(phoneNumber),
-        const SizedBox(height: 10),
-        _buildGreyText('Gender'),
-        _buildWhiteText(gender),
-        const SizedBox(height: 10),
-        _buildGreyText('Date of Birth'),
-        _buildWhiteText(dob),
-        const SizedBox(height: 10),
-        _buildGreyText('Password'),
-        _buildWhiteText(password, color: Colors.red),
+        _buildProfileButton(Icons.logout, 'Logout', Colors.grey[850]),
       ],
     );
   }
 
-  Widget _buildGreyText(String text) {
-    return Text(
-      text,
-      style: const TextStyle(color: Colors.grey),
-    );
-  }
-
-  Widget _buildWhiteText(String? text, {Color color = Colors.white}) {
-    return Text(
-      text ?? '-',
-      style: TextStyle(color: color, fontSize: 18),
+  Widget _buildProfileButton(IconData icon, String label, Color? color) {
+    return ElevatedButton(
+      onPressed: () {},
+      style: ElevatedButton.styleFrom(
+        backgroundColor: color,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+        minimumSize: const Size(double.infinity, 50),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, color: Colors.white),
+          Expanded(
+            child: Text(
+              label,
+              style: const TextStyle(color: Colors.white),
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
