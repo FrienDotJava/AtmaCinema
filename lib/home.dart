@@ -29,30 +29,38 @@ class _homePageState extends State<homePage> {
     Center(
       child: ProfilePage(),
     ),
+    Center(
+      child: ProfilePage(),
+    ),
+    Center(
+      child: ProfilePage(),
+    ),
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       bottomNavigationBar: BottomNavigationBar(
+        type: BottomNavigationBarType.fixed,
         items: const [
           BottomNavigationBarItem(
-              icon: Icon(
-                Icons.home,
-              ),
+              icon: Icon(Icons.home_filled, color: Colors.black),
               label: 'Home'),
           BottomNavigationBarItem(
-              icon: Icon(
-                Icons.list,
-              ),
+              icon: Icon(Icons.movie_creation_outlined, color: Colors.black),
               label: 'List'),
           BottomNavigationBarItem(
-              icon: Icon(
-                Icons.person,
-              ),
+              icon: Icon(Icons.food_bank_outlined, color: Colors.black),
+              label: 'Profile'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.local_movies, color: Colors.black),
+              label: 'Profile'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.person_2_rounded, color: Colors.black),
               label: 'Profile'),
         ],
         currentIndex: _selectedIndex,
+        selectedItemColor: Colors.black,
         onTap: _onItemTapped,
       ),
       body: _widgetOptions.elementAt(_selectedIndex),
