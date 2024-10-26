@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:tubes/edit_profile.dart';
+import 'package:tubes/login.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -35,9 +37,9 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: const Color(0xFF04031E),
       appBar: AppBar(
-        backgroundColor: Colors.black,
+        backgroundColor: const Color(0xFF04031E),
         elevation: 0,
         title: const Text('Profile', style: TextStyle(color: Colors.white)),
         centerTitle: true,
@@ -69,7 +71,7 @@ class _ProfilePageState extends State<ProfilePage> {
               const SizedBox(height: 10),
               _buildProfileDetails(),
               const SizedBox(height: 30),
-              _buildActionButtons(),
+              _buildActionButtons(context),
             ],
           ),
         ),
@@ -118,21 +120,53 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Widget _buildActionButtons() {
+  Widget _buildActionButtons(BuildContext context) {
     return Column(
       children: [
-        _buildProfileButton(Icons.edit, 'Edit Profile', Colors.grey[850]),
+        _buildProfileButton(
+          icon: Icons.edit,
+          label: 'Edit Profile',
+          color: Colors.grey[850],
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => EditProfile()),
+            );
+          },
+        ),
         const SizedBox(height: 10),
-        _buildProfileButton(Icons.lock, 'Change Password', Colors.grey[850]),
+        _buildProfileButton(
+          icon: Icons.lock,
+          label: 'Change Password',
+          color: Colors.grey[850],
+          onPressed: () {
+            // Nanti tambah route ke page lain disini :D
+          },
+        ),
         const SizedBox(height: 10),
-        _buildProfileButton(Icons.logout, 'Logout', Colors.grey[850]),
+        _buildProfileButton(
+          icon: Icons.logout,
+          label: 'Logout',
+          color: Colors.grey[850],
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => LoginPage()),
+            );
+          },
+        ),
       ],
     );
   }
 
-  Widget _buildProfileButton(IconData icon, String label, Color? color) {
+  Widget _buildProfileButton({
+    required IconData icon,
+    required String label,
+    required Color? color,
+    required VoidCallback onPressed,
+  }) {
     return ElevatedButton(
-      onPressed: () {},
+      onPressed: onPressed,
       style: ElevatedButton.styleFrom(
         backgroundColor: color,
         shape: RoundedRectangleBorder(
