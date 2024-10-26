@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:tubes/login.dart';
+import 'package:tubes/profile.dart';
 
 enum Gender { man, female }
 
@@ -14,12 +17,13 @@ class _RegisterDataState extends State<RegisterData> {
   bool isPasswordVisible = false;
   late Color myColor;
   late Size mediaSize;
-  TextEditingController usernameController = TextEditingController();
+  // TextEditingController emailController = TextEditingController();
   TextEditingController nameController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   TextEditingController phoneController = TextEditingController();
   TextEditingController dobController = TextEditingController();
   Gender? _selectedGender;
+  String? email;
 
   @override
   Widget build(BuildContext context) {
@@ -111,6 +115,12 @@ class _RegisterDataState extends State<RegisterData> {
             _buildGreyText("Gender"),
             const SizedBox(height: 10),
             _buildGenderField(),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pushNamed(context, '/camera');
+              },
+              child: Text('Open Camera'),
+            ),
             const SizedBox(height: 50),
             _buildRegisterButton(),
           ],
@@ -258,11 +268,18 @@ class _RegisterDataState extends State<RegisterData> {
 
   Widget _buildRegisterButton() {
     return ElevatedButton(
-      onPressed: () {
-        debugPrint("Username : ${usernameController.text}");
-        debugPrint("Nama : ${nameController.text}");
-        debugPrint("Password : ${passwordController.text}");
-        debugPrint("Nomor Telepon : ${phoneController.text}");
+      onPressed: () async {
+        // debugPrint("Username : ${usernameController.text}");
+        // debugPrint("Nama : ${nameController.text}");
+        // debugPrint("Password : ${passwordController.text}");
+        // debugPrint("Nomor Telepon : ${phoneController.text}");
+
+        await _saveUserData();
+
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const LoginPage()),
+        );
       },
       style: ElevatedButton.styleFrom(
         shape: const StadiumBorder(),
@@ -280,5 +297,23 @@ class _RegisterDataState extends State<RegisterData> {
         ),
       ),
     );
+  }
+
+  Future<void> _saveUserData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('full_name', nameController.text);
+    await prefs.setString('phone_number', phoneController.text);
+    // await prefs.setString('email', emailController.text);
+    await prefs.getString('email');
+    await prefs.setString('dob', dobController.text);
+    await prefs.setString(
+        'gender', _selectedGender == Gender.man ? 'Man' : 'Female');
+  }
+
+  _loadUserData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      email = prefs.getString('email');
+    });
   }
 }
