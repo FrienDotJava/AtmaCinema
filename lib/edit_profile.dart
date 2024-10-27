@@ -85,11 +85,21 @@ class _EditProfileState extends State<EditProfile> {
         Positioned(
           right: 0,
           bottom: 0,
-          child: CircleAvatar(
-            radius: 15,
-            backgroundColor: const Color(0xFF04031E),
-            child: const Icon(Icons.edit, size: 15, color: Colors.white),
-          ),
+            child: Container(
+              width: 35, // Set the width to control the circle's diameter
+              height: 35,
+              decoration: BoxDecoration(
+                color: Colors.black,
+                shape: BoxShape.circle,
+              ),
+              child: IconButton(
+                onPressed: () {
+                  Navigator.pushNamed(context, '/camera');
+                },
+                icon: const Icon(Icons.edit, size: 15, color: Colors.white),
+              ),
+            )
+
         ),
       ],
     );
