@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:tubes/loading_screen.dart';
 import 'package:tubes/login.dart';
+import 'package:camera/camera.dart';
+import 'package:tubes/camera_screen.dart';
 
-void main() {
+List<CameraDescription> cameras = [];
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  cameras = await availableCameras();
   runApp(const MyApp());
 }
 
@@ -16,6 +21,7 @@ class MyApp extends StatelessWidget {
       home: LoadingScreen(),
       routes: {
         '/home': (context) => LoginPage(),
+        '/camera': (context) => CameraScreen(cameras: cameras),
       },
     );
   }
