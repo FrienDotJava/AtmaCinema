@@ -1,1 +1,0 @@
-Susahnya modul Git dan Github adalah memahami istilah-istilah baru yang asing didengar seperti push, pull, commit, dll.
