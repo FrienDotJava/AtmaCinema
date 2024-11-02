@@ -1,8 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:tubes/movieDetail.dart';
 import 'movie.dart';
 
-class ListMovieView extends StatelessWidget {
+class ListMovieView extends StatefulWidget {
   const ListMovieView({super.key});
+
+  @override
+  _ListMovieViewState createState() => _ListMovieViewState();
+}
+
+class _ListMovieViewState extends State<ListMovieView> {
+  bool showNowPlaying = true;
 
   @override
   Widget build(BuildContext context) {
@@ -23,9 +31,29 @@ class ListMovieView extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                FilterButton(label: "Now Playing", isSelected: true),
+                GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      showNowPlaying = true;
+                    });
+                  },
+                  child: FilterButton(
+                    label: "Now Playing",
+                    isSelected: showNowPlaying,
+                  ),
+                ),
                 const SizedBox(width: 8),
-                FilterButton(label: "Coming Soon", isSelected: false),
+                GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      showNowPlaying = false;
+                    });
+                  },
+                  child: FilterButton(
+                    label: "Coming Soon",
+                    isSelected: !showNowPlaying,
+                  ),
+                ),
               ],
             ),
           ),
@@ -41,9 +69,7 @@ class ListMovieView extends StatelessWidget {
                 prefixIcon: const Icon(Icons.search, color: Colors.grey),
                 suffixIcon: IconButton(
                   icon: const Icon(Icons.mic, color: Colors.grey),
-                  onPressed: () {
-                    // Tambahkan fungsi untuk mikrofon jika diperlukan
-                  },
+                  onPressed: () {},
                 ),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(30),
@@ -54,7 +80,10 @@ class ListMovieView extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Expanded(
-            child: MovieGrid(),
+            child: MovieGrid(
+              movies: showNowPlaying ? nowPlayingMovies : comingSoonMovies,
+              isComingSoon: !showNowPlaying,
+            ),
           ),
         ],
       ),
@@ -66,8 +95,11 @@ class FilterButton extends StatelessWidget {
   final String label;
   final bool isSelected;
 
-  const FilterButton(
-      {required this.label, required this.isSelected, super.key});
+  const FilterButton({
+    required this.label,
+    required this.isSelected,
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -88,6 +120,15 @@ class FilterButton extends StatelessWidget {
 }
 
 class MovieGrid extends StatelessWidget {
+  final List<Movie> movies;
+  final bool isComingSoon;
+
+  const MovieGrid({
+    required this.movies,
+    required this.isComingSoon,
+    super.key,
+  });
+
   @override
   Widget build(BuildContext context) {
     return GridView.builder(
@@ -101,7 +142,7 @@ class MovieGrid extends StatelessWidget {
       itemCount: movies.length,
       itemBuilder: (context, index) {
         final movie = movies[index];
-        return MovieCard(movie: movie);
+        return MovieCard(movie: movie, isComingSoon: isComingSoon);
       },
     );
   }
@@ -109,79 +150,64 @@ class MovieGrid extends StatelessWidget {
 
 class MovieCard extends StatelessWidget {
   final Movie movie;
+  final bool isComingSoon;
 
-  const MovieCard({required this.movie, super.key});
+  const MovieCard({
+    required this.movie,
+    required this.isComingSoon,
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.grey[850],
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          ClipRRect(
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(10)),
-            child: Image.asset(
-              movie.posterUrl,
-              height: 200,
-              fit: BoxFit.cover,
-            ),
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) =>
+                MovieDetailPage(movie: movie, isComingSoon: isComingSoon),
           ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Text(
-                  movie.title,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 8),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Row(
-                      children: const [
-                        Icon(Icons.access_time, color: Colors.grey, size: 14),
-                        SizedBox(width: 4),
-                        Text("1h 20m",
-                            style:
-                                TextStyle(color: Colors.white, fontSize: 12)),
-                      ],
-                    ),
-                    Row(
-                      children: const [
-                        Icon(Icons.visibility, color: Colors.grey, size: 14),
-                        SizedBox(width: 4),
-                        Text("17+",
-                            style:
-                                TextStyle(color: Colors.white, fontSize: 12)),
-                      ],
-                    ),
-                    Row(
-                      children: const [
-                        Icon(Icons.theaters, color: Colors.grey, size: 14),
-                        SizedBox(width: 4),
-                        Text("2D",
-                            style:
-                                TextStyle(color: Colors.white, fontSize: 12)),
-                      ],
-                    ),
-                  ],
-                ),
-              ],
+        );
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.grey[850],
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            ClipRRect(
+              borderRadius:
+                  const BorderRadius.vertical(top: Radius.circular(10)),
+              child: Image.asset(
+                movie.posterUrl,
+                height: 200,
+                fit: BoxFit.cover,
+              ),
             ),
-          ),
-        ],
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(
+                    movie.title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 8),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
