@@ -1,21 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:tubes/login.dart';
-import 'package:tubes/register_otp.dart';
+import 'package:tubes/register_email.dart';
+import 'package:tubes/register_data.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class RegisterPage extends StatefulWidget {
-  const RegisterPage({super.key});
+class RegisterOTPPage extends StatefulWidget {
+  const RegisterOTPPage({super.key});
 
   @override
-  State<RegisterPage> createState() => _RegisterPageState();
+  State<RegisterOTPPage> createState() => _RegisterOTPPageState();
 }
 
-class _RegisterPageState extends State<RegisterPage> {
+class _RegisterOTPPageState extends State<RegisterOTPPage> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  bool isPasswordVisible = false;
   late Color myColor;
   late Size mediaSize;
-  TextEditingController emailController = TextEditingController();
+  TextEditingController otpController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -49,7 +49,7 @@ class _RegisterPageState extends State<RegisterPage> {
           onPressed: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => const LoginPage()),
+              MaterialPageRoute(builder: (context) => const RegisterPage()),
             );
           },
         ),
@@ -94,14 +94,14 @@ class _RegisterPageState extends State<RegisterPage> {
           ),
           child: Padding(
             padding: const EdgeInsets.all(15.0),
-            child: _buildInputRegister(),
+            child: _buildInputOTP(),
           ),
         ),
       ),
     );
   }
 
-  Widget _buildInputRegister() {
+  Widget _buildInputOTP() {
     return Padding(
       padding: const EdgeInsets.all(15.0),
       child: Form(
@@ -109,18 +109,18 @@ class _RegisterPageState extends State<RegisterPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              "Register Account",
-              textAlign: TextAlign.center,
-              style: const TextStyle(
+            const Text(
+              "Email Verification",
+              textAlign: TextAlign.start,
+              style: TextStyle(
                 color: Colors.white,
                 fontFamily: 'Poppins-SemiBold',
                 fontSize: 32,
               ),
             ),
             const Text(
-              "Enjoy Movie With Us",
-              textAlign: TextAlign.center,
+              "We’ve send a verification code to your email",
+              textAlign: TextAlign.start,
               style: TextStyle(
                 color: Colors.white,
                 fontFamily: 'Poppins-Light',
@@ -128,12 +128,14 @@ class _RegisterPageState extends State<RegisterPage> {
               ),
             ),
             const SizedBox(height: 40),
-            _buildGreyText("Email Address"),
+            _buildGreyText("OTP Code"),
             const SizedBox(height: 5),
-            _emailInput(emailController),
+            _otpInput(otpController),
             const SizedBox(height: 40),
-            _buildContinueButton(),
-            const SizedBox(height: 300),
+            _buildVerifyButton(),
+            const SizedBox(height: 20),
+            _buildResendOTP(),
+            const SizedBox(height: 230),
             _buildLoginLink(),
             const SizedBox(height: 20),
           ],
@@ -153,7 +155,7 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
-  Widget _emailInput(TextEditingController controller) {
+  Widget _otpInput(TextEditingController controller) {
     return SizedBox(
       width: double.infinity,
       child: TextFormField(
@@ -162,20 +164,20 @@ class _RegisterPageState extends State<RegisterPage> {
           fontFamily: 'Poppins-Regular',
         ),
         controller: controller,
-        keyboardType: TextInputType.emailAddress,
+        keyboardType: TextInputType.number,
         decoration: InputDecoration(
-          hintText: 'Enter your email',
+          hintText: 'Enter OTP code',
           hintStyle: const TextStyle(
             color: Colors.grey,
             fontFamily: 'Poppins-Light',
           ),
-          suffixIcon: const Icon(Icons.email, color: Colors.white70),
+          suffixIcon: const Icon(Icons.lock, color: Colors.white70),
         ),
         validator: (value) {
           if (value == null || value.isEmpty) {
-            return 'Email cannot be empty';
-          } else if (!value.contains('@')) {
-            return 'Enter a valid email address';
+            return 'OTP cannot be empty';
+          } else if (value.length != 6) {
+            return 'OTP must be 6 digits';
           }
           return null;
         },
@@ -183,15 +185,15 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
-  Widget _buildContinueButton() {
+  Widget _buildVerifyButton() {
     return ElevatedButton(
       onPressed: () async {
-        debugPrint("Email : ${emailController.text}");
+        debugPrint("OTP : ${otpController.text}");
         if (_formKey.currentState!.validate()) {
-          await _saveUserData();
+          await _saveOTPData();
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => const RegisterOTPPage()),
+            MaterialPageRoute(builder: (context) => const RegisterData()),
           );
         }
       },
@@ -205,11 +207,44 @@ class _RegisterPageState extends State<RegisterPage> {
         minimumSize: const Size.fromHeight(50),
       ),
       child: const Text(
-        "CONTINUE",
+        "VERIFY",
         style: TextStyle(
           color: Colors.black,
           fontFamily: 'Poppins-SemiBold',
           fontSize: 16,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildResendOTP() {
+    return Center(
+      child: TextButton(
+        onPressed: () {
+          // Navigator.push(
+          //   context,
+          //   MaterialPageRoute(builder: (context) => const LoginPage()),
+          // );
+        },
+        child: RichText(
+          text: TextSpan(
+            text: "Didn’t receive code? ",
+            style: const TextStyle(
+              color: Colors.white,
+              fontFamily: 'Poppins-Regular',
+              fontSize: 14,
+            ),
+            children: [
+              TextSpan(
+                text: "Resend Code",
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontFamily: 'Poppins-SemiBold',
+                  fontSize: 16,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -226,7 +261,7 @@ class _RegisterPageState extends State<RegisterPage> {
         },
         child: RichText(
           text: TextSpan(
-            text: "Already have any account? ",
+            text: "Already have an account? ",
             style: const TextStyle(
               color: Colors.white,
               fontFamily: 'Poppins-Regular',
@@ -248,8 +283,8 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
-  Future<void> _saveUserData() async {
+  Future<void> _saveOTPData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setString('email', emailController.text);
+    await prefs.setString('otp', otpController.text);
   }
 }
