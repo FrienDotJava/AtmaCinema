@@ -21,32 +21,24 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     myColor = Colors.white12;
     mediaSize = MediaQuery.of(context).size;
+
     return Container(
       decoration: BoxDecoration(
-        color: myColor,
-        image: DecorationImage(
-          image: const AssetImage("images/bg2.jpg"),
-          fit: BoxFit.cover,
-        ),
+        color: Colors.black,
       ),
       child: Scaffold(
         resizeToAvoidBottomInset: false,
         backgroundColor: Colors.transparent,
-        body: Stack(children: [
-          Container(
-            width: mediaSize.width,
-            height: mediaSize.height,
-            color: Colors.black.withOpacity(0.6),
-          ),
-          Positioned(
-            top: 80,
-            child: _buildTop(),
-          ),
-          Positioned(
-            bottom: 0,
-            child: _buildBottom(),
-          ),
-        ]),
+        body: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(top: 32.0, left: 20.0),
+              child: _buildTop(),
+            ),
+            _buildBottom(),
+          ],
+        ),
       ),
     );
   }
@@ -54,122 +46,213 @@ class _LoginPageState extends State<LoginPage> {
   Widget _buildTop() {
     return SizedBox(
       width: mediaSize.width,
-      child: const Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            Icons.movie_creation,
-            size: 100,
-            color: Colors.white,
-          ),
-          Text(
-            "ATMA Cinema",
-            style: TextStyle(
-                color: Colors.white,
-                fontFamily: 'Poppins-Semibold',
-                fontWeight: FontWeight.bold,
-                fontSize: 36,
-                letterSpacing: 0),
-          )
-        ],
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            RichText(
+              text: const TextSpan(
+                children: [
+                  TextSpan(
+                    text: "ATMA ",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontFamily: 'Poppins-Bold',
+                      fontSize: 28,
+                    ),
+                  ),
+                  TextSpan(
+                    text: "Cinema",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontFamily: 'Poppins-Regular',
+                      fontSize: 28,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 
   Widget _buildBottom() {
-    return SizedBox(
-      width: mediaSize.width,
-      child: Card(
-        color: Colors.black.withOpacity(0.75),
-        shape: const RoundedRectangleBorder(
+    return Container(
+      margin: const EdgeInsets.only(left: 15, right: 15, top: 15),
+      child: SizedBox(
+        width: mediaSize.width,
+        child: Card(
+          color: const Color(0xFF0A2038),
+          shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(30),
-          topRight: Radius.circular(30),
-        )),
-        child: Padding(
-          padding: const EdgeInsets.all(32.0),
-          child: _buildForm(),
+              topLeft: Radius.circular(30),
+              topRight: Radius.circular(30),
+            ),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(15.0),
+            child: _buildForm(),
+          ),
         ),
       ),
     );
   }
 
   Widget _buildForm() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          "Welcome",
-          style: TextStyle(
-              color: Colors.white,
-              fontFamily: 'Poppins-SemiBold',
-              fontSize: 32),
-        ),
-        _buildWhiteText("Please login with your information"),
-        const SizedBox(height: 20),
-        _buildGreyText("Email address"),
-        _buildInputField(emailController),
-        const SizedBox(height: 20),
-        _buildGreyText("Password"),
-        _buildPasswordField(passwordController),
-        const SizedBox(height: 20),
-        _buildRememberForgot(),
-        const SizedBox(height: 20),
-        _buildLoginButton(),
-        const SizedBox(height: 20),
-        _buildOtherLogin(),
-        const SizedBox(height: 20),
-        _buildRegisterLink(),
-      ],
+    return Padding(
+      padding: const EdgeInsets.all(15.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildTitleText("Welcome"),
+          _buildWhiteText("Please login with your account"),
+          const SizedBox(height: 50),
+          _buildGreyText("Email Address"),
+          const SizedBox(height: 5),
+          _buildInputField(emailController),
+          const SizedBox(height: 20),
+          _buildGreyText("Password"),
+          _buildPasswordField(passwordController),
+          const SizedBox(height: 20),
+          _buildRememberForgot(),
+          const SizedBox(height: 20),
+          _buildLoginButton(),
+          const SizedBox(height: 30),
+          _buildOtherLogin(),
+          const SizedBox(height: 20),
+          _buildRegisterLink(),
+          const SizedBox(height: 20),
+        ],
+      ),
     );
   }
 
-  Widget _buildGreyText(String text) {
+  Widget _buildTitleText(String text) {
     return Text(
       text,
-      style: const TextStyle(color: Colors.grey),
+      style: const TextStyle(
+        color: Colors.white,
+        fontFamily: 'Poppins-SemiBold',
+        fontSize: 32,
+      ),
     );
   }
 
   Widget _buildWhiteText(String text) {
     return Text(
       text,
-      style: const TextStyle(color: Colors.white),
+      style: const TextStyle(
+        color: Colors.white,
+        fontFamily: 'Poppins-Light',
+        fontSize: 16,
+      ),
+    );
+  }
+
+  Widget _buildGreyText(String text) {
+    return Text(
+      text,
+      style: const TextStyle(
+        color: Colors.grey,
+        fontFamily: 'Poppins-Regular',
+      ),
     );
   }
 
   Widget _buildInputField(TextEditingController controller,
-      {isPassword = false}) {
+      {bool isPassword = false}) {
     return TextFormField(
       controller: controller,
-      style: TextStyle(
+      style: const TextStyle(
         color: Colors.white,
+        fontFamily: 'Poppins-Regular',
       ),
       decoration: InputDecoration(
-        suffixIcon: isPassword ? Icon(Icons.remove_red_eye) : Icon(Icons.done),
+        hintText: isPassword ? 'Enter your password' : 'Enter your email',
+        hintStyle: const TextStyle(
+          color: Colors.grey,
+          fontFamily: 'Poppins-Light',
+        ),
+        suffixIcon: isPassword
+            ? IconButton(
+                icon: Icon(
+                  isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                  color: Colors.white70,
+                ),
+                onPressed: () {
+                  setState(() {
+                    isPasswordVisible = !isPasswordVisible;
+                  });
+                },
+              )
+            : Icon(Icons.email, color: Colors.white70),
       ),
       obscureText: isPassword,
     );
   }
 
+  Widget _buildPasswordField(TextEditingController controller) {
+    return TextField(
+      controller: controller,
+      style: const TextStyle(
+        color: Colors.white,
+      ),
+      obscureText: !isPasswordVisible,
+      decoration: InputDecoration(
+        hintText: 'Enter your password',
+        hintStyle: const TextStyle(
+          color: Colors.grey,
+          fontFamily: 'Poppins-Light',
+        ),
+        suffixIcon: IconButton(
+          icon: Icon(
+            isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+            color: Colors.white70,
+          ),
+          onPressed: () {
+            setState(() {
+              isPasswordVisible = !isPasswordVisible;
+            });
+          },
+        ),
+      ),
+    );
+  }
+
   Widget _buildRememberForgot() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           children: [
             Checkbox(
-                value: rememberUser,
-                onChanged: (value) {
-                  setState(() {
-                    rememberUser = value!;
-                  });
-                }),
+              value: rememberUser,
+              onChanged: (value) {
+                setState(() {
+                  rememberUser = value!;
+                });
+              },
+            ),
             _buildGreyText("Remember me"),
           ],
         ),
-        TextButton(
-            onPressed: () {}, child: _buildGreyText("I forgot my password"))
+        Center(
+          child: TextButton(
+            onPressed: () {},
+            child: const Text(
+              "Forget Password?",
+              style: TextStyle(
+                color: Colors.white,
+                fontFamily: 'Poppins-Regular',
+                decoration: TextDecoration.underline,
+              ),
+            ),
+          ),
+        ),
       ],
     );
   }
@@ -193,38 +276,17 @@ class _LoginPageState extends State<LoginPage> {
           borderRadius: BorderRadius.circular(18),
         ),
         backgroundColor: Colors.white,
-        elevation: 20,
-        shadowColor: Colors.white30,
+        elevation: 5,
         minimumSize: const Size.fromHeight(50),
       ),
       child: const Text(
         "LOGIN",
         style: TextStyle(
           color: Colors.black,
-          fontFamily: 'Poppins-Semibold',
+          fontFamily: 'Poppins-SemiBold',
           fontSize: 16,
         ),
       ),
-    );
-  }
-
-  void _showErrorDialog() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text("Error"),
-          content: const Text("Email and Password fields cannot be empty."),
-          actions: <Widget>[
-            TextButton(
-              child: const Text("OK"),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
     );
   }
 
@@ -232,16 +294,25 @@ class _LoginPageState extends State<LoginPage> {
     return Center(
       child: Column(
         children: [
-          _buildGreyText("Or Login with"),
-          const SizedBox(height: 10),
+          _buildGreyText("Login with"),
+          const SizedBox(height: 15),
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Tab(icon: Image.asset("images/google.png")),
-              Tab(icon: Image.asset("images/facebook.png")),
-              Tab(icon: Image.asset("images/twitter.png")),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 15),
+                child: Image.asset("images/google.png", height: 40),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 15),
+                child: Image.asset("images/facebook.png", height: 40),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 15),
+                child: Image.asset("images/twitter.png", height: 40),
+              ),
             ],
-          )
+          ),
         ],
       ),
     );
@@ -268,8 +339,8 @@ class _LoginPageState extends State<LoginPage> {
               TextSpan(
                 text: "Register",
                 style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontFamily: 'Poppins-Semibold',
+                  color: Colors.white,
+                  fontFamily: 'Poppins-SemiBold',
                   fontSize: 16,
                 ),
               ),
@@ -280,25 +351,23 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Widget _buildPasswordField(TextEditingController controller) {
-    return TextField(
-      controller: controller,
-      style: TextStyle(
-        color: Colors.white,
-      ),
-      obscureText: !isPasswordVisible,
-      decoration: InputDecoration(
-        suffixIcon: IconButton(
-          icon: Icon(
-            isPasswordVisible ? Icons.visibility : Icons.visibility_off,
-          ),
-          onPressed: () {
-            setState(() {
-              isPasswordVisible = !isPasswordVisible;
-            });
-          },
-        ),
-      ),
+  void _showErrorDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Error"),
+          content: const Text("Email and Password fields cannot be empty."),
+          actions: <Widget>[
+            TextButton(
+              child: const Text("OK"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 }

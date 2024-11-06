@@ -64,17 +64,21 @@ flutter:
     - images/
 
   fonts:
+    - family: "Poppins-Bold"
+      fonts:
+        - asset: fonts/Poppins-Bold.ttf
+
     - family: "Poppins-SemiBold"
       fonts:
         - asset: fonts/Poppins-SemiBold.ttf
 
-    - family: "Poppins-Light"
-      fonts:
-        - asset: fonts/Poppins-Light.ttf
-
     - family: "Poppins-Regular"
       fonts:
         - asset: fonts/Poppins-Regular.ttf
+
+    - family: "Poppins-Light"
+      fonts:
+        - asset: fonts/Poppins-Light.ttf
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
