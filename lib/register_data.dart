@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tubes/login.dart';
-import 'package:tubes/profile.dart';
+import 'package:tubes/register_otp.dart';
 
 enum Gender { man, female }
 
@@ -17,7 +17,6 @@ class _RegisterDataState extends State<RegisterData> {
   bool isPasswordVisible = false;
   late Color myColor;
   late Size mediaSize;
-  // TextEditingController emailController = TextEditingController();
   TextEditingController nameController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   TextEditingController phoneController = TextEditingController();
@@ -27,57 +26,83 @@ class _RegisterDataState extends State<RegisterData> {
 
   @override
   Widget build(BuildContext context) {
-    myColor = Colors.white12;
+    myColor = Colors.black;
     mediaSize = MediaQuery.of(context).size;
 
     return Container(
-      decoration: BoxDecoration(
-        color: myColor,
-        image: DecorationImage(
-          image: const AssetImage("images/bg5.jpg"),
-          fit: BoxFit.cover,
-        ),
-      ),
+      decoration: BoxDecoration(color: myColor),
       child: Scaffold(
         resizeToAvoidBottomInset: false,
         backgroundColor: Colors.transparent,
-        appBar: AppBar(
-          backgroundColor: Colors.black,
-          elevation: 0,
-          leading: IconButton(
-            icon: Icon(Icons.arrow_back, color: Colors.white),
-            onPressed: () {
-              Navigator.pop(context);
-            },
-          ),
-        ),
-        body: Stack(
+        body: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Container(
-              width: mediaSize.width,
-              height: mediaSize.height,
-              color: Colors.black.withOpacity(0.5),
+            Padding(
+              padding: const EdgeInsets.only(top: 32.0, left: 5.0),
+              child: _buildTop(),
             ),
-            Positioned(bottom: 0, child: _buildBottom()),
+            _buildBottom(),
           ],
         ),
       ),
     );
   }
 
+  Widget _buildTop() {
+    return Row(
+      children: [
+        IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const RegisterOTPPage()),
+            );
+          },
+        ),
+        RichText(
+          text: const TextSpan(
+            children: [
+              TextSpan(
+                text: "ATMA ",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontFamily: 'Poppins-Bold',
+                  fontSize: 28,
+                ),
+              ),
+              TextSpan(
+                text: "Cinema",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontFamily: 'Poppins-Regular',
+                  fontSize: 28,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _buildBottom() {
-    return SizedBox(
-      width: mediaSize.width,
-      child: Card(
-        color: Colors.black.withOpacity(0.75),
-        shape: const RoundedRectangleBorder(
+    return Container(
+      margin: const EdgeInsets.only(left: 15, right: 15, top: 15),
+      child: SizedBox(
+        width: mediaSize.width,
+        child: Card(
+          color: const Color(0xFF0A2038),
+          shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(30),
-          topRight: Radius.circular(30),
-        )),
-        child: Padding(
-          padding: const EdgeInsets.all(32.0),
-          child: _buildInputRegister(),
+              topLeft: Radius.circular(30),
+              topRight: Radius.circular(30),
+            ),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(15.0),
+            child: _buildInputRegister(),
+          ),
         ),
       ),
     );
@@ -85,29 +110,41 @@ class _RegisterDataState extends State<RegisterData> {
 
   Widget _buildInputRegister() {
     return Padding(
-      padding: const EdgeInsets.all(8.0),
+      padding: const EdgeInsets.all(15.0),
       child: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              "Input Your Data",
-              textAlign: TextAlign.center,
+            const Text(
+              "User Information",
+              textAlign: TextAlign.start,
               style: TextStyle(
                 color: Colors.white,
                 fontFamily: 'Poppins-SemiBold',
                 fontSize: 32,
               ),
             ),
+            const Text(
+              "Please input your information",
+              textAlign: TextAlign.start,
+              style: TextStyle(
+                color: Colors.white,
+                fontFamily: 'Poppins-Light',
+                fontSize: 16,
+              ),
+            ),
             const SizedBox(height: 30),
-            _buildGreyText("Full Name"),
-            _buildInputField(nameController),
+            _buildGreyText("First Name"),
+            _buildFirstNameField(nameController),
+            const SizedBox(height: 20),
+            _buildGreyText("Last Name"),
+            _buildLastNameField(nameController),
             const SizedBox(height: 20),
             _buildGreyText("Password"),
             _buildPasswordField(passwordController),
             const SizedBox(height: 20),
             _buildGreyText("Phone Number"),
-            _buildInputField(phoneController, isPhone: true),
+            _buildPhoneField(phoneController, isPhone: true),
             const SizedBox(height: 20),
             _buildGreyText("Date of Birth"),
             _buildDobField(dobController),
@@ -115,8 +152,9 @@ class _RegisterDataState extends State<RegisterData> {
             _buildGreyText("Gender"),
             const SizedBox(height: 10),
             _buildGenderField(),
-            const SizedBox(height: 50),
+            const SizedBox(height: 30),
             _buildRegisterButton(),
+            const SizedBox(height: 20),
           ],
         ),
       ),
@@ -126,16 +164,21 @@ class _RegisterDataState extends State<RegisterData> {
   Widget _buildGreyText(String text) {
     return Text(
       text,
-      style: const TextStyle(color: Colors.grey),
+      textAlign: TextAlign.left,
+      style: const TextStyle(
+        color: Colors.grey,
+        fontFamily: 'Poppins-Regular',
+      ),
     );
   }
 
-  Widget _buildInputField(TextEditingController controller,
+  Widget _buildFirstNameField(TextEditingController controller,
       {bool isEmail = false, bool isPhone = false}) {
     return TextField(
       controller: controller,
       style: TextStyle(
         color: Colors.white,
+        fontFamily: 'Poppins-Regular',
       ),
       keyboardType: isEmail
           ? TextInputType.emailAddress
@@ -143,6 +186,67 @@ class _RegisterDataState extends State<RegisterData> {
               ? TextInputType.phone
               : TextInputType.text,
       decoration: InputDecoration(
+        hintText: 'Enter first name',
+        hintStyle: const TextStyle(
+          color: Colors.grey,
+          fontFamily: 'Poppins-Light',
+        ),
+        suffixIcon: isEmail
+            ? const Icon(Icons.email)
+            : isPhone
+                ? const Icon(Icons.phone)
+                : const Icon(Icons.person),
+      ),
+    );
+  }
+
+  Widget _buildLastNameField(TextEditingController controller,
+      {bool isEmail = false, bool isPhone = false}) {
+    return TextField(
+      controller: controller,
+      style: TextStyle(
+        color: Colors.white,
+        fontFamily: 'Poppins-Regular',
+      ),
+      keyboardType: isEmail
+          ? TextInputType.emailAddress
+          : isPhone
+              ? TextInputType.phone
+              : TextInputType.text,
+      decoration: InputDecoration(
+        hintText: 'Enter last name',
+        hintStyle: const TextStyle(
+          color: Colors.grey,
+          fontFamily: 'Poppins-Light',
+        ),
+        suffixIcon: isEmail
+            ? const Icon(Icons.email)
+            : isPhone
+                ? const Icon(Icons.phone)
+                : const Icon(Icons.person),
+      ),
+    );
+  }
+
+  Widget _buildPhoneField(TextEditingController controller,
+      {bool isEmail = false, bool isPhone = false}) {
+    return TextField(
+      controller: controller,
+      style: TextStyle(
+        color: Colors.white,
+        fontFamily: 'Poppins-Regular',
+      ),
+      keyboardType: isEmail
+          ? TextInputType.emailAddress
+          : isPhone
+              ? TextInputType.phone
+              : TextInputType.text,
+      decoration: InputDecoration(
+        hintText: 'Enter phone number',
+        hintStyle: const TextStyle(
+          color: Colors.grey,
+          fontFamily: 'Poppins-Light',
+        ),
         suffixIcon: isEmail
             ? const Icon(Icons.email)
             : isPhone
@@ -160,6 +264,11 @@ class _RegisterDataState extends State<RegisterData> {
       ),
       obscureText: !isPasswordVisible,
       decoration: InputDecoration(
+        hintText: 'Enter password',
+        hintStyle: const TextStyle(
+          color: Colors.grey,
+          fontFamily: 'Poppins-Light',
+        ),
         suffixIcon: IconButton(
           icon: Icon(
             isPasswordVisible ? Icons.visibility : Icons.visibility_off,
@@ -182,6 +291,11 @@ class _RegisterDataState extends State<RegisterData> {
       ),
       readOnly: true,
       decoration: InputDecoration(
+        hintText: 'Select your date of birth',
+        hintStyle: const TextStyle(
+          color: Colors.grey,
+          fontFamily: 'Poppins-Light',
+        ),
         suffixIcon: IconButton(
           icon: Icon(Icons.calendar_today),
           onPressed: () {
@@ -230,6 +344,7 @@ class _RegisterDataState extends State<RegisterData> {
                   "Man",
                   style: TextStyle(
                     color: Colors.white,
+                    fontFamily: 'Poppins-Light',
                   ),
                 ),
               ],
@@ -250,6 +365,7 @@ class _RegisterDataState extends State<RegisterData> {
                   "Female",
                   style: TextStyle(
                     color: Colors.white,
+                    fontFamily: 'Poppins-Light',
                   ),
                 ),
               ],
@@ -263,11 +379,6 @@ class _RegisterDataState extends State<RegisterData> {
   Widget _buildRegisterButton() {
     return ElevatedButton(
       onPressed: () async {
-        // debugPrint("Username : ${usernameController.text}");
-        // debugPrint("Nama : ${nameController.text}");
-        // debugPrint("Password : ${passwordController.text}");
-        // debugPrint("Nomor Telepon : ${phoneController.text}");
-
         await _saveUserData();
 
         Navigator.push(
@@ -297,7 +408,6 @@ class _RegisterDataState extends State<RegisterData> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString('full_name', nameController.text);
     await prefs.setString('phone_number', phoneController.text);
-    // await prefs.setString('email', emailController.text);
     await prefs.getString('email');
     await prefs.setString('dob', dobController.text);
     await prefs.setString(
