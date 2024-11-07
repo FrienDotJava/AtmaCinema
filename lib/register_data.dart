@@ -17,7 +17,8 @@ class _RegisterDataState extends State<RegisterData> {
   bool isPasswordVisible = false;
   late Color myColor;
   late Size mediaSize;
-  TextEditingController nameController = TextEditingController();
+  TextEditingController firstNameController = TextEditingController();
+  TextEditingController lastNameController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   TextEditingController phoneController = TextEditingController();
   TextEditingController dobController = TextEditingController();
@@ -135,10 +136,10 @@ class _RegisterDataState extends State<RegisterData> {
             ),
             const SizedBox(height: 30),
             _buildGreyText("First Name"),
-            _buildFirstNameField(nameController),
+            _buildFirstNameField(firstNameController),
             const SizedBox(height: 20),
             _buildGreyText("Last Name"),
-            _buildLastNameField(nameController),
+            _buildLastNameField(lastNameController),
             const SizedBox(height: 20),
             _buildGreyText("Password"),
             _buildPasswordField(passwordController),
@@ -406,7 +407,8 @@ class _RegisterDataState extends State<RegisterData> {
 
   Future<void> _saveUserData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setString('full_name', nameController.text);
+    await prefs.setString('first_name', firstNameController.text);
+    await prefs.setString('last_name', lastNameController.text);
     await prefs.setString('phone_number', phoneController.text);
     await prefs.getString('email');
     await prefs.setString('dob', dobController.text);
