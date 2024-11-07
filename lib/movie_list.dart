@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:tubes/movieDetail.dart';
 import 'movie.dart';
+import 'package:speech_to_text/speech_to_text.dart' as stt;
+
 
 class ListMovieView extends StatefulWidget {
   const ListMovieView({super.key});
@@ -11,6 +13,39 @@ class ListMovieView extends StatefulWidget {
 
 class _ListMovieViewState extends State<ListMovieView> {
   bool showNowPlaying = true;
+  late stt.SpeechToText _speech;
+  bool _isListening = false;
+  String _searchQuery = "";
+
+  @override
+  void initState() {
+    super.initState();
+    _speech = stt.SpeechToText();
+  }
+
+  // Function to start or stop listening
+  void _listen() async {
+    if (!_isListening) {
+      bool available = await _speech.initialize(
+        onStatus: (status) => print("onStatus: $status"),
+        onError: (error) => print("onError: $error"),
+      );
+
+      if (available) {
+        setState(() => _isListening = true);
+        _speech.listen(
+          onResult: (result) {
+            setState(() {
+              _searchQuery = result.recognizedWords;
+            });
+          },
+        );
+      }
+    } else {
+      setState(() => _isListening = false);
+      _speech.stop();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -60,6 +95,11 @@ class _ListMovieViewState extends State<ListMovieView> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: TextField(
+              onChanged: (value) {
+                setState(() {
+                  _searchQuery = value;
+                });
+              },
               style: const TextStyle(color: Colors.white),
               decoration: InputDecoration(
                 filled: true,
@@ -68,14 +108,18 @@ class _ListMovieViewState extends State<ListMovieView> {
                 hintStyle: const TextStyle(color: Colors.grey),
                 prefixIcon: const Icon(Icons.search, color: Colors.grey),
                 suffixIcon: IconButton(
-                  icon: const Icon(Icons.mic, color: Colors.grey),
-                  onPressed: () {},
+                  icon: Icon(
+                    _isListening ? Icons.mic : Icons.mic_none,
+                    color: Colors.grey,
+                  ),
+                  onPressed: _listen,
                 ),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(30),
                   borderSide: BorderSide.none,
                 ),
               ),
+              controller: TextEditingController(text: _searchQuery),
             ),
           ),
           const SizedBox(height: 8),
@@ -212,3 +256,5 @@ class MovieCard extends StatelessWidget {
     );
   }
 }
+
+
