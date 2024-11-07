@@ -3,16 +3,17 @@ import 'package:tubes/movieDetail.dart';
 import 'movie.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 
-
 class ListMovieView extends StatefulWidget {
-  const ListMovieView({super.key});
+  final bool showNowPlaying;
+
+  const ListMovieView({Key? key, this.showNowPlaying = true}) : super(key: key);
 
   @override
   _ListMovieViewState createState() => _ListMovieViewState();
 }
 
 class _ListMovieViewState extends State<ListMovieView> {
-  bool showNowPlaying = true;
+  late bool showNowPlaying;
   late stt.SpeechToText _speech;
   bool _isListening = false;
   String _searchQuery = "";
@@ -20,6 +21,7 @@ class _ListMovieViewState extends State<ListMovieView> {
   @override
   void initState() {
     super.initState();
+    showNowPlaying = widget.showNowPlaying;
     _speech = stt.SpeechToText();
   }
 
@@ -256,5 +258,3 @@ class MovieCard extends StatelessWidget {
     );
   }
 }
-
-

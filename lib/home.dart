@@ -9,34 +9,33 @@ class homePage extends StatefulWidget {
   const homePage({super.key});
 
   @override
-  State<homePage> createState() => _homePageState();
+  State<homePage> createState() => homePageState();
 }
 
-class _homePageState extends State<homePage> {
+class homePageState extends State<homePage> {
   int _selectedIndex = 0;
+  bool showNowPlaying = true;
 
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
+      if (index == 1) showNowPlaying = true;
+    });
+  }
+
+  void navigateToMovies({required bool nowPlaying}) {
+    setState(() {
+      _selectedIndex = 1;
+      showNowPlaying = nowPlaying;
     });
   }
 
   static const List<Widget> _widgetOptions = <Widget>[
-    Center(
-      child: MyHomeView(),
-    ),
-    Center(
-      child: ListMovieView(),
-    ),
-    Center(
-      child: FnBPage(),
-    ),
-    Center(
-      child: NewsList(),
-    ),
-    Center(
-      child: ProfilePage(),
-    ),
+    Center(child: MyHomeView()),
+    Center(child: ListMovieView()),
+    Center(child: FnBPage()),
+    Center(child: NewsList()),
+    Center(child: ProfilePage()),
   ];
 
   @override
@@ -66,12 +65,12 @@ class _homePageState extends State<homePage> {
         selectedItemColor: Colors.white,
         unselectedItemColor: Colors.white,
         selectedLabelStyle: TextStyle(fontWeight: FontWeight.bold),
-        unselectedLabelStyle: TextStyle(
-          fontWeight: FontWeight.bold,
-        ),
+        unselectedLabelStyle: TextStyle(fontWeight: FontWeight.bold),
         onTap: _onItemTapped,
       ),
-      body: _widgetOptions.elementAt(_selectedIndex),
+      body: _selectedIndex == 1
+          ? ListMovieView(showNowPlaying: showNowPlaying)
+          : _widgetOptions.elementAt(_selectedIndex),
     );
   }
 }

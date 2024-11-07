@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:tubes/movie_list.dart';
+import 'package:tubes/home.dart';
 import 'package:tubes/profile.dart';
 
 class MyHomeView extends StatefulWidget {
@@ -133,8 +135,8 @@ class _MyHomeViewState extends State<MyHomeView> {
                   padding: const EdgeInsets.symmetric(horizontal: 16.0),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: const [
-                      Text(
+                    children: [
+                      const Text(
                         'Now Playing',
                         style: TextStyle(
                           color: Colors.white,
@@ -142,11 +144,22 @@ class _MyHomeViewState extends State<MyHomeView> {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      Text(
-                        'See all >',
-                        style: TextStyle(
-                          color: Colors.white70,
-                          fontSize: 16,
+                      GestureDetector(
+                        onTap: () {
+                          if (context
+                                  .findAncestorStateOfType<homePageState>() !=
+                              null) {
+                            context
+                                .findAncestorStateOfType<homePageState>()!
+                                .navigateToMovies(nowPlaying: true);
+                          }
+                        },
+                        child: const Text(
+                          'See all >',
+                          style: TextStyle(
+                            color: Colors.white70,
+                            fontSize: 16,
+                          ),
                         ),
                       ),
                     ],
@@ -202,7 +215,7 @@ class _MyHomeViewState extends State<MyHomeView> {
                   padding: const EdgeInsets.symmetric(horizontal: 16.0),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: const [
+                    children: [
                       Text(
                         'Coming Soon',
                         style: TextStyle(
@@ -211,11 +224,23 @@ class _MyHomeViewState extends State<MyHomeView> {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      Text(
-                        'See all >',
-                        style: TextStyle(
-                          color: Colors.white70,
-                          fontSize: 16,
+                      GestureDetector(
+                        onTap: () {
+                          if (context
+                                  .findAncestorStateOfType<homePageState>() !=
+                              null) {
+                            context
+                                .findAncestorStateOfType<homePageState>()!
+                                .navigateToMovies(
+                                    nowPlaying: false); // Direct to Coming Soon
+                          }
+                        },
+                        child: const Text(
+                          'See all >',
+                          style: TextStyle(
+                            color: Colors.white70,
+                            fontSize: 16,
+                          ),
                         ),
                       ),
                     ],
