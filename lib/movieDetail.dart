@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'movie.dart';
+import 'buyTicket.dart';
 
 class MovieDetailPage extends StatelessWidget {
   final Movie movie;
@@ -31,6 +32,7 @@ class MovieDetailPage extends StatelessWidget {
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  //Ini Untuk Poster / Gambar Film
                   ClipRRect(
                     borderRadius: BorderRadius.circular(8.0),
                     child: Image.asset(
@@ -40,6 +42,7 @@ class MovieDetailPage extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 16),
+                  //Ini Untuuk Judul Film
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -53,6 +56,7 @@ class MovieDetailPage extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(height: 8),
+                        //Ini Untuk Detail Film (Masih Dummy karena tidak ada di listnya utk datanya)
                         Row(
                           children: [
                             const Icon(Icons.access_time,
@@ -91,12 +95,25 @@ class MovieDetailPage extends StatelessWidget {
                           ],
                         ),
                         const SizedBox(height: 8),
+                        //Ini Untuk Tombol Buy Ticket dan See Review
                         Row(
                           children: [
                             SizedBox(
                               width: 100,
                               child: ElevatedButton(
-                                onPressed: isComingSoon ? null : () {},
+                                onPressed: isComingSoon
+                                    ? null
+                                    : () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                //Ini dipakai buat nyimpen movie (indeks ?) dari movie yang diklik. Disimpan ke dalam variabel movie
+                                                //Agar data bisa dibawa ke buyTicketPage
+                                                MovieShowtimePage(movie: movie),
+                                          ),
+                                        );
+                                      },
                                 style: ButtonStyle(
                                   backgroundColor:
                                       WidgetStateProperty.resolveWith<Color>(
@@ -147,6 +164,7 @@ class MovieDetailPage extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 16),
+              //Ini Bagian Trailer
               const Text(
                 "Trailer",
                 style: TextStyle(
@@ -167,6 +185,7 @@ class MovieDetailPage extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 16),
+              //Ini Bagian Sinopsis, diambil dari list movie.dart
               const Text(
                 "Synopsis",
                 style: TextStyle(
@@ -180,6 +199,7 @@ class MovieDetailPage extends StatelessWidget {
                 style: const TextStyle(color: Colors.white70),
               ),
               const SizedBox(height: 16),
+              //Ini Bagian Data Produser diamana diambil dari list movie.dart
               const Text(
                 "Producer",
                 style: TextStyle(
@@ -193,6 +213,7 @@ class MovieDetailPage extends StatelessWidget {
                 style: const TextStyle(color: Colors.white70),
               ),
               const SizedBox(height: 16),
+              //Ini Bagian Data Director diamana diambil dari list movie.dart
               const Text(
                 "Director",
                 style: TextStyle(
@@ -206,6 +227,7 @@ class MovieDetailPage extends StatelessWidget {
                 style: const TextStyle(color: Colors.white70),
               ),
               const SizedBox(height: 16),
+              //Ini Bagian Data Writers diamana diambil dari list movie.dart
               const Text(
                 "Writers",
                 style: TextStyle(
@@ -219,6 +241,7 @@ class MovieDetailPage extends StatelessWidget {
                 style: const TextStyle(color: Colors.white70),
               ),
               const SizedBox(height: 16),
+              //Ini Bagian Data Cast diamana diambil dari list movie.dart
               const Text(
                 "Cast",
                 style: TextStyle(

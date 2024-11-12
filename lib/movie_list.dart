@@ -66,7 +66,7 @@ class _ListMovieViewState extends State<ListMovieView> {
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 8.0),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 GestureDetector(
                   onTap: () {
@@ -95,33 +95,44 @@ class _ListMovieViewState extends State<ListMovieView> {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: TextField(
-              onChanged: (value) {
-                setState(() {
-                  _searchQuery = value;
-                });
-              },
-              style: const TextStyle(color: Colors.white),
-              decoration: InputDecoration(
-                filled: true,
-                fillColor: Colors.grey[850],
-                hintText: 'Search',
-                hintStyle: const TextStyle(color: Colors.grey),
-                prefixIcon: const Icon(Icons.search, color: Colors.grey),
-                suffixIcon: IconButton(
-                  icon: Icon(
-                    _isListening ? Icons.mic : Icons.mic_none,
-                    color: Colors.grey,
-                  ),
-                  onPressed: _listen,
-                ),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(30),
-                  borderSide: BorderSide.none,
-                ),
+            padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 6.0),
+            child: Container(
+              decoration: BoxDecoration(
+                color: const Color(0xFF1F1F1F),
+                borderRadius: BorderRadius.circular(24.0),
+                border: Border.all(color: Colors.white, width: 1),
               ),
-              controller: TextEditingController(text: _searchQuery),
+              child: Row(
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.search, color: Colors.white54),
+                    onPressed: () {},
+                  ),
+                  Expanded(
+                    child: TextField(
+                      onChanged: (value) {
+                        setState(() {
+                          _searchQuery = value;
+                        });
+                      },
+                      controller: TextEditingController(text: _searchQuery),
+                      decoration: const InputDecoration(
+                        border: InputBorder.none,
+                        hintText: 'Search movies...',
+                        hintStyle: TextStyle(color: Colors.white54),
+                      ),
+                      style: const TextStyle(color: Colors.white),
+                    ),
+                  ),
+                  IconButton(
+                    icon: Icon(
+                      _isListening ? Icons.mic : Icons.mic_none,
+                      color: Colors.white54,
+                    ),
+                    onPressed: _listen,
+                  ),
+                ],
+              ),
             ),
           ),
           const SizedBox(height: 8),
@@ -212,6 +223,9 @@ class MovieCard extends StatelessWidget {
           context,
           MaterialPageRoute(
             builder: (context) =>
+                //Ini dipakai buat nyimpen movie (indeks ?) dari movie yang diklik. Disimpan ke dalam variabel movie
+                //Untuk isComingSoon dipakai untuk penanda di movie detail agar tombol beli tiket tidak bisa diklik
+                //Semua variabel bisa disimpan karena di movieDetailPage membutuhkan semua variabel yang ada di movie (Atribut Class)
                 MovieDetailPage(movie: movie, isComingSoon: isComingSoon),
           ),
         );
