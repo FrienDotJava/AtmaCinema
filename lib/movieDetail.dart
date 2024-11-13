@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'movie.dart';
 import 'buyTicket.dart';
+import 'movie_review.dart';
 
 class MovieDetailPage extends StatelessWidget {
   final Movie movie;
@@ -145,15 +146,24 @@ class MovieDetailPage extends StatelessWidget {
                             SizedBox(
                               width: 100,
                               child: OutlinedButton(
-                                onPressed: () {},
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            const MovieReviewPage()),
+                                  );
+                                },
                                 style: OutlinedButton.styleFrom(
                                   backgroundColor: Colors.white,
                                   foregroundColor: Colors.black,
                                   padding:
                                       const EdgeInsets.symmetric(vertical: 8),
                                 ),
-                                child: const Text("SEE REVIEW",
-                                    style: TextStyle(fontSize: 12)),
+                                child: const Text(
+                                  "SEE REVIEW",
+                                  style: TextStyle(fontSize: 12),
+                                ),
                               ),
                             ),
                           ],
