@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:tubes/news_detail.dart';
+import 'package:tubes/news/news_detail.dart';
 
 class NewsList extends StatelessWidget {
   const NewsList({super.key});

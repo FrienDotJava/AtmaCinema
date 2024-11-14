@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:tubes/home.dart';
-import 'package:tubes/register_email.dart';
+import 'package:tubes/home/home.dart';
+import 'package:tubes/register/register_email.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -198,9 +198,8 @@ class _LoginPageState extends State<LoginPage> {
   Widget _buildPasswordField(TextEditingController controller) {
     return TextField(
       controller: controller,
-      style: const TextStyle(
-        color: Colors.white,
-      ),
+      style:
+          const TextStyle(color: Colors.white, fontFamily: 'Poppins-Regular'),
       obscureText: !isPasswordVisible,
       decoration: InputDecoration(
         hintText: 'Enter your password',

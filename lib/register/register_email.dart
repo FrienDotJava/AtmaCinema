@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:tubes/login.dart';
-import 'package:tubes/register_otp.dart';
+import 'package:tubes/login/login.dart';
+import 'package:tubes/register/register_otp.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class RegisterPage extends StatefulWidget {

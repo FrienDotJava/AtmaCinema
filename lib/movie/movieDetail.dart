@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'movie.dart';
-import 'buyTicket.dart';
+import '../transaction/buyTicket.dart';
 import 'movie_review.dart';
 
 class MovieDetailPage extends StatelessWidget {

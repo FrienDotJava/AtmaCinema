@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:tubes/loading_screen.dart';
-import 'package:tubes/login.dart';
+import 'package:tubes/login/login.dart';
 import 'package:camera/camera.dart';
-import 'package:tubes/camera_screen.dart';
+import 'package:tubes/profile/camera_screen.dart';
 
 List<CameraDescription> cameras = [];
 Future<void> main() async {

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:tubes/movieDetail.dart';
+import 'package:tubes/movie/movieDetail.dart';
 import 'movie.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 

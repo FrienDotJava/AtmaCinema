@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'movie.dart';
+import '../movie/movie.dart';
 import 'paymentConfirmation.dart';
 import 'package:intl/intl.dart';
 

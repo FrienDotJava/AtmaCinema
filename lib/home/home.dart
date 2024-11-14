@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:tubes/fnb.dart';
-import 'package:tubes/profile.dart';
-import 'package:tubes/homeView.dart';
-import 'package:tubes/movie_list.dart';
-import 'package:tubes/news_list.dart';
+import 'package:tubes/fnb/fnb.dart';
+import 'package:tubes/profile/profile.dart';
+import 'package:tubes/home/homeView.dart';
+import 'package:tubes/movie/movie_list.dart';
+import 'package:tubes/news/news_list.dart';
 
 class homePage extends StatefulWidget {
   const homePage({super.key});

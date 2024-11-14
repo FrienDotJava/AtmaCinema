@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'movie.dart';
-import 'home.dart';
+import '../movie/movie.dart';
+import '../home/home.dart';
 import 'package:intl/intl.dart';
 
 class PaymentConfirmation extends StatelessWidget {
