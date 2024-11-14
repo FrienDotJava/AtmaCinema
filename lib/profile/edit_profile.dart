@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:image_picker/image_picker.dart';
 
 enum Gender { man, female }
 
@@ -51,7 +52,7 @@ class _EditProfileState extends State<EditProfile> {
               child: Column(
                 children: [
                   const SizedBox(height: 20),
-                  _buildProfilePicture(),
+                  _buildProfilePicture(context),
                   const SizedBox(height: 30),
                   _buildInputField("First Name", nameController),
                   const SizedBox(height: 20),
@@ -74,7 +75,7 @@ class _EditProfileState extends State<EditProfile> {
     );
   }
 
-  Widget _buildProfilePicture() {
+  Widget _buildProfilePicture(BuildContext context) {
     return Stack(
       children: [
         CircleAvatar(
@@ -85,24 +86,72 @@ class _EditProfileState extends State<EditProfile> {
         Positioned(
           right: 0,
           bottom: 0,
-            child: Container(
-              width: 35, // Set the width to control the circle's diameter
-              height: 35,
-              decoration: BoxDecoration(
-                color: Colors.black,
-                shape: BoxShape.circle,
-              ),
-              child: IconButton(
-                onPressed: () {
-                  Navigator.pushNamed(context, '/camera');
-                },
-                icon: const Icon(Icons.edit, size: 15, color: Colors.white),
-              ),
-            )
-
+          child: Container(
+            width: 35,
+            height: 35,
+            decoration: BoxDecoration(
+              color: Colors.black,
+              shape: BoxShape.circle,
+            ),
+            child: IconButton(
+              onPressed: () {
+                _showProfilePictureOptions(context);
+              },
+              icon: const Icon(Icons.edit, size: 15, color: Colors.white),
+            ),
+          ),
         ),
       ],
     );
+  }
+
+  void _showProfilePictureOptions(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (BuildContext context) {
+        return Container(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                title: const Text('Take a Picture'),
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.pushNamed(context, '/camera');
+                },
+              ),
+              ListTile(
+                title: const Text('Choose from Gallery'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _openGallery();
+                },
+              ),
+              ListTile(
+                title: const Text('Remove Profile Picture'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _removeProfilePicture();
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _openGallery() async {
+    final ImagePicker _picker = ImagePicker();
+    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+  }
+
+  void _removeProfilePicture() {
+    //
   }
 
   Widget _buildInputField(String label, TextEditingController controller,

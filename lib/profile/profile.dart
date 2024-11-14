@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:tubes/edit_profile.dart';
-import 'package:tubes/login.dart';
+import 'package:tubes/profile/edit_profile.dart';
+import 'package:tubes/login/login.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});

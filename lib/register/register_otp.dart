@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:tubes/login.dart';
-import 'package:tubes/register_email.dart';
-import 'package:tubes/register_data.dart';
+import 'package:tubes/login/login.dart';
+import 'package:tubes/register/register_email.dart';
+import 'package:tubes/register/register_data.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class RegisterOTPPage extends StatefulWidget {

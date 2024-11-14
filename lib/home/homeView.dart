@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:tubes/movie_list.dart';
-import 'package:tubes/home.dart';
-import 'package:tubes/profile.dart';
+import 'package:tubes/movie/movie_list.dart';
+import 'package:tubes/home/home.dart';
+import 'package:tubes/profile/profile.dart';
 
 class MyHomeView extends StatefulWidget {
   const MyHomeView({super.key});
