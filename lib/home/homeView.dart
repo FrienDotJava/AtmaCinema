@@ -158,8 +158,15 @@ class _MyHomeViewState extends State<MyHomeView> {
                   color: Colors.white70,
                   size: 16,
                 ),
-              ],
-            ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 12),
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            children: movies,
           ),
         ],
       ),
@@ -224,6 +231,7 @@ class _MyHomeViewState extends State<MyHomeView> {
   }
 }
 
+// MovieCard Widget
 class MovieCard extends StatelessWidget {
   final String imagePath;
   final String title;
@@ -283,6 +291,7 @@ class MovieCard extends StatelessWidget {
   }
 }
 
+// MovieTag Widget
 class MovieTag extends StatelessWidget {
   final String text;
 
@@ -307,6 +316,7 @@ class MovieTag extends StatelessWidget {
   }
 }
 
+// ComingSoonCard Widget
 class ComingSoonCard extends StatelessWidget {
   final String imagePath;
   final String title;

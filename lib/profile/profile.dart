@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tubes/profile/edit_profile.dart';
 import 'package:tubes/login/login.dart';
+import 'package:tubes/profile/change_password.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -140,7 +141,11 @@ class _ProfilePageState extends State<ProfilePage> {
           label: 'Change Password',
           color: Colors.grey[850],
           onPressed: () {
-            // Nanti tambah route ke page lain disini :D
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => const ChangePasswordPage()),
+            );
           },
         ),
         const SizedBox(height: 10),
