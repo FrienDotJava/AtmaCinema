@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:tubes/movie/movie_list.dart';
-import 'package:tubes/home/home.dart';
 import 'package:tubes/profile/profile.dart';
+import 'package:tubes/movie/movie_list.dart';
 
 class MyHomeView extends StatefulWidget {
   const MyHomeView({super.key});
@@ -13,34 +12,73 @@ class MyHomeView extends StatefulWidget {
 class _MyHomeViewState extends State<MyHomeView> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: _buildAppBar(),
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [Color(0xFF000000), Color(0xFF000B6D)],
-            stops: [0.3, 0.7],
+    return Container(
+      decoration: const BoxDecoration(color: Colors.black),
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        appBar: AppBar(
+          automaticallyImplyLeading: false,
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.person_2_rounded, size: 36),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const ProfilePage()),
+                );
+              },
+              color: Colors.white,
+            ),
+            IconButton(
+              icon: const Icon(Icons.notifications, size: 36),
+              onPressed: () {},
+              color: Colors.white,
+            ),
+          ],
+          title: RichText(
+            text: const TextSpan(
+              children: [
+                TextSpan(
+                  text: "ATMA ",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontFamily: 'Poppins-Bold',
+                    fontSize: 28,
+                  ),
+                ),
+                TextSpan(
+                  text: "Cinema",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontFamily: 'Poppins-Regular',
+                    fontSize: 28,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
-        child: Column(
+        body: Column(
           children: [
+            _buildSearchBar(),
             const SizedBox(height: 20),
-            _buildSearchSection(context),
-            const SizedBox(height: 10),
-            _buildMovieSection(
-              context,
-              title: 'Now Playing',
-              movies: _buildNowPlayingMovies(),
-              nowPlaying: true,
-            ),
-            const SizedBox(height: 12),
-            _buildMovieSection(
-              context,
-              title: 'Coming Soon',
-              movies: _buildComingSoonMovies(),
-              nowPlaying: false,
+            Expanded(
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    _buildSectionHeader("Now Playing", true),
+                    const SizedBox(height: 15),
+                    _buildMovieList(),
+                    _buildSectionHeader("Coming Soon", false),
+                    const SizedBox(height: 15),
+                    _buildComingSoonList(),
+                    _buildSectionHeader("ATMA News", false),
+                    const SizedBox(height: 15),
+                  ],
+                ),
+              ),
             ),
           ],
         ),
@@ -48,132 +86,77 @@ class _MyHomeViewState extends State<MyHomeView> {
     );
   }
 
-  // AppBar
-  AppBar _buildAppBar() {
-    return AppBar(
-      automaticallyImplyLeading: false,
-      backgroundColor: Colors.black,
-      actions: [
-        IconButton(
-          icon: const Icon(Icons.person_2_rounded),
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const ProfilePage()),
-            );
-          },
-          color: Colors.white,
-          iconSize: 40,
-        ),
-        IconButton(
-          icon: const Icon(Icons.notification_add_rounded),
-          onPressed: () {},
-          color: Colors.white,
-          iconSize: 40,
-        ),
-      ],
-      title: const Text(
-        'Atma Cinema',
-        style: TextStyle(
-          color: Colors.white,
-          fontSize: 36,
-          fontWeight: FontWeight.bold,
-        ),
+  Widget _buildSearchBar() {
+    return Container(
+      margin: const EdgeInsets.all(16.0),
+      decoration: BoxDecoration(
+        color: const Color(0xFF0A2038),
+        borderRadius: BorderRadius.circular(30),
       ),
-    );
-  }
-
-  // Search Section
-  Widget _buildSearchSection(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Row(
         children: [
-          const Text(
-            'Hello, User!',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
+          IconButton(
+            icon: const Icon(Icons.search, color: Colors.white54),
+            onPressed: () {},
+          ),
+          Expanded(
+            child: TextField(
+              style: const TextStyle(color: Colors.white),
+              decoration: const InputDecoration(
+                hintText: "Search for movies...",
+                hintStyle: TextStyle(color: Colors.white54),
+                border: InputBorder.none,
+              ),
             ),
           ),
-          const SizedBox(height: 8),
-          Row(
-            children: [
-              Container(
-                width: MediaQuery.of(context).size.width * 0.8,
-                decoration: BoxDecoration(
-                  color: const Color(0xFF1F1F1F),
-                  borderRadius: BorderRadius.circular(24.0),
-                  border: Border.all(color: Colors.white, width: 1),
-                ),
-                child: Row(
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.search, color: Colors.white54),
-                      onPressed: () {},
-                    ),
-                    const Expanded(
-                      child: TextField(
-                        decoration: InputDecoration(
-                          border: InputBorder.none,
-                        ),
-                        style: TextStyle(color: Colors.white),
-                      ),
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.mic, color: Colors.white54),
-                      onPressed: () {},
-                    ),
-                  ],
-                ),
-              ),
-              IconButton(
-                icon: const Icon(Icons.notifications, color: Colors.white),
-                iconSize: 32,
-                onPressed: () {},
-              ),
-            ],
+          IconButton(
+            icon: const Icon(Icons.mic, color: Colors.white54),
+            onPressed: () {},
           ),
         ],
       ),
     );
   }
 
-  // Movie Section (bisa juga pake ini buat yang playing now + coming soon)
-  Widget _buildMovieSection(
-    BuildContext context, {
-    required String title,
-    required List<Widget> movies,
-    required bool nowPlaying,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                title,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
+  Widget _buildSectionHeader(String title, bool showNowPlaying) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            title,
+            style: const TextStyle(
+              color: Colors.white,
+              fontFamily: 'Poppins-SemiBold',
+              fontSize: 20,
+            ),
+          ),
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ListMovieView(
+                    showNowPlaying: showNowPlaying,
+                  ),
                 ),
-              ),
-              GestureDetector(
-                onTap: () {
-                  // nanti direct ke movie detail
-                },
-                child: const Text(
-                  'See all >',
+              );
+            },
+            child: Row(
+              children: const [
+                Text(
+                  "See all",
                   style: TextStyle(
                     color: Colors.white70,
                     fontSize: 16,
                   ),
+                ),
+                SizedBox(width: 4),
+                Icon(
+                  Icons.arrow_forward_ios,
+                  color: Colors.white70,
+                  size: 16,
                 ),
               ),
             ],
@@ -185,54 +168,66 @@ class _MyHomeViewState extends State<MyHomeView> {
           child: Row(
             children: movies,
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
-  // Now Playing
-  List<Widget> _buildNowPlayingMovies() {
-    return [
-      MovieCard(
-        imagePath: 'images/film1.jpg',
-        title: 'AVENGERS',
-        duration: '1h 20m',
-        ageRating: '17+',
-        format: '2D',
+  Widget _buildMovieList() {
+    return SizedBox(
+      height: 250,
+      child: ListView(
+        scrollDirection: Axis.horizontal,
+        children: const [
+          SizedBox(width: 16),
+          MovieCard(
+            imagePath: 'images/film1.jpg',
+            title: 'AVENGERS',
+            duration: '1h 20m',
+            ageRating: '17+',
+            format: '2D',
+          ),
+          MovieCard(
+            imagePath: 'images/film1.jpg',
+            title: 'SPIDERMAN',
+            duration: '2h 10m',
+            ageRating: '13+',
+            format: '3D',
+          ),
+          MovieCard(
+            imagePath: 'images/bg3.jpg',
+            title: 'BLACK PANTHER',
+            duration: '2h 30m',
+            ageRating: '13+',
+            format: '3D',
+          ),
+        ],
       ),
-      MovieCard(
-        imagePath: 'images/film1.jpg',
-        title: 'SPIDERMAN',
-        duration: '2h 10m',
-        ageRating: '13+',
-        format: '3D',
-      ),
-      MovieCard(
-        imagePath: 'images/bg3.jpg',
-        title: 'IRON MAN',
-        duration: '2h 10m',
-        ageRating: '13+',
-        format: '3D',
-      ),
-    ];
+    );
   }
 
-  // Coming Soon
-  List<Widget> _buildComingSoonMovies() {
-    return [
-      ComingSoonCard(
-        imagePath: 'images/film1.jpg',
-        title: 'IRON MAN',
+  Widget _buildComingSoonList() {
+    return SizedBox(
+      height: 220,
+      child: ListView(
+        scrollDirection: Axis.horizontal,
+        children: const [
+          SizedBox(width: 16),
+          ComingSoonCard(
+            imagePath: 'images/film1.jpg',
+            title: 'IRON MAN',
+          ),
+          ComingSoonCard(
+            imagePath: 'images/film1.jpg',
+            title: 'IRON MAN 2',
+          ),
+          ComingSoonCard(
+            imagePath: 'images/film1.jpg',
+            title: 'IRON MAN 3',
+          ),
+        ],
       ),
-      ComingSoonCard(
-        imagePath: 'images/film1.jpg',
-        title: 'IRON MAN 2',
-      ),
-      ComingSoonCard(
-        imagePath: 'images/film1.jpg',
-        title: 'IRON MAN 3',
-      ),
-    ];
+    );
   }
 }
 
@@ -245,6 +240,7 @@ class MovieCard extends StatelessWidget {
   final String format;
 
   const MovieCard({
+    super.key,
     required this.imagePath,
     required this.title,
     required this.duration,
@@ -256,8 +252,7 @@ class MovieCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: 365,
-      height: 250,
-      margin: const EdgeInsets.only(right: 8),
+      margin: const EdgeInsets.symmetric(horizontal: 8),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
@@ -300,7 +295,7 @@ class MovieCard extends StatelessWidget {
 class MovieTag extends StatelessWidget {
   final String text;
 
-  const MovieTag({required this.text});
+  const MovieTag({super.key, required this.text});
 
   @override
   Widget build(BuildContext context) {
@@ -327,6 +322,7 @@ class ComingSoonCard extends StatelessWidget {
   final String title;
 
   const ComingSoonCard({
+    super.key,
     required this.imagePath,
     required this.title,
   });
@@ -335,7 +331,7 @@ class ComingSoonCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: 160,
-      margin: const EdgeInsets.only(right: 8),
+      margin: const EdgeInsets.symmetric(horizontal: 8),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [

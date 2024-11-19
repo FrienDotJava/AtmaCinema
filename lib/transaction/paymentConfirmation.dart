@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import '../movie/movie.dart';
 import '../home/home.dart';
 import 'package:intl/intl.dart';
+// import 'package:tubes/transaction/invoice_pdf.dart';
+import '../transaction/invoice_pdf.dart';
 
 class PaymentConfirmation extends StatelessWidget {
   final Movie movie;
@@ -65,7 +67,12 @@ class PaymentConfirmation extends StatelessWidget {
               const SizedBox(height: 8),
               GestureDetector(
                 onTap: () {
-                  // Buat routing ke PDF Invoice
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => InvoicePage(),
+                    ),
+                  );
                 },
                 child: const Text(
                   "Check Invoice",
