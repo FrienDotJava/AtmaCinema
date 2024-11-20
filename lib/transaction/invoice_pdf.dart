@@ -294,43 +294,4 @@ class InvoicePage extends StatelessWidget {
       );
     }
   }
-  // Future<void> _downloadInvoice(BuildContext context) async {
-  //   final pdf = pw.Document();
-  //   pdf.addPage(
-  //     pw.Page(
-  //       build: (pw.Context context) {
-  //         return pw.Center(
-  //           child: pw.Text('Invoice'),
-  //         );
-  //       },
-  //     ),
-  //   );
-
-  //   try {
-  //     // Request permission to write to external storage (important for Android).
-  //     if (await Permission.storage.request().isGranted) {
-  //       final downloadsDirectory = Directory('/storage/emulated/0/Download');
-  //       if (!downloadsDirectory.existsSync()) {
-  //         downloadsDirectory
-  //             .createSync(); // Ensure the Downloads folder exists.
-  //       }
-
-  //       final path = '${downloadsDirectory.path}/invoice.pdf';
-  //       final file = File(path);
-  //       await file.writeAsBytes(await pdf.save());
-
-  //       ScaffoldMessenger.of(context).showSnackBar(
-  //         SnackBar(content: Text('Invoice downloaded to $path')),
-  //       );
-  //     } else {
-  //       ScaffoldMessenger.of(context).showSnackBar(
-  //         const SnackBar(content: Text('Permission denied to access storage')),
-  //       );
-  //     }
-  //   } catch (e) {
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       SnackBar(content: Text('Failed to download invoice: $e')),
-  //     );
-  //   }
-  // }
 }
