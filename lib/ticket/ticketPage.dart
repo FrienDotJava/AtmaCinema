@@ -111,9 +111,7 @@ class _TicketsPageState extends State<TicketsPage> with SingleTickerProviderStat
             child: TabBarView(
               controller: _tabController,
               children: [
-                // On Progress Tab
                 _buildTicketList(),
-                // History Tab
                 Center(
                   child: Text(
                     "No tickets in history",
@@ -130,32 +128,30 @@ class _TicketsPageState extends State<TicketsPage> with SingleTickerProviderStat
 
   Widget _buildTicketList() {
     return ListView.builder(
-      itemCount: 1, // Number of tickets (replace with dynamic count)
+      itemCount: 1,
       itemBuilder: (context, index) {
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
           child: Container(
             decoration: BoxDecoration(
-              color: Colors.black, // Background color for the card
-              borderRadius: BorderRadius.circular(16.0), // Rounded corners
-              border: Border.all(color: Colors.grey, width: 2.0), // White border
+              color: Colors.black,
+              borderRadius: BorderRadius.circular(16.0),
+              border: Border.all(color: Colors.grey, width: 2.0),
             ),
             child: Padding(
               padding: const EdgeInsets.all(12.0),
               child: Row(
                 children: [
-                  // Movie Poster
                   ClipRRect(
                     borderRadius: BorderRadius.circular(12),
                     child: Image.asset(
-                      'images/img_poster/avengers.jpg', // Replace with your asset path
+                      'images/img_poster/avengers.jpg',
                       width: 80,
                       height: 120,
                       fit: BoxFit.cover,
                     ),
                   ),
                   SizedBox(width: 12),
-                  // Ticket Details
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -228,8 +224,8 @@ class _TicketsPageState extends State<TicketsPage> with SingleTickerProviderStat
                                 );
                               },
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.white, // Replaces 'primary'
-                                foregroundColor: Colors.black, // Replaces 'onPrimary'
+                                backgroundColor: Colors.white,
+                                foregroundColor: Colors.black,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(8),
                                 ),
