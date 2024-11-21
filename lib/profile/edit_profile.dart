@@ -1,7 +1,8 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:image_picker/image_picker.dart';
 
 enum Gender { man, female }
 
@@ -20,6 +21,7 @@ class _EditProfileState extends State<EditProfile> {
   TextEditingController phoneController = TextEditingController();
   TextEditingController dobController = TextEditingController();
   Gender? _selectedGender;
+  String? profilePicturePath;
 
   @override
   Widget build(BuildContext context) {
@@ -81,7 +83,12 @@ class _EditProfileState extends State<EditProfile> {
         CircleAvatar(
           radius: 50,
           backgroundColor: Colors.white,
-          child: const Icon(Icons.person, size: 50, color: Colors.black),
+          backgroundImage: profilePicturePath != null
+              ? FileImage(File(profilePicturePath!))
+              : null,
+          child: profilePicturePath == null
+              ? const Icon(Icons.person, size: 50, color: Colors.black)
+              : null,
         ),
         Positioned(
           right: 0,
@@ -119,16 +126,21 @@ class _EditProfileState extends State<EditProfile> {
             children: [
               ListTile(
                 title: const Text('Take a Picture'),
-                onTap: () {
+                onTap: () async {
                   Navigator.pop(context);
-                  Navigator.pushNamed(context, '/camera');
+                  final imagePath = await Navigator.pushNamed(context, '/camera');
+                  if (imagePath != null && mounted) {
+                    setState(() {
+                      profilePicturePath = imagePath as String;
+                    });
+                  }
                 },
               ),
               ListTile(
                 title: const Text('Choose from Gallery'),
-                onTap: () {
+                onTap: () async {
                   Navigator.pop(context);
-                  _openGallery();
+                  await _openGallery();
                 },
               ),
               ListTile(
@@ -145,13 +157,21 @@ class _EditProfileState extends State<EditProfile> {
     );
   }
 
-  void _openGallery() async {
+  Future<void> _openGallery() async {
     final ImagePicker _picker = ImagePicker();
     final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+
+    if (image != null && mounted) {
+      setState(() {
+        profilePicturePath = image.path;
+      });
+    }
   }
 
   void _removeProfilePicture() {
-    //
+    setState(() {
+      profilePicturePath = null;
+    });
   }
 
   Widget _buildInputField(String label, TextEditingController controller,
@@ -290,5 +310,6 @@ class _EditProfileState extends State<EditProfile> {
     await prefs.setString('dob', dobController.text);
     await prefs.setString(
         'gender', _selectedGender == Gender.man ? 'Male' : 'Female');
+    await prefs.setString('profile_picture', profilePicturePath ?? '');
   }
 }

@@ -3,6 +3,7 @@ import '../movie/movie.dart';
 import '../home/home.dart';
 import 'package:intl/intl.dart';
 // import 'package:tubes/transaction/invoice_pdf.dart';
+import '../transaction/ticketDetails.dart';
 import '../transaction/invoice_pdf.dart';
 
 class PaymentConfirmation extends StatelessWidget {
@@ -53,7 +54,12 @@ class PaymentConfirmation extends StatelessWidget {
               const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: () {
-                  // Buat routing ke detail ticket terkait
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => MovieTicketDetails(),
+                    ),
+                  );
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.white,
