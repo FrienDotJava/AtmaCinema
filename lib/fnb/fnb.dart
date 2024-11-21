@@ -143,12 +143,7 @@ class _FnBPageState extends State<FnBPage> {
       ),
       body: Container(
         decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [Color(0xFF000000), Color(0xFF000B6D)],
-            stops: [0.3, 0.7],
-          ),
+          color: Colors.black,
         ),
         child: _buildItemList(),
       ),
@@ -217,7 +212,7 @@ class FnBItemCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.transparent,
           borderRadius: BorderRadius.circular(16.0),
-          border: Border.all(color: Colors.white, width: 1),
+          border: Border.all(color: Colors.grey, width: 1),
         ),
         child: Stack(
           children: [

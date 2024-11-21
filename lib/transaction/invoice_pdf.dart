@@ -3,6 +3,7 @@ import 'package:pdf/widgets.dart' as pw;
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:barcode_widget/barcode_widget.dart';
 
 class InvoicePage extends StatelessWidget {
   @override
@@ -248,15 +249,20 @@ class InvoicePage extends StatelessWidget {
             Center(
               child: Column(
                 children: [
-                  Image.asset(
-                    'images/barcode.png',
-                    width: 300,
-                    fit: BoxFit.contain,
+                  BarcodeWidget(
+                    barcode: Barcode.code128(),
+                    data: "abcdefg",
+                    width: 200,
+                    height: 80,
+                    drawText: false,
                   ),
                   SizedBox(height: 8),
                   Text(
-                    "INV/2024/1001",
-                    style: TextStyle(fontSize: 16, color: Colors.black),
+                    "CODEBOOKING696",
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey[800],
+                    ),
                   ),
                 ],
               ),
