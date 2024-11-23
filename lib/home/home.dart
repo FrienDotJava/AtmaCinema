@@ -71,7 +71,7 @@ class homePageState extends State<homePage> {
         onTap: _onItemTapped,
       ),
       body: _selectedIndex == 1
-          ? ListMovieView(showNowPlaying: showNowPlaying)
+          ? ListMovieView()
           : _widgetOptions.elementAt(_selectedIndex),
     );
   }
