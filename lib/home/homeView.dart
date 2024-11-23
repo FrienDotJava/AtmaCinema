@@ -497,9 +497,7 @@ class _MyHomeViewState extends State<MyHomeView> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => ListMovieView(
-                    showNowPlaying: showNowPlaying,
-                  ),
+                  builder: (context) => ListMovieView(),
                 ),
               );
             },

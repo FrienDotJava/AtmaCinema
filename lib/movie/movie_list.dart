@@ -4,16 +4,15 @@ import 'movie.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 
 class ListMovieView extends StatefulWidget {
-  final bool showNowPlaying;
-
-  const ListMovieView({Key? key, this.showNowPlaying = true}) : super(key: key);
+  const ListMovieView({Key? key}) : super(key: key);
 
   @override
   _ListMovieViewState createState() => _ListMovieViewState();
 }
 
-class _ListMovieViewState extends State<ListMovieView> {
-  late bool showNowPlaying;
+class _ListMovieViewState extends State<ListMovieView>
+    with SingleTickerProviderStateMixin {
+  late TabController _tabController;
   late stt.SpeechToText _speech;
   bool _isListening = false;
   String _searchQuery = "";
@@ -21,7 +20,7 @@ class _ListMovieViewState extends State<ListMovieView> {
   @override
   void initState() {
     super.initState();
-    showNowPlaying = widget.showNowPlaying;
+    _tabController = TabController(length: 2, vsync: this);
     _speech = stt.SpeechToText();
   }
 
@@ -60,40 +59,18 @@ class _ListMovieViewState extends State<ListMovieView> {
           style: TextStyle(color: Colors.white),
         ),
         backgroundColor: Colors.black,
+        bottom: TabBar(
+          controller: _tabController,
+          indicatorColor: Colors.white,
+          labelColor: Colors.white,
+          tabs: const [
+            Tab(text: "Now Playing"),
+            Tab(text: "Coming Soon"),
+          ],
+        ),
       ),
       body: Column(
         children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      showNowPlaying = true;
-                    });
-                  },
-                  child: FilterButton(
-                    label: "Now Playing",
-                    isSelected: showNowPlaying,
-                  ),
-                ),
-                const SizedBox(width: 8),
-                GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      showNowPlaying = false;
-                    });
-                  },
-                  child: FilterButton(
-                    label: "Coming Soon",
-                    isSelected: !showNowPlaying,
-                  ),
-                ),
-              ],
-            ),
-          ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 6.0),
             child: Container(
@@ -137,40 +114,21 @@ class _ListMovieViewState extends State<ListMovieView> {
           ),
           const SizedBox(height: 8),
           Expanded(
-            child: MovieGrid(
-              movies: showNowPlaying ? nowPlayingMovies : comingSoonMovies,
-              isComingSoon: !showNowPlaying,
+            child: TabBarView(
+              controller: _tabController,
+              children: [
+                MovieGrid(
+                  movies: nowPlayingMovies,
+                  isComingSoon: false,
+                ),
+                MovieGrid(
+                  movies: comingSoonMovies,
+                  isComingSoon: true,
+                ),
+              ],
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class FilterButton extends StatelessWidget {
-  final String label;
-  final bool isSelected;
-
-  const FilterButton({
-    required this.label,
-    required this.isSelected,
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 16),
-      decoration: BoxDecoration(
-        color: isSelected ? Colors.white : Colors.grey[800],
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Text(
-        label,
-        style: TextStyle(
-          color: isSelected ? Colors.black : Colors.white,
-        ),
       ),
     );
   }
@@ -222,11 +180,10 @@ class MovieCard extends StatelessWidget {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) =>
-                //Ini dipakai buat nyimpen movie (indeks ?) dari movie yang diklik. Disimpan ke dalam variabel movie
-                //Untuk isComingSoon dipakai untuk penanda di movie detail agar tombol beli tiket tidak bisa diklik
-                //Semua variabel bisa disimpan karena di movieDetailPage membutuhkan semua variabel yang ada di movie (Atribut Class)
-                MovieDetailPage(movie: movie, isComingSoon: isComingSoon),
+            builder: (context) => MovieDetailPage(
+              movie: movie,
+              isComingSoon: isComingSoon,
+            ),
           ),
         );
       },
@@ -240,7 +197,7 @@ class MovieCard extends StatelessWidget {
           children: [
             ClipRRect(
               borderRadius:
-                  const BorderRadius.vertical(top: Radius.circular(10)),
+              const BorderRadius.vertical(top: Radius.circular(10)),
               child: Image.asset(
                 movie.posterUrl,
                 height: 200,

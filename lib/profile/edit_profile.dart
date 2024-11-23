@@ -29,12 +29,12 @@ class _EditProfileState extends State<EditProfile> {
 
     return Container(
       decoration: const BoxDecoration(
-        color: Color(0xFF04031E),
+        color: Colors.black,
       ),
       child: Scaffold(
         backgroundColor: Colors.transparent,
         appBar: AppBar(
-          backgroundColor: const Color(0xFF04031E),
+          backgroundColor: Colors.black,
           elevation: 0,
           title: const Text(
             'Edit Profile',
