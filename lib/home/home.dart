@@ -4,6 +4,7 @@ import 'package:tubes/profile/profile.dart';
 import 'package:tubes/home/homeView.dart';
 import 'package:tubes/movie/movie_list.dart';
 import 'package:tubes/news/news_list.dart';
+import 'package:tubes/ticket/ticketPage.dart';
 
 class homePage extends StatefulWidget {
   const homePage({super.key});
@@ -34,7 +35,8 @@ class homePageState extends State<homePage> {
     Center(child: MyHomeView()),
     Center(child: ListMovieView()),
     Center(child: FnBPage()),
-    Center(child: NewsList()),
+    Center(child: TicketsPage()),
+    //Center(child: NewsList()),
     Center(child: ProfilePage()),
   ];
 
@@ -69,7 +71,7 @@ class homePageState extends State<homePage> {
         onTap: _onItemTapped,
       ),
       body: _selectedIndex == 1
-          ? ListMovieView(showNowPlaying: showNowPlaying)
+          ? ListMovieView()
           : _widgetOptions.elementAt(_selectedIndex),
     );
   }
