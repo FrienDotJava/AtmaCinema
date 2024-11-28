@@ -14,6 +14,7 @@ class Film {
   String writers;
   String cast;
   String poster;
+  String status;
 
   Film({
     required this.id_film,
@@ -29,6 +30,7 @@ class Film {
     required this.writers,
     required this.cast,
     required this.poster,
+    required this.status,
   });
 
   factory Film.fromRawJson(String str) => Film.fromJson(json.decode(str));
@@ -46,6 +48,7 @@ class Film {
         writers: json["writers"],
         cast: json["cast"],
         poster: json["poster"],
+        status: json["status"],
       );
 
   String toRawJson() => json.encode(toJson());
@@ -63,5 +66,6 @@ class Film {
         "writers": writers,
         "cast": cast,
         "poster": poster,
+        "status": status,
       };
 }

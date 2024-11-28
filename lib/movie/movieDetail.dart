@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'movie.dart';
+import 'package:tubes/client/FilmClient.dart';
+import 'package:tubes/entity/Film.dart';
 import '../transaction/buyTicket.dart';
 import 'movie_review.dart';
 
 class MovieDetailPage extends StatelessWidget {
-  final Movie movie;
+  final Film movie;
   final bool isComingSoon;
 
   const MovieDetailPage({
@@ -33,23 +34,25 @@ class MovieDetailPage extends StatelessWidget {
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  //Ini Untuk Poster / Gambar Film
                   ClipRRect(
                     borderRadius: BorderRadius.circular(8.0),
-                    child: Image.asset(
-                      movie.posterUrl,
-                      height: 200,
-                      fit: BoxFit.cover,
+                    child: FittedBox(
+                      child: Image.asset(
+                        movie.poster,
+                        height: 200,
+                        fit: BoxFit.cover,
+                      ),
                     ),
                   ),
                   const SizedBox(width: 16),
-                  //Ini Untuuk Judul Film
+
+                  // Judul Film dan Detail
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          movie.title,
+                          movie.judul_film, // Menggunakan judul dari model Film
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 24,
@@ -57,32 +60,34 @@ class MovieDetailPage extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(height: 8),
-                        //Ini Untuk Detail Film (Masih Dummy karena tidak ada di listnya utk datanya)
+
+                        // Detail Film
                         Row(
                           children: [
                             const Icon(Icons.access_time,
                                 color: Colors.grey, size: 14),
                             const SizedBox(width: 4),
-                            const Text("1h 20m",
-                                style: TextStyle(color: Colors.white)),
+                            Text("${movie.durasi} min",
+                                style: const TextStyle(color: Colors.white)),
                             const SizedBox(width: 16),
                             const Icon(Icons.visibility,
                                 color: Colors.grey, size: 14),
                             const SizedBox(width: 4),
-                            const Text("17+",
-                                style: TextStyle(color: Colors.white)),
+                            Text(movie.rating_umur,
+                                style: const TextStyle(color: Colors.white)),
                             const SizedBox(width: 16),
                             const Icon(Icons.theaters,
                                 color: Colors.grey, size: 14),
                             const SizedBox(width: 4),
-                            const Text("2D",
-                                style: TextStyle(color: Colors.white)),
+                            Text(movie.dimensi,
+                                style: const TextStyle(color: Colors.white)),
                           ],
                         ),
                         const SizedBox(height: 8),
-                        const Text(
-                          "Action, Sci-Fi",
-                          style: TextStyle(color: Colors.white70, fontSize: 16),
+                        Text(
+                          movie.genre, // Genre dari model Film
+                          style: const TextStyle(
+                              color: Colors.white70, fontSize: 16),
                         ),
                         const SizedBox(height: 8),
                         Row(
@@ -92,11 +97,14 @@ class MovieDetailPage extends StatelessWidget {
                             const SizedBox(width: 4),
                             const Text("4.8",
                                 style: TextStyle(
-                                    color: Colors.white, fontSize: 16)),
+                                    color: Colors.white,
+                                    fontSize: 16)), // Contoh rating
                           ],
                         ),
                         const SizedBox(height: 8),
-                        //Ini Untuk Tombol Buy Ticket dan See Review
+
+                        // Tombol Buy Ticket dan See Review
+                        // Masih dicomment biar gak error. Itu masuk transaksi soale
                         Row(
                           children: [
                             SizedBox(
@@ -105,15 +113,13 @@ class MovieDetailPage extends StatelessWidget {
                                 onPressed: isComingSoon
                                     ? null
                                     : () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) =>
-                                                //Ini dipakai buat nyimpen movie (indeks ?) dari movie yang diklik. Disimpan ke dalam variabel movie
-                                                //Agar data bisa dibawa ke buyTicketPage
-                                                MovieShowtimePage(movie: movie),
-                                          ),
-                                        );
+                                        // Navigator.push(
+                                        //   context,
+                                        //   MaterialPageRoute(
+                                        //     builder: (context) =>
+                                        //         MovieShowtimePage(movie: movie),
+                                        //   ),
+                                        // );
                                       },
                                 style: ButtonStyle(
                                   backgroundColor:
@@ -147,12 +153,12 @@ class MovieDetailPage extends StatelessWidget {
                               width: 100,
                               child: OutlinedButton(
                                 onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            const MovieReviewPage()),
-                                  );
+                                  // Navigator.push(
+                                  //   context,
+                                  //   MaterialPageRoute(
+                                  //       builder: (context) =>
+                                  //           MovieReviewPage(movie: movie)),
+                                  // );
                                 },
                                 style: OutlinedButton.styleFrom(
                                   backgroundColor: Colors.white,
@@ -160,10 +166,8 @@ class MovieDetailPage extends StatelessWidget {
                                   padding:
                                       const EdgeInsets.symmetric(vertical: 8),
                                 ),
-                                child: const Text(
-                                  "SEE REVIEW",
-                                  style: TextStyle(fontSize: 12),
-                                ),
+                                child: const Text("SEE REVIEW",
+                                    style: TextStyle(fontSize: 12)),
                               ),
                             ),
                           ],
@@ -174,7 +178,8 @@ class MovieDetailPage extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 16),
-              //Ini Bagian Trailer
+
+              // Bagian Trailer
               const Text(
                 "Trailer",
                 style: TextStyle(
@@ -195,7 +200,8 @@ class MovieDetailPage extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 16),
-              //Ini Bagian Sinopsis, diambil dari list movie.dart
+
+              // Bagian Sinopsis
               const Text(
                 "Synopsis",
                 style: TextStyle(
@@ -205,11 +211,12 @@ class MovieDetailPage extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               Text(
-                movie.synopsis,
+                movie.sinopsis, // Sinopsis dari model Film
                 style: const TextStyle(color: Colors.white70),
               ),
               const SizedBox(height: 16),
-              //Ini Bagian Data Produser diamana diambil dari list movie.dart
+
+              // Bagian Data Produser
               const Text(
                 "Producer",
                 style: TextStyle(
@@ -219,11 +226,12 @@ class MovieDetailPage extends StatelessWidget {
               ),
               const SizedBox(height: 4),
               Text(
-                movie.producer,
+                movie.producer, // Producer dari model Film
                 style: const TextStyle(color: Colors.white70),
               ),
               const SizedBox(height: 16),
-              //Ini Bagian Data Director diamana diambil dari list movie.dart
+
+              // Bagian Data Director
               const Text(
                 "Director",
                 style: TextStyle(
@@ -233,11 +241,12 @@ class MovieDetailPage extends StatelessWidget {
               ),
               const SizedBox(height: 4),
               Text(
-                movie.director,
+                movie.director, // Director dari model Film
                 style: const TextStyle(color: Colors.white70),
               ),
               const SizedBox(height: 16),
-              //Ini Bagian Data Writers diamana diambil dari list movie.dart
+
+              // Bagian Data Writers
               const Text(
                 "Writers",
                 style: TextStyle(
@@ -247,11 +256,12 @@ class MovieDetailPage extends StatelessWidget {
               ),
               const SizedBox(height: 4),
               Text(
-                movie.writers,
+                movie.writers, // Writers dari model Film
                 style: const TextStyle(color: Colors.white70),
               ),
               const SizedBox(height: 16),
-              //Ini Bagian Data Cast diamana diambil dari list movie.dart
+
+              // Bagian Data Cast
               const Text(
                 "Cast",
                 style: TextStyle(
@@ -261,7 +271,7 @@ class MovieDetailPage extends StatelessWidget {
               ),
               const SizedBox(height: 4),
               Text(
-                movie.cast,
+                movie.cast, // Cast dari model Film
                 style: const TextStyle(color: Colors.white70),
               ),
             ],

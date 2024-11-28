@@ -3,6 +3,9 @@ import 'package:tubes/movie/movieDetail.dart';
 import 'movie.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 
+import 'package:tubes/client/FilmClient.dart';
+import 'package:tubes/entity/Film.dart';
+
 class ListMovieView extends StatefulWidget {
   const ListMovieView({Key? key}) : super(key: key);
 
@@ -16,15 +19,20 @@ class _ListMovieViewState extends State<ListMovieView>
   late stt.SpeechToText _speech;
   bool _isListening = false;
   String _searchQuery = "";
+  late Future<List<Film>> nowPlayingMovies; // List<Film> untuk 'Now Playing'
+  late Future<List<Film>> comingSoonMovies; // List<Film> untuk 'Coming Soon'
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
     _speech = stt.SpeechToText();
+
+    // Panggil API berdasarkan status
+    nowPlayingMovies = FilmClient.fetchByStatus('now playing');
+    comingSoonMovies = FilmClient.fetchByStatus('coming soon');
   }
 
-  // Function to start or stop listening
   void _listen() async {
     if (!_isListening) {
       bool available = await _speech.initialize(
@@ -117,13 +125,44 @@ class _ListMovieViewState extends State<ListMovieView>
             child: TabBarView(
               controller: _tabController,
               children: [
-                MovieGrid(
-                  movies: nowPlayingMovies,
-                  isComingSoon: false,
+                // Menampilkan data film yang sedang tayang
+                // Disini pakai FutureBuilder untuk menampilkan data film yang sedang tayang
+                FutureBuilder<List<Film>>(
+                  future: nowPlayingMovies,
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator());
+                    } else if (snapshot.hasError) {
+                      return Center(child: Text('Error: ${snapshot.error}'));
+                    } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                      return const Center(child: Text('No movies found'));
+                    } else {
+                      return MovieGrid(
+                        movies: snapshot.data!,
+                        isComingSoon: false,
+                      );
+                    }
+                  },
                 ),
-                MovieGrid(
-                  movies: comingSoonMovies,
-                  isComingSoon: true,
+
+                // Menampilkan data film yang akan tayang
+                // Disini pakai FutureBuilder untuk menampilkan data film yang akan tayang
+                FutureBuilder<List<Film>>(
+                  future: comingSoonMovies,
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator());
+                    } else if (snapshot.hasError) {
+                      return Center(child: Text('Error: ${snapshot.error}'));
+                    } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                      return const Center(child: Text('No movies found'));
+                    } else {
+                      return MovieGrid(
+                        movies: snapshot.data!,
+                        isComingSoon: true,
+                      );
+                    }
+                  },
                 ),
               ],
             ),
@@ -135,7 +174,7 @@ class _ListMovieViewState extends State<ListMovieView>
 }
 
 class MovieGrid extends StatelessWidget {
-  final List<Movie> movies;
+  final List<Film> movies;
   final bool isComingSoon;
 
   const MovieGrid({
@@ -164,7 +203,7 @@ class MovieGrid extends StatelessWidget {
 }
 
 class MovieCard extends StatelessWidget {
-  final Movie movie;
+  final Film movie;
   final bool isComingSoon;
 
   const MovieCard({
@@ -197,9 +236,9 @@ class MovieCard extends StatelessWidget {
           children: [
             ClipRRect(
               borderRadius:
-              const BorderRadius.vertical(top: Radius.circular(10)),
+                  const BorderRadius.vertical(top: Radius.circular(10)),
               child: Image.asset(
-                movie.posterUrl,
+                movie.poster,
                 height: 200,
                 fit: BoxFit.cover,
               ),
@@ -210,7 +249,7 @@ class MovieCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Text(
-                    movie.title,
+                    movie.judul_film,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     textAlign: TextAlign.center,
