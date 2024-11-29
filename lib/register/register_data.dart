@@ -3,6 +3,8 @@ import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tubes/login/login.dart';
 import 'package:tubes/register/register_otp.dart';
+import 'package:tubes/client/UserClient.dart';
+import 'package:tubes/entity/User.dart';
 
 enum Gender { man, female }
 
@@ -24,11 +26,39 @@ class _RegisterDataState extends State<RegisterData> {
   TextEditingController dobController = TextEditingController();
   Gender? _selectedGender;
   String? email;
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData(); // Mengambil email dari shared preferences
+  }
+
+  // Method untuk mengambil email dari shared preferences
+  Future<void> _loadUserData() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      email = prefs.getString('email');
+      isLoading = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     myColor = Colors.black;
     mediaSize = MediaQuery.of(context).size;
+
+    // Menampilkan loading spinner jika data sedang dimuat
+    if (isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    // Misale nek email e kosong, bakal nampilkeun pesan error
+    if (email == null) {
+      return Scaffold(
+        body: Center(child: Text('Email not found in shared preferences')),
+      );
+    }
 
     return Container(
       decoration: BoxDecoration(color: myColor),
@@ -145,7 +175,7 @@ class _RegisterDataState extends State<RegisterData> {
             _buildPasswordField(passwordController),
             const SizedBox(height: 20),
             _buildGreyText("Phone Number"),
-            _buildPhoneField(phoneController, isPhone: true),
+            _buildPhoneField(phoneController),
             const SizedBox(height: 20),
             _buildGreyText("Date of Birth"),
             _buildDobField(dobController),
@@ -173,86 +203,56 @@ class _RegisterDataState extends State<RegisterData> {
     );
   }
 
-  Widget _buildFirstNameField(TextEditingController controller,
-      {bool isEmail = false, bool isPhone = false}) {
+  Widget _buildFirstNameField(TextEditingController controller) {
     return TextField(
       controller: controller,
-      style: TextStyle(
+      style: const TextStyle(
         color: Colors.white,
         fontFamily: 'Poppins-Regular',
       ),
-      keyboardType: isEmail
-          ? TextInputType.emailAddress
-          : isPhone
-              ? TextInputType.phone
-              : TextInputType.text,
       decoration: InputDecoration(
         hintText: 'Enter first name',
         hintStyle: const TextStyle(
           color: Colors.grey,
           fontFamily: 'Poppins-Light',
         ),
-        suffixIcon: isEmail
-            ? const Icon(Icons.email)
-            : isPhone
-                ? const Icon(Icons.phone)
-                : const Icon(Icons.person),
+        suffixIcon: const Icon(Icons.person),
       ),
     );
   }
 
-  Widget _buildLastNameField(TextEditingController controller,
-      {bool isEmail = false, bool isPhone = false}) {
+  Widget _buildLastNameField(TextEditingController controller) {
     return TextField(
       controller: controller,
-      style: TextStyle(
+      style: const TextStyle(
         color: Colors.white,
         fontFamily: 'Poppins-Regular',
       ),
-      keyboardType: isEmail
-          ? TextInputType.emailAddress
-          : isPhone
-              ? TextInputType.phone
-              : TextInputType.text,
       decoration: InputDecoration(
         hintText: 'Enter last name',
         hintStyle: const TextStyle(
           color: Colors.grey,
           fontFamily: 'Poppins-Light',
         ),
-        suffixIcon: isEmail
-            ? const Icon(Icons.email)
-            : isPhone
-                ? const Icon(Icons.phone)
-                : const Icon(Icons.person),
+        suffixIcon: const Icon(Icons.person),
       ),
     );
   }
 
-  Widget _buildPhoneField(TextEditingController controller,
-      {bool isEmail = false, bool isPhone = false}) {
+  Widget _buildPhoneField(TextEditingController controller) {
     return TextField(
       controller: controller,
-      style: TextStyle(
+      style: const TextStyle(
         color: Colors.white,
         fontFamily: 'Poppins-Regular',
       ),
-      keyboardType: isEmail
-          ? TextInputType.emailAddress
-          : isPhone
-              ? TextInputType.phone
-              : TextInputType.text,
       decoration: InputDecoration(
         hintText: 'Enter phone number',
         hintStyle: const TextStyle(
           color: Colors.grey,
           fontFamily: 'Poppins-Light',
         ),
-        suffixIcon: isEmail
-            ? const Icon(Icons.email)
-            : isPhone
-                ? const Icon(Icons.phone)
-                : const Icon(Icons.person),
+        suffixIcon: const Icon(Icons.phone),
       ),
     );
   }
@@ -260,7 +260,7 @@ class _RegisterDataState extends State<RegisterData> {
   Widget _buildPasswordField(TextEditingController controller) {
     return TextField(
       controller: controller,
-      style: TextStyle(
+      style: const TextStyle(
         color: Colors.white,
       ),
       obscureText: !isPasswordVisible,
@@ -287,7 +287,7 @@ class _RegisterDataState extends State<RegisterData> {
   Widget _buildDobField(TextEditingController controller) {
     return TextField(
       controller: controller,
-      style: TextStyle(
+      style: const TextStyle(
         color: Colors.white,
       ),
       readOnly: true,
@@ -298,7 +298,7 @@ class _RegisterDataState extends State<RegisterData> {
           fontFamily: 'Poppins-Light',
         ),
         suffixIcon: IconButton(
-          icon: Icon(Icons.calendar_today),
+          icon: const Icon(Icons.calendar_today),
           onPressed: () {
             _selectDate(context, controller);
           },
@@ -328,7 +328,6 @@ class _RegisterDataState extends State<RegisterData> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
-          mainAxisAlignment: MainAxisAlignment.start,
           children: [
             Row(
               children: [
@@ -341,16 +340,15 @@ class _RegisterDataState extends State<RegisterData> {
                     });
                   },
                 ),
-                Text(
-                  "Man",
+                const Text(
+                  'Man',
                   style: TextStyle(
                     color: Colors.white,
-                    fontFamily: 'Poppins-Light',
+                    fontFamily: 'Poppins-Regular',
                   ),
                 ),
               ],
             ),
-            SizedBox(width: 20),
             Row(
               children: [
                 Radio<Gender>(
@@ -362,11 +360,11 @@ class _RegisterDataState extends State<RegisterData> {
                     });
                   },
                 ),
-                Text(
-                  "Female",
+                const Text(
+                  'Female',
                   style: TextStyle(
                     color: Colors.white,
-                    fontFamily: 'Poppins-Light',
+                    fontFamily: 'Poppins-Regular',
                   ),
                 ),
               ],
@@ -380,12 +378,74 @@ class _RegisterDataState extends State<RegisterData> {
   Widget _buildRegisterButton() {
     return ElevatedButton(
       onPressed: () async {
-        await _saveUserData();
+        // Melakukan validasi input
+        if (firstNameController.text.isEmpty ||
+            lastNameController.text.isEmpty) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+                content: Text('Please enter both first and last name!')),
+          );
+          return;
+        }
+        if (passwordController.text.length < 6) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+                content: Text('Password must be at least 6 characters long!')),
+          );
+          return;
+        }
+        if (phoneController.text.isEmpty) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Please enter your phone number!')),
+          );
+          return;
+        }
+        if (_selectedGender == null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Please select your gender!')),
+          );
+          return;
+        }
+        if (dobController.text.isEmpty) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Please select your date of birth!')),
+          );
+          return;
+        }
 
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const LoginPage()),
+        // Melakukan create / register user dari input yang diberikan
+        final user = User(
+          first_name: firstNameController.text,
+          last_name: lastNameController.text,
+          email: email!,
+          password: passwordController.text,
+          no_telp: phoneController.text,
+          gender: _selectedGender == Gender.man ? 'male' : 'female',
+          tanggal_lahir: dobController.text,
         );
+
+        try {
+          // Melakukan request ke API untuk register user baru dengan data yang diberikan
+          bool success = await UserClient.registerUser(user);
+
+          // Jika registrasi berhasil, alihkan ke halaman login
+          if (success) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => const LoginPage()),
+            );
+          } else {
+            // Jika registrasi gagal, bakal nampilkan pesan error
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Registration failed!')),
+            );
+          }
+        } catch (e) {
+          // Cuma exception aja kalau Sum Ting Wong
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error: ${e.toString()}')),
+          );
+        }
       },
       style: ElevatedButton.styleFrom(
         shape: const StadiumBorder(),
@@ -395,7 +455,7 @@ class _RegisterDataState extends State<RegisterData> {
         minimumSize: const Size.fromHeight(50),
       ),
       child: const Text(
-        "REGISTER",
+        "Register",
         style: TextStyle(
           color: Colors.black,
           fontFamily: 'Poppins-Semibold',
@@ -403,23 +463,5 @@ class _RegisterDataState extends State<RegisterData> {
         ),
       ),
     );
-  }
-
-  Future<void> _saveUserData() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setString('first_name', firstNameController.text);
-    await prefs.setString('last_name', lastNameController.text);
-    await prefs.setString('phone_number', phoneController.text);
-    await prefs.getString('email');
-    await prefs.setString('dob', dobController.text);
-    await prefs.setString(
-        'gender', _selectedGender == Gender.man ? 'Man' : 'Female');
-  }
-
-  _loadUserData() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    setState(() {
-      email = prefs.getString('email');
-    });
   }
 }

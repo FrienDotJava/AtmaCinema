@@ -8,9 +8,11 @@ class FilmClient {
   static final String endpoint = '/api/film';
 
   // Fungsi untuk mengambil data film berdasarkan status (Now Playing atau Coming Soon)
-  static Future<List<Film>> fetchByStatus(String status) async {
+  static Future<List<Film>> fetchByStatus(String status, String token) async {
     try {
-      final response = await get(Uri.http(url, '$endpoint/status/$status'));
+      final response = await get(Uri.http(url, '$endpoint/status/$status'),
+          headers: {'Authorization': 'Bearer $token'}); //Buat ngambil token
+      //Wajib karena semua fungsi di backend butuh token -> auth sanctum
 
       if (response.statusCode != 200) {
         throw Exception(response.reasonPhrase);

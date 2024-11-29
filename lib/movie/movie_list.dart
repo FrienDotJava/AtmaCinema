@@ -5,6 +5,7 @@ import 'package:speech_to_text/speech_to_text.dart' as stt;
 
 import 'package:tubes/client/FilmClient.dart';
 import 'package:tubes/entity/Film.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ListMovieView extends StatefulWidget {
   const ListMovieView({Key? key}) : super(key: key);
@@ -19,20 +20,37 @@ class _ListMovieViewState extends State<ListMovieView>
   late stt.SpeechToText _speech;
   bool _isListening = false;
   String _searchQuery = "";
-  late Future<List<Film>> nowPlayingMovies; // List<Film> untuk 'Now Playing'
-  late Future<List<Film>> comingSoonMovies; // List<Film> untuk 'Coming Soon'
+  late Future<List<Film>> nowPlayingMovies; // List<Film> for 'Now Playing'
+  late Future<List<Film>> comingSoonMovies; // List<Film> for 'Coming Soon'
+  String? token;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
     _speech = stt.SpeechToText();
-
-    // Panggil API berdasarkan status
-    nowPlayingMovies = FilmClient.fetchByStatus('now playing');
-    comingSoonMovies = FilmClient.fetchByStatus('coming soon');
+    _loadToken(); //Buat ngambil token biar data bisa diambil
+    //Harus ambil token karena di laravel, untuk fungsi indexByStatus udah kena auth middleware
   }
 
+  // Fungsi untuk load token dari SharedPreferences
+  void _loadToken() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    token = prefs.getString('token'); // Mengambil token dari SharedPreferences
+
+    if (token != null) {
+      // Kalau tokennya dapat, maka fetch data dari API
+      setState(() {
+        nowPlayingMovies = FilmClient.fetchByStatus('now playing', token!);
+        comingSoonMovies = FilmClient.fetchByStatus('coming soon', token!);
+      });
+    } else {
+      // Kalau token tidak ada  / null, maka print pesan error dan mundur ke halaman login
+      print('Token not found');
+    }
+  }
+
+  // Speech recognition to handle voice search
   void _listen() async {
     if (!_isListening) {
       bool available = await _speech.initialize(
@@ -122,50 +140,60 @@ class _ListMovieViewState extends State<ListMovieView>
           ),
           const SizedBox(height: 8),
           Expanded(
-            child: TabBarView(
-              controller: _tabController,
-              children: [
-                // Menampilkan data film yang sedang tayang
-                // Disini pakai FutureBuilder untuk menampilkan data film yang sedang tayang
-                FutureBuilder<List<Film>>(
-                  future: nowPlayingMovies,
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Center(child: CircularProgressIndicator());
-                    } else if (snapshot.hasError) {
-                      return Center(child: Text('Error: ${snapshot.error}'));
-                    } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                      return const Center(child: Text('No movies found'));
-                    } else {
-                      return MovieGrid(
-                        movies: snapshot.data!,
-                        isComingSoon: false,
-                      );
-                    }
-                  },
-                ),
+            child: token == null
+                ? const Center(
+                    child:
+                        CircularProgressIndicator()) // Cuma buat loading biar gak nampak layar merah karena token belum diambil
+                : TabBarView(
+                    controller: _tabController,
+                    children: [
+                      // Menampilkan data 'Now Playing'
+                      FutureBuilder<List<Film>>(
+                        future: nowPlayingMovies,
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return const Center(
+                                child: CircularProgressIndicator());
+                          } else if (snapshot.hasError) {
+                            return Center(
+                                child: Text('Error: ${snapshot.error}'));
+                          } else if (!snapshot.hasData ||
+                              snapshot.data!.isEmpty) {
+                            return const Center(child: Text('No movies found'));
+                          } else {
+                            return MovieGrid(
+                              movies: snapshot.data!,
+                              isComingSoon: false,
+                            );
+                          }
+                        },
+                      ),
 
-                // Menampilkan data film yang akan tayang
-                // Disini pakai FutureBuilder untuk menampilkan data film yang akan tayang
-                FutureBuilder<List<Film>>(
-                  future: comingSoonMovies,
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Center(child: CircularProgressIndicator());
-                    } else if (snapshot.hasError) {
-                      return Center(child: Text('Error: ${snapshot.error}'));
-                    } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                      return const Center(child: Text('No movies found'));
-                    } else {
-                      return MovieGrid(
-                        movies: snapshot.data!,
-                        isComingSoon: true,
-                      );
-                    }
-                  },
-                ),
-              ],
-            ),
+                      // Menampilkan data 'Coming Soon'
+                      FutureBuilder<List<Film>>(
+                        future: comingSoonMovies,
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return const Center(
+                                child: CircularProgressIndicator());
+                          } else if (snapshot.hasError) {
+                            return Center(
+                                child: Text('Error: ${snapshot.error}'));
+                          } else if (!snapshot.hasData ||
+                              snapshot.data!.isEmpty) {
+                            return const Center(child: Text('No movies found'));
+                          } else {
+                            return MovieGrid(
+                              movies: snapshot.data!,
+                              isComingSoon: true,
+                            );
+                          }
+                        },
+                      ),
+                    ],
+                  ),
           ),
         ],
       ),
@@ -173,6 +201,7 @@ class _ListMovieViewState extends State<ListMovieView>
   }
 }
 
+// Movie grid buat menampilkan list film
 class MovieGrid extends StatelessWidget {
   final List<Film> movies;
   final bool isComingSoon;
@@ -202,6 +231,7 @@ class MovieGrid extends StatelessWidget {
   }
 }
 
+// Movie card widget
 class MovieCard extends StatelessWidget {
   final Film movie;
   final bool isComingSoon;
