@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:tubes/login/login.dart';
 import 'package:tubes/register/register_otp.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:tubes/client/UserClient.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -186,13 +187,23 @@ class _RegisterPageState extends State<RegisterPage> {
   Widget _buildContinueButton() {
     return ElevatedButton(
       onPressed: () async {
-        debugPrint("Email : ${emailController.text}");
         if (_formKey.currentState!.validate()) {
-          await _saveUserData();
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const RegisterOTPPage()),
-          );
+          final email = emailController.text;
+          bool success = await UserClient.registerEmail(email);
+
+          if (success) {
+            // Menyimpan email dalam lokal buat digunakan di halaman selanjutnya
+            await _saveUserData();
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const RegisterOTPPage()),
+            );
+          } else {
+            // Nampilken pesen nek email wis didaftari
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Email already registered or invalid.')),
+            );
+          }
         }
       },
       style: ElevatedButton.styleFrom(
@@ -207,10 +218,7 @@ class _RegisterPageState extends State<RegisterPage> {
       child: const Text(
         "CONTINUE",
         style: TextStyle(
-          color: Colors.black,
-          fontFamily: 'Poppins-SemiBold',
-          fontSize: 16,
-        ),
+            color: Colors.black, fontFamily: 'Poppins-SemiBold', fontSize: 16),
       ),
     );
   }

@@ -1,8 +1,11 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:tubes/entity/User.dart';
 import 'package:tubes/profile/edit_profile.dart';
 import 'package:tubes/login/login.dart';
 import 'package:tubes/profile/change_password.dart';
+import 'package:tubes/client/UserClient.dart'; // Import UserClient untuk API request
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -17,6 +20,7 @@ class _ProfilePageState extends State<ProfilePage> {
   String? phoneNumber;
   String? gender;
   String? dob;
+  String? token; // Menyimpan token untuk autentikasi
 
   @override
   void initState() {
@@ -24,15 +28,34 @@ class _ProfilePageState extends State<ProfilePage> {
     _loadUserData();
   }
 
+  // Fungsi untuk memuat data pengguna, mengambil token dan request data dari API
   _loadUserData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    setState(() {
-      fullName = prefs.getString('full_name') ?? '-';
-      email = prefs.getString('email') ?? '-';
-      phoneNumber = prefs.getString('phone_number') ?? '-';
-      gender = prefs.getString('gender') ?? '-';
-      dob = prefs.getString('dob') ?? '-';
-    });
+    token = prefs.getString('token'); // Mendapatkan token pengguna
+
+    if (token != null) {
+      // Ambil data profil menggunakan UserClient
+      User? user = await UserClient.getProfile(token!);
+      if (user != null) {
+        // Mengisi data pengguna ke variabel state dari data yang didapat (database)
+        setState(() {
+          fullName = user.first_name + ' ' + user.last_name;
+          email = user.email;
+          phoneNumber = user.no_telp;
+          gender = user.gender;
+          dob = user.tanggal_lahir;
+        });
+      } else {
+        // Handle error, jika data gagal diambil
+        print('Failed to load user data');
+      }
+    } else {
+      // Jika token tidak ditemukan, alihkan ke halaman login
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const LoginPage()),
+      );
+    }
   }
 
   @override
@@ -153,10 +176,13 @@ class _ProfilePageState extends State<ProfilePage> {
           icon: Icons.logout,
           label: 'Logout',
           color: Colors.grey[850],
-          onPressed: () {
-            Navigator.push(
+          onPressed: () async {
+            SharedPreferences prefs = await SharedPreferences.getInstance();
+            prefs.remove('token'); // Menghapus token pengguna
+
+            Navigator.pushReplacement(
               context,
-              MaterialPageRoute(builder: (context) => LoginPage()),
+              MaterialPageRoute(builder: (context) => const LoginPage()),
             );
           },
         ),
