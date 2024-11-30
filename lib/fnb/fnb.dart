@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:tubes/client/MakananMinumanClient.dart';
+import 'package:tubes/entity/MakananMinuman.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:intl/intl.dart';
 
 class FnBPage extends StatefulWidget {
   const FnBPage({Key? key}) : super(key: key);
@@ -9,60 +13,39 @@ class FnBPage extends StatefulWidget {
 
 class _FnBPageState extends State<FnBPage> {
   int _selectedIndex = 0;
+  late Future<List<Makananminuman>> _items;
+  String? token;
 
-  final List<Item> _bundles = [
-    Item(
-        title: 'Atma Bundle 1',
-        description: 'Atma Popcorn Small + Soft Drink Small',
-        price: 'Rp 45.000'),
-    Item(
-        title: 'Atma Bundle 2',
-        description: 'Atma Popcorn Medium + Soft Drink Small',
-        price: 'Rp 60.000'),
-    Item(
-        title: 'Atma Bundle 3',
-        description: 'Atma Popcorn Large + Soft Drink Small',
-        price: 'Rp 75.000'),
-    Item(
-        title: 'Atma Bundle 4',
-        description: 'Atma Snack Platter + Atma Tea',
-        price: 'Rp 100.000'),
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _loadItems();
+  }
 
-  final List<Item> _foods = [
-    Item(
-        title: 'Atma Popcorn Small',
-        description: 'Small-sized popcorn',
-        price: 'Rp 30.000'),
-    Item(
-        title: 'Atma Popcorn Medium',
-        description: 'Medium-sized popcorn',
-        price: 'Rp 45.000'),
-    Item(
-        title: 'Atma Popcorn Large',
-        description: 'Large-sized popcorn',
-        price: 'Rp 60.000'),
-    Item(
-        title: 'Atma Snack Platter',
-        description: 'Delicious snack platter',
-        price: 'Rp 70.000'),
-  ];
+  void _loadItems() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    token = prefs.getString('token');
 
-  final List<Item> _drinks = [
-    Item(
-        title: 'Soft Drink Small',
-        description: 'Refreshing soft drink',
-        price: 'Rp 15.000'),
-    Item(
-        title: 'Soft Drink Large',
-        description: 'Large refreshing drink',
-        price: 'Rp 25.000'),
-    Item(title: 'Milo', description: 'Medium Sized Milo', price: 'Rp 35.000'),
-    Item(
-        title: 'Atma Tea',
-        description: 'Authentic Atma tea',
-        price: 'Rp 20.000'),
-  ];
+    if (token != null) {
+      String category = _getCategoryByIndex(_selectedIndex);
+      setState(() {
+        _items = MakananMinumanClient.fetchByKategori(category, token!);
+      });
+    } else {
+      print('Token not found');
+    }
+  }
+
+  String _getCategoryByIndex(int index) {
+    switch (index) {
+      case 1:
+        return 'makanan';
+      case 2:
+        return 'minuman';
+      default:
+        return 'bundle';
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -83,8 +66,7 @@ class _FnBPageState extends State<FnBPage> {
           child: Column(
             children: [
               Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
                 child: Container(
                   decoration: BoxDecoration(
                     color: const Color(0xFF1F1F1F),
@@ -95,9 +77,7 @@ class _FnBPageState extends State<FnBPage> {
                     children: [
                       IconButton(
                         icon: const Icon(Icons.search, color: Colors.white54),
-                        onPressed: () {
-                          // buat search
-                        },
+                        onPressed: () {},
                       ),
                       Expanded(
                         child: TextField(
@@ -109,9 +89,7 @@ class _FnBPageState extends State<FnBPage> {
                       ),
                       IconButton(
                         icon: const Icon(Icons.mic, color: Colors.white54),
-                        onPressed: () {
-                          // buat voice search
-                        },
+                        onPressed: () {},
                       ),
                     ],
                   ),
@@ -130,9 +108,7 @@ class _FnBPageState extends State<FnBPage> {
                     const Spacer(),
                     IconButton(
                       icon: const Icon(Icons.swap_vert, color: Colors.white),
-                      onPressed: () {
-                        // buat sort?
-                      },
+                      onPressed: () {},
                     ),
                   ],
                 ),
@@ -145,7 +121,20 @@ class _FnBPageState extends State<FnBPage> {
         decoration: const BoxDecoration(
           color: Colors.black,
         ),
-        child: _buildItemList(),
+        child: FutureBuilder<List<Makananminuman>>(
+          future: _items, // Use _items directly here, no null check needed
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (snapshot.hasError) {
+              return Center(child: Text('Error: ${snapshot.error}'));
+            } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+              return const Center(child: Text('No items available.'));
+            } else {
+              return _buildItemList(snapshot.data!);
+            }
+          },
+        ),
       ),
     );
   }
@@ -156,6 +145,7 @@ class _FnBPageState extends State<FnBPage> {
       onTap: () {
         setState(() {
           _selectedIndex = index;
+          _loadItems(); // Reload items when category is changed
         });
       },
       child: Container(
@@ -176,19 +166,7 @@ class _FnBPageState extends State<FnBPage> {
     );
   }
 
-  Widget _buildItemList() {
-    List<Item> items;
-    switch (_selectedIndex) {
-      case 1:
-        items = _foods;
-        break;
-      case 2:
-        items = _drinks;
-        break;
-      default:
-        items = _bundles;
-    }
-
+  Widget _buildItemList(List<Makananminuman> items) {
     return ListView.builder(
       padding: const EdgeInsets.all(16.0),
       itemCount: items.length,
@@ -200,12 +178,13 @@ class _FnBPageState extends State<FnBPage> {
 }
 
 class FnBItemCard extends StatelessWidget {
-  final Item item;
+  final Makananminuman item;
 
   const FnBItemCard({Key? key, required this.item}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final formattedPrice = NumberFormat.currency(locale: 'id_ID', symbol: 'Rp ').format(item.harga_item);
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Container(
@@ -223,7 +202,7 @@ class FnBItemCard extends StatelessWidget {
                   ClipRRect(
                     borderRadius: BorderRadius.circular(8.0),
                     child: Image.asset(
-                      'images/bg4.jpg',
+                      item.gambar,
                       width: 90,
                       height: 90,
                       fit: BoxFit.cover,
@@ -235,7 +214,7 @@ class FnBItemCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          item.title,
+                          item.nama_item,
                           style: const TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
@@ -243,7 +222,7 @@ class FnBItemCard extends StatelessWidget {
                           ),
                         ),
                         Text(
-                          item.description,
+                          item.deskripsi_item,
                           style: const TextStyle(
                             color: Colors.white70,
                             fontSize: 14,
@@ -259,7 +238,7 @@ class FnBItemCard extends StatelessWidget {
               bottom: 8,
               right: 8,
               child: Text(
-                item.price,
+                formattedPrice,
                 style: const TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
@@ -271,12 +250,4 @@ class FnBItemCard extends StatelessWidget {
       ),
     );
   }
-}
-
-class Item {
-  final String title;
-  final String description;
-  final String price;
-
-  Item({required this.title, required this.description, required this.price});
 }

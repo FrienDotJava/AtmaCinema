@@ -22,7 +22,7 @@ class Makananminuman {
   factory Makananminuman.fromJson(Map<String, dynamic> json) => Makananminuman(
         id_makanan_minuman: json["id_makanan_minuman"],
         nama_item: json["nama_item"],
-        harga_item: json["harga_item"],
+        harga_item: double.tryParse(json['harga_item'].toString()) ?? 0.0,
         deskripsi_item: json["deskripsi_item"],
         kategori: json["kategori"],
         gambar: json["gambar"],
