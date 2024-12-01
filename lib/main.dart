@@ -22,7 +22,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Sinema Layar Kaca',
+      title: 'ATMA Cinema',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
