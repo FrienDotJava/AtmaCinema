@@ -60,7 +60,7 @@ class _MyHomeViewState extends State<MyHomeView> {
           elevation: 0,
           actions: [
             IconButton(
-              icon: const Icon(Icons.person_2_rounded, size: 36),
+              icon: const Icon(Icons.person_2, size: 36),
               onPressed: () {
                 Navigator.push(
                   context,
@@ -101,7 +101,7 @@ class _MyHomeViewState extends State<MyHomeView> {
         body: Column(
           children: [
             _buildSearchBar(),
-            const SizedBox(height: 20),
+            const SizedBox(height: 15),
             Expanded(
               child: SingleChildScrollView(
                 child: Column(
@@ -113,7 +113,7 @@ class _MyHomeViewState extends State<MyHomeView> {
                     _buildSectionHeader("Coming Soon", false),
                     const SizedBox(height: 15),
                     _buildComingSoonList(),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 15),
                     buildAtmaNewsSection(context),
                     const SizedBox(height: 30),
                     buildTopMoviesSection(context),
@@ -205,15 +205,14 @@ class _MyHomeViewState extends State<MyHomeView> {
     );
   }
 
-  // _buildMovieList() now takes data from the API response
   Widget _buildMovieList() {
     return FutureBuilder<List<Film>>(
       future: nowPlayingMovies,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const CircularProgressIndicator();
+          return const Center(child: CircularProgressIndicator());
         } else if (snapshot.hasError) {
-          return Text('Error: ${snapshot.error}');
+          return Center(child: Text('Error: ${snapshot.error}'));
         } else if (snapshot.hasData) {
           List<Film> movies = snapshot.data!;
           return SizedBox(
@@ -223,18 +222,21 @@ class _MyHomeViewState extends State<MyHomeView> {
               itemCount: movies.length,
               itemBuilder: (context, index) {
                 Film movie = movies[index];
-                return MovieCard(
-                  imagePath: movie.poster ?? 'images/film1.jpg',
-                  title: movie.judul_film,
-                  duration: movie.durasi.toString() ?? 'N/A',
-                  ageRating: movie.rating_umur ?? 'N/A',
-                  format: '2D', // Example static format
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  child: MovieCard(
+                    imagePath: movie.poster ?? 'images/film1.jpg',
+                    title: movie.judul_film,
+                    duration: movie.durasi.toString() + ' mnt' ?? 'N/A',
+                    ageRating: movie.rating_umur ?? 'N/A',
+                    format: movie.dimensi ?? 'N/A',
+                  ),
                 );
               },
             ),
           );
         } else {
-          return const Text('No data available');
+          return const Center(child: Text('No data available'));
         }
       },
     );
@@ -273,7 +275,7 @@ class _MyHomeViewState extends State<MyHomeView> {
   }
 }
 
-// MovieCard Widget (unchanged)
+// MovieCard Widget
 class MovieCard extends StatelessWidget {
   final String imagePath;
   final String title;
@@ -310,12 +312,64 @@ class MovieCard extends StatelessWidget {
           const SizedBox(height: 8),
           Text(
             title,
-            style: const TextStyle(color: Colors.white, fontSize: 16),
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 20,
+              fontFamily: 'Poppins-SemiBold',
+            ),
           ),
-          const SizedBox(height: 4),
-          Text(
-            '$duration | $ageRating | $format',
-            style: const TextStyle(color: Colors.white54, fontSize: 14),
+          const SizedBox(height: 3),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.white10,
+                  borderRadius: BorderRadius.circular(7),
+                ),
+                padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 7),
+                margin: const EdgeInsets.only(right: 8),
+                child: Text(
+                  duration,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontFamily: 'Poppins-Medium',
+                  ),
+                ),
+              ),
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.white10,
+                  borderRadius: BorderRadius.circular(7),
+                ),
+                padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 7),
+                margin: const EdgeInsets.only(right: 8),
+                child: Text(
+                  ageRating,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontFamily: 'Poppins-Medium',
+                  ),
+                ),
+              ),
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.white10,
+                  borderRadius: BorderRadius.circular(7),
+                ),
+                padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 7),
+                child: Text(
+                  format,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontFamily: 'Poppins-Medium',
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -323,7 +377,7 @@ class MovieCard extends StatelessWidget {
   }
 }
 
-// ComingSoonCard Widget (unchanged)
+// ComingSoonCard Widget
 class ComingSoonCard extends StatelessWidget {
   final String? imagePath;
   final String title;
@@ -354,13 +408,14 @@ class ComingSoonCard extends StatelessWidget {
           const SizedBox(height: 8),
           Text(
             title,
-            maxLines: 2, // Batasi teks menjadi 2 baris
+            maxLines: 1, // Batasi teks menjadi 2 baris
             textAlign: TextAlign.center,
             overflow: TextOverflow
                 .ellipsis, // Tampilkan elipsis jika teks terlalu panjang
             style: const TextStyle(
               color: Colors.white,
               fontSize: 16,
+              fontFamily: 'Poppins-SemiBold',
             ),
           ),
         ],
@@ -393,12 +448,22 @@ Widget buildAtmaNewsSection(BuildContext context) {
                   MaterialPageRoute(builder: (context) => const NewsList()),
                 );
               },
-              child: const Text(
-                'See all >',
-                style: TextStyle(
-                  color: Colors.white70,
-                  fontSize: 16,
-                ),
+              child: Row(
+                children: const [
+                  Text(
+                    "See all",
+                    style: TextStyle(
+                      color: Colors.white70,
+                      fontSize: 16,
+                    ),
+                  ),
+                  SizedBox(width: 4),
+                  Icon(
+                    Icons.arrow_forward_ios,
+                    color: Colors.white70,
+                    size: 16,
+                  ),
+                ],
               ),
             ),
           ],
@@ -511,12 +576,22 @@ Widget buildTopMoviesSection(BuildContext context) {
                   MaterialPageRoute(builder: (context) => TopMovieList()),
                 );
               },
-              child: const Text(
-                'See all >',
-                style: TextStyle(
-                  color: Colors.white70,
-                  fontSize: 16,
-                ),
+              child: Row(
+                children: const [
+                  Text(
+                    "See all",
+                    style: TextStyle(
+                      color: Colors.white70,
+                      fontSize: 16,
+                    ),
+                  ),
+                  SizedBox(width: 4),
+                  Icon(
+                    Icons.arrow_forward_ios,
+                    color: Colors.white70,
+                    size: 16,
+                  ),
+                ],
               ),
             ),
           ],
