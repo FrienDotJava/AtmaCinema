@@ -111,6 +111,27 @@ class UserClient {
     }
   }
 
+  static Future<String?> logout(String token) async {
+    final Uri apiUrl = Uri.parse('$url/api/logout');
+    try {
+      final response = await http.post(
+        apiUrl,
+        headers: {'Authorization': 'Bearer $token'},
+      );
+
+      if (response.statusCode == 200) {
+        return "Logout Success";
+      } else if (response.statusCode == 401) {
+        return "Unauthorized: Please log in again.";
+      } else {
+        return "Failed to logout: ${response.body}";
+      }
+    } catch (e) {
+      print('Error: $e');
+      return "An error occurred while logging out.";
+    }
+  }
+
   static Future<void> saveToken(String token) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString('token', token);

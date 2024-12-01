@@ -5,7 +5,9 @@ import 'package:tubes/entity/User.dart';
 import 'package:tubes/profile/edit_profile.dart';
 import 'package:tubes/login/login.dart';
 import 'package:tubes/profile/change_password.dart';
-import 'package:tubes/client/UserClient.dart'; // Import UserClient untuk API request
+
+import 'package:tubes/client/UserClient.dart';
+import 'package:tubes/entity/User.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -178,12 +180,34 @@ class _ProfilePageState extends State<ProfilePage> {
           color: Colors.grey[850],
           onPressed: () async {
             SharedPreferences prefs = await SharedPreferences.getInstance();
-            prefs.remove('token'); // Menghapus token pengguna
+            String? token = prefs.getString('token'); // Ambil token pengguna
 
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (context) => const LoginPage()),
-            );
+            if (token != null) {
+              // Panggil fungsi logout untuk mengirimkan request ke server
+              String? logoutMessage = await UserClient.logout(token);
+
+              if (logoutMessage == "Logout Success") {
+                // Hapus token dari SharedPreferences
+                prefs.remove('token');
+
+                // Arahkan pengguna ke halaman login
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => const LoginPage()),
+                );
+              } else {
+                // Tampilkan pesan error jika gagal logout
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(logoutMessage ?? 'Unknown error')),
+                );
+              }
+            } else {
+              print('No token found');
+              // Tampilkan pesan jika token tidak ditemukan
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Token not found, please log in again')),
+              );
+            }
           },
         ),
       ],

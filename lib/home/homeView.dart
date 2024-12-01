@@ -8,6 +8,9 @@ import 'package:tubes/home/home.dart';
 import 'package:tubes/profile/profile.dart';
 import 'package:tubes/news/news_list.dart';
 import 'package:tubes/news/news_detail.dart';
+import 'package:tubes/client/FilmClient.dart';
+import 'package:tubes/entity/Film.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MyHomeView extends StatefulWidget {
   const MyHomeView({super.key});
@@ -17,6 +20,34 @@ class MyHomeView extends StatefulWidget {
 }
 
 class _MyHomeViewState extends State<MyHomeView> {
+  late Future<List<Film>> nowPlayingMovies = Future.value([]);
+  late Future<List<Film>> comingSoonMovies = Future.value([]);
+
+  String? token;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadToken(); // Fetch token to load data from API
+  }
+
+  void _loadToken() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    token =
+        prefs.getString('token'); // Retrieve the token from SharedPreferences
+
+    if (token != null) {
+      // Fetch movie data if token is available
+      setState(() {
+        nowPlayingMovies = FilmClient.fetchByStatus('now playing', token!);
+        comingSoonMovies = FilmClient.fetchByStatus('coming soon', token!);
+      });
+    } else {
+      // If token is not available, print an error and navigate to login screen
+      print('Token not found');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -82,7 +113,7 @@ class _MyHomeViewState extends State<MyHomeView> {
                     _buildSectionHeader("Coming Soon", false),
                     const SizedBox(height: 15),
                     _buildComingSoonList(),
-                    const SizedBox(height: 30),
+                    const SizedBox(height: 24),
                     buildAtmaNewsSection(context),
                     const SizedBox(height: 30),
                     buildTopMoviesSection(context),
@@ -174,65 +205,75 @@ class _MyHomeViewState extends State<MyHomeView> {
     );
   }
 
+  // _buildMovieList() now takes data from the API response
   Widget _buildMovieList() {
-    return SizedBox(
-      height: 250,
-      child: ListView(
-        scrollDirection: Axis.horizontal,
-        children: const [
-          SizedBox(width: 16),
-          MovieCard(
-            imagePath: 'images/film1.jpg',
-            title: 'AVENGERS',
-            duration: '1h 20m',
-            ageRating: '17+',
-            format: '2D',
-          ),
-          MovieCard(
-            imagePath: 'images/film1.jpg',
-            title: 'SPIDERMAN',
-            duration: '2h 10m',
-            ageRating: '13+',
-            format: '3D',
-          ),
-          MovieCard(
-            imagePath: 'images/film1.jpg',
-            title: 'BLACK PANTHER',
-            duration: '2h 30m',
-            ageRating: '13+',
-            format: '3D',
-          ),
-        ],
-      ),
+    return FutureBuilder<List<Film>>(
+      future: nowPlayingMovies,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const CircularProgressIndicator();
+        } else if (snapshot.hasError) {
+          return Text('Error: ${snapshot.error}');
+        } else if (snapshot.hasData) {
+          List<Film> movies = snapshot.data!;
+          return SizedBox(
+            height: 250,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: movies.length,
+              itemBuilder: (context, index) {
+                Film movie = movies[index];
+                return MovieCard(
+                  imagePath: movie.poster ?? 'images/film1.jpg',
+                  title: movie.judul_film,
+                  duration: movie.durasi.toString() ?? 'N/A',
+                  ageRating: movie.rating_umur ?? 'N/A',
+                  format: '2D', // Example static format
+                );
+              },
+            ),
+          );
+        } else {
+          return const Text('No data available');
+        }
+      },
     );
   }
 
+  // _buildComingSoonList() now takes data from the API response
   Widget _buildComingSoonList() {
-    return SizedBox(
-      height: 220,
-      child: ListView(
-        scrollDirection: Axis.horizontal,
-        children: const [
-          SizedBox(width: 16),
-          ComingSoonCard(
-            imagePath: 'images/film1.jpg',
-            title: 'IRON MAN',
-          ),
-          ComingSoonCard(
-            imagePath: 'images/film1.jpg',
-            title: 'IRON MAN 2',
-          ),
-          ComingSoonCard(
-            imagePath: 'images/film1.jpg',
-            title: 'IRON MAN 3',
-          ),
-        ],
-      ),
+    return FutureBuilder<List<Film>>(
+      future: comingSoonMovies,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const CircularProgressIndicator();
+        } else if (snapshot.hasError) {
+          return Text('Error: ${snapshot.error}');
+        } else if (snapshot.hasData) {
+          List<Film> movies = snapshot.data!;
+          return SizedBox(
+            height: 220,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: movies.length,
+              itemBuilder: (context, index) {
+                Film movie = movies[index];
+                return ComingSoonCard(
+                  imagePath: movie.poster,
+                  title: movie.judul_film,
+                );
+              },
+            ),
+          );
+        } else {
+          return const Text('No data available');
+        }
+      },
     );
   }
 }
 
-// MovieCard Widget
+// MovieCard Widget (unchanged)
 class MovieCard extends StatelessWidget {
   final String imagePath;
   final String title;
@@ -269,22 +310,12 @@ class MovieCard extends StatelessWidget {
           const SizedBox(height: 8),
           Text(
             title,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-            ),
+            style: const TextStyle(color: Colors.white, fontSize: 16),
           ),
           const SizedBox(height: 4),
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              MovieTag(text: duration),
-              const SizedBox(width: 8),
-              MovieTag(text: ageRating),
-              const SizedBox(width: 8),
-              MovieTag(text: format),
-            ],
+          Text(
+            '$duration | $ageRating | $format',
+            style: const TextStyle(color: Colors.white54, fontSize: 14),
           ),
         ],
       ),
@@ -292,34 +323,9 @@ class MovieCard extends StatelessWidget {
   }
 }
 
-// MovieTag Widget
-class MovieTag extends StatelessWidget {
-  final String text;
-
-  const MovieTag({super.key, required this.text});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
-      decoration: BoxDecoration(
-        color: const Color(0xFF1F1F1F),
-        borderRadius: BorderRadius.circular(10.0),
-      ),
-      child: Text(
-        text,
-        style: const TextStyle(
-          fontSize: 12,
-          color: Colors.white,
-        ),
-      ),
-    );
-  }
-}
-
-// ComingSoonCard Widget
+// ComingSoonCard Widget (unchanged)
 class ComingSoonCard extends StatelessWidget {
-  final String imagePath;
+  final String? imagePath;
   final String title;
 
   const ComingSoonCard({
@@ -331,7 +337,7 @@ class ComingSoonCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 160,
+      width: 110,
       margin: const EdgeInsets.symmetric(horizontal: 8),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -339,21 +345,23 @@ class ComingSoonCard extends StatelessWidget {
           ClipRRect(
             borderRadius: BorderRadius.circular(12.0),
             child: Image.asset(
-              imagePath,
+              imagePath ?? 'images/film_default.jpg',
               fit: BoxFit.cover,
-              width: 140,
-              height: 180,
+              width: 120,
+              height: 165,
             ),
           ),
           const SizedBox(height: 8),
           Text(
             title,
+            maxLines: 2, // Batasi teks menjadi 2 baris
+            textAlign: TextAlign.center,
+            overflow: TextOverflow
+                .ellipsis, // Tampilkan elipsis jika teks terlalu panjang
             style: const TextStyle(
               color: Colors.white,
               fontSize: 16,
-              fontWeight: FontWeight.bold,
             ),
-            textAlign: TextAlign.center,
           ),
         ],
       ),
@@ -623,6 +631,31 @@ class MovieListCard extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+// MovieTag Widget
+class MovieTag extends StatelessWidget {
+  final String text;
+
+  const MovieTag({super.key, required this.text});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+      decoration: BoxDecoration(
+        color: const Color(0xFF1F1F1F),
+        borderRadius: BorderRadius.circular(10.0),
+      ),
+      child: Text(
+        text,
+        style: const TextStyle(
+          fontSize: 12,
+          color: Colors.white,
+        ),
       ),
     );
   }
