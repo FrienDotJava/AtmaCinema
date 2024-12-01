@@ -52,7 +52,7 @@ class MovieDetailPage extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          movie.judul_film, // Menggunakan judul dari model Film
+                          movie.judul_film,
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 24,
@@ -85,7 +85,7 @@ class MovieDetailPage extends StatelessWidget {
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          movie.genre, // Genre dari model Film
+                          movie.genre,
                           style: const TextStyle(
                               color: Colors.white70, fontSize: 16),
                         ),
@@ -98,7 +98,7 @@ class MovieDetailPage extends StatelessWidget {
                             const Text("4.8",
                                 style: TextStyle(
                                     color: Colors.white,
-                                    fontSize: 16)), // Contoh rating
+                                    fontSize: 16)),
                           ],
                         ),
                         const SizedBox(height: 8),
@@ -153,12 +153,12 @@ class MovieDetailPage extends StatelessWidget {
                               width: 100,
                               child: OutlinedButton(
                                 onPressed: () {
-                                  // Navigator.push(
-                                  //   context,
-                                  //   MaterialPageRoute(
-                                  //       builder: (context) =>
-                                  //           MovieReviewPage(movie: movie)),
-                                  // );
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => MovieReviewPage(
+                                            idFilm: movie.id_film)),
+                                  );
                                 },
                                 style: OutlinedButton.styleFrom(
                                   backgroundColor: Colors.white,
@@ -211,7 +211,7 @@ class MovieDetailPage extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               Text(
-                movie.sinopsis, // Sinopsis dari model Film
+                movie.sinopsis, 
                 style: const TextStyle(color: Colors.white70),
               ),
               const SizedBox(height: 16),
@@ -226,7 +226,7 @@ class MovieDetailPage extends StatelessWidget {
               ),
               const SizedBox(height: 4),
               Text(
-                movie.producer, // Producer dari model Film
+                movie.producer, 
                 style: const TextStyle(color: Colors.white70),
               ),
               const SizedBox(height: 16),
@@ -241,7 +241,7 @@ class MovieDetailPage extends StatelessWidget {
               ),
               const SizedBox(height: 4),
               Text(
-                movie.director, // Director dari model Film
+                movie.director, 
                 style: const TextStyle(color: Colors.white70),
               ),
               const SizedBox(height: 16),
@@ -256,7 +256,7 @@ class MovieDetailPage extends StatelessWidget {
               ),
               const SizedBox(height: 4),
               Text(
-                movie.writers, // Writers dari model Film
+                movie.writers, 
                 style: const TextStyle(color: Colors.white70),
               ),
               const SizedBox(height: 16),
@@ -271,7 +271,7 @@ class MovieDetailPage extends StatelessWidget {
               ),
               const SizedBox(height: 4),
               Text(
-                movie.cast, // Cast dari model Film
+                movie.cast, 
                 style: const TextStyle(color: Colors.white70),
               ),
             ],

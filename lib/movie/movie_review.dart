@@ -1,7 +1,50 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:tubes/client/ReviewClient.dart';
+import 'package:tubes/entity/Review.dart';
 
-class MovieReviewPage extends StatelessWidget {
-  const MovieReviewPage({super.key});
+class MovieReviewPage extends StatefulWidget {
+  final int idFilm;
+  const MovieReviewPage({super.key, required this.idFilm});
+
+  @override
+  State<MovieReviewPage> createState() => _MovieReviewPageState();
+}
+
+class _MovieReviewPageState extends State<MovieReviewPage> {
+  Future<ResponseReview>? review;
+  bool isDataLoaded = false;
+
+  @override
+  void initState() {
+    super.initState();
+    getReview();
+  }
+
+  Future<void> getReview() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
+
+    if (token == null) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text('Token not found')));
+      return;
+    }
+
+    try {
+      ResponseReview res =
+          await ReviewClient.fetchReview(widget.idFilm, token!);
+
+      setState(() {
+        review = Future.value(res);
+        isDataLoaded = true;
+      });
+    } catch (e) {
+      setState(() {
+        isDataLoaded = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,73 +69,41 @@ class MovieReviewPage extends StatelessWidget {
           ),
           child: Padding(
             padding: const EdgeInsets.all(20.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildCombinedRatingAndReviewSummary(),
-                const SizedBox(height: 20),
-                Expanded(
-                  child: ListView(
-                    children: [
-                      _buildReview(
-                        reviewerName: "Frendy Suhendro",
-                        daysAgo: "3 days ago",
-                        rating: 5,
-                        reviewText:
-                            "The Avengers (2012) is an exciting superhero team-up, blending action, humor, and stunning visuals. Directed by Joss Whedon, it unites Iron Man, Captain America, Thor, and others to battle Loki and an alien invasion. A must-watch for MCU fans!",
-                      ),
-                      Divider(color: Colors.white.withOpacity(0.2)),
-                      _buildReview(
-                        reviewerName: "Citra Susanti",
-                        daysAgo: "3 days ago",
-                        rating: 5,
-                        reviewText:
-                            "The Avengers (2012) is a thrilling superhero film that brings together Marvel's top heroes to stop Loki's invasion. With sharp dialogue, dynamic action, and great character chemistry, it’s a fun, fast-paced blockbuster and a highlight of the MCU.",
-                      ),
-                      Divider(color: Colors.white.withOpacity(0.2)),
-                      _buildReview(
-                        reviewerName: "Richard Sugeno",
-                        daysAgo: "3 days ago",
-                        rating: 5,
-                        reviewText:
-                            "In The Avengers (2012), Marvel brings its top heroes together for the first time. Iron Man, Captain America, Thor, and others are united to fight a common enemy. It's a defining moment for superhero cinema!",
-                      ),
-                      Divider(color: Colors.white.withOpacity(0.2)),
-                      _buildReview(
-                        reviewerName: "Linda Hartanto",
-                        daysAgo: "4 days ago",
-                        rating: 4,
-                        reviewText:
-                            "An iconic movie that set the tone for superhero team-ups. The chemistry between the characters and the action scenes are amazing. Some pacing issues, but overall a great experience!",
-                      ),
-                      Divider(color: Colors.white.withOpacity(0.2)),
-                      _buildReview(
-                        reviewerName: "Michael Gunawan",
-                        daysAgo: "5 days ago",
-                        rating: 4,
-                        reviewText:
-                            "A well-done film with a lot of humor and heart. The Avengers shows what happens when you bring together different heroes with their unique personalities and quirks. Loved it!",
-                      ),
-                      Divider(color: Colors.white.withOpacity(0.2)),
-                      _buildReview(
-                        reviewerName: "Siti Nur Aisyah",
-                        daysAgo: "6 days ago",
-                        rating: 5,
-                        reviewText:
-                            "One of my favorite movies of all time! The story, the characters, and the action sequences are top-notch. This movie redefined superhero movies for me.",
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
+            child: isDataLoaded
+                ? FutureBuilder<ResponseReview>(
+                    future: review,
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(child: CircularProgressIndicator());
+                      } else if (snapshot.hasError) {
+                        return const Center(child: Text("No data available"));
+                      } else if (!snapshot.hasData) {
+                        return const Center(child: Text("No data available"));
+                      } else {
+                        ResponseReview res = snapshot.data!;
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _buildCombinedRatingAndReviewSummary(res),
+                            const SizedBox(height: 20),
+                            Expanded(
+                              child: ListView(
+                                children: _buildReviewList(res.reviews ?? []),
+                              ),
+                            ),
+                          ],
+                        );
+                      }
+                    },
+                  )
+                : const Center(child: Text("No data available")),
           ),
         ),
       ),
     );
   }
 
-  Widget _buildCombinedRatingAndReviewSummary() {
+  Widget _buildCombinedRatingAndReviewSummary(ResponseReview res) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
@@ -101,9 +112,9 @@ class MovieReviewPage extends StatelessWidget {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              "4.8/5",
-              style: TextStyle(
+            Text(
+              "${res.average}/5",
+              style: const TextStyle(
                 color: Colors.white,
                 fontSize: 32,
                 fontWeight: FontWeight.bold,
@@ -122,14 +133,14 @@ class MovieReviewPage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              "243 User Ratings",
+              "${res.totalRating} User Ratings",
               style: TextStyle(
                 color: Colors.white.withOpacity(0.7),
                 fontSize: 14,
               ),
             ),
             Text(
-              "122 User Reviews",
+              "${res.totalDescription} User Reviews",
               style: TextStyle(
                 color: Colors.white.withOpacity(0.7),
                 fontSize: 14,
@@ -200,5 +211,22 @@ class MovieReviewPage extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  List<Widget> _buildReviewList(List<Review> reviews) {
+    return reviews.map((review) {
+      return Column(
+        children: [
+          _buildReview(
+            reviewerName: review.full_name,
+            daysAgo: review.review_at ?? "Just now",
+            rating: review.rating_review,
+            reviewText:
+                review.deskripsi_review ?? "No review from ${review.full_name}",
+          ),
+          Divider(color: Colors.white.withOpacity(0.2)),
+        ],
+      );
+    }).toList();
   }
 }

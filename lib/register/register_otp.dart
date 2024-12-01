@@ -3,6 +3,7 @@ import 'package:tubes/login/login.dart';
 import 'package:tubes/register/register_email.dart';
 import 'package:tubes/register/register_data.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:tubes/client/UserClient.dart';
 
 class RegisterOTPPage extends StatefulWidget {
   const RegisterOTPPage({super.key});
@@ -16,6 +17,27 @@ class _RegisterOTPPageState extends State<RegisterOTPPage> {
   late Color myColor;
   late Size mediaSize;
   TextEditingController otpController = TextEditingController();
+  String? email;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadEmailFromPrefs(); // Memuat email dari SharedPreferences
+  }
+
+  Future<void> _loadEmailFromPrefs() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      email = prefs.getString('email'); // Ambil email dari SharedPreferences
+    });
+    if (email == null) {
+      // Jika email tidak ditemukan, arahkan kembali ke RegisterEmail atau tampilkan pesan error
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const RegisterPage()),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -119,7 +141,7 @@ class _RegisterOTPPageState extends State<RegisterOTPPage> {
               ),
             ),
             const Text(
-              "We’ve send a verification code to your email",
+              "We’ve sent a verification code to your email",
               textAlign: TextAlign.start,
               style: TextStyle(
                 color: Colors.white,
@@ -221,10 +243,7 @@ class _RegisterOTPPageState extends State<RegisterOTPPage> {
     return Center(
       child: TextButton(
         onPressed: () {
-          // Navigator.push(
-          //   context,
-          //   MaterialPageRoute(builder: (context) => const LoginPage()),
-          // );
+          // Implementasi resend OTP
         },
         child: RichText(
           text: TextSpan(
@@ -285,6 +304,7 @@ class _RegisterOTPPageState extends State<RegisterOTPPage> {
 
   Future<void> _saveOTPData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setString('otp', otpController.text);
+    await prefs.setString(
+        'otp', otpController.text); // Simpan OTP kalau mau dipakai nanti
   }
 }

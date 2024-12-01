@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:tubes/home/home.dart';
 import 'package:tubes/register/register_email.dart';
 
+import 'package:tubes/client/UserClient.dart';
+import 'package:tubes/entity/User.dart';
+
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
@@ -258,16 +261,33 @@ class _LoginPageState extends State<LoginPage> {
 
   Widget _buildLoginButton() {
     return ElevatedButton(
-      onPressed: () {
+      onPressed: () async {
         if (emailController.text.isEmpty || passwordController.text.isEmpty) {
-          _showErrorDialog();
+          _showErrorDialog("Email and Password cannot be empty.");
         } else {
-          debugPrint("Email : ${emailController.text}");
-          debugPrint("Password : ${passwordController.text}");
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const homePage()),
-          );
+          // Mengambil email dan password dari controller
+          String email = emailController.text;
+          String password = passwordController.text;
+
+          // Menjalankan login request ke backend
+          try {
+            // Mengirim email dan password untuk login
+            User user = await UserClient.login(email, password);
+
+            if (user.token != null && user.token!.isNotEmpty) {
+              // Jika login berhasil dan token diterima, lanjutkan ke home
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => const homePage()),
+              );
+            } else {
+              // Jika token kosong, tampilkan error
+              _showErrorDialog("Login failed. Invalid credentials.");
+            }
+          } catch (e) {
+            // Tangani error jika ada masalah saat melakukan request
+            _showErrorDialog("Error: ${e.toString()}");
+          }
         }
       },
       style: ElevatedButton.styleFrom(
@@ -286,6 +306,26 @@ class _LoginPageState extends State<LoginPage> {
           fontSize: 16,
         ),
       ),
+    );
+  }
+
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Error"),
+          content: Text(message),
+          actions: <Widget>[
+            TextButton(
+              child: const Text("OK"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -347,26 +387,6 @@ class _LoginPageState extends State<LoginPage> {
           ),
         ),
       ),
-    );
-  }
-
-  void _showErrorDialog() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text("Error"),
-          content: const Text("Email and Password fields cannot be empty."),
-          actions: <Widget>[
-            TextButton(
-              child: const Text("OK"),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
     );
   }
 }
