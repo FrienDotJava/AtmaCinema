@@ -74,6 +74,47 @@ class _ListMovieViewState extends State<ListMovieView>
     }
   }
 
+  Widget _buildSearchBar() {
+    return Container(
+      margin: const EdgeInsets.all(16.0),
+      decoration: BoxDecoration(
+        color: const Color(0xFF0A2038),
+        borderRadius: BorderRadius.circular(30),
+      ),
+      child: Row(
+        children: [
+          IconButton(
+            icon: const Icon(Icons.search, color: Colors.white54),
+            onPressed: () {},
+          ),
+          Expanded(
+            child: TextField(
+              style: const TextStyle(color: Colors.white),
+              onChanged: (value) {
+                setState(() {
+                  _searchQuery = value;
+                });
+              },
+              controller: TextEditingController(text: _searchQuery),
+              decoration: const InputDecoration(
+                hintText: "Search for movies...",
+                hintStyle: TextStyle(color: Colors.white54),
+                border: InputBorder.none,
+              ),
+            ),
+          ),
+          IconButton(
+            icon: Icon(
+              _isListening ? Icons.mic : Icons.mic_none,
+              color: Colors.white54,
+            ),
+            onPressed: _listen,
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -82,7 +123,11 @@ class _ListMovieViewState extends State<ListMovieView>
         automaticallyImplyLeading: false,
         title: const Text(
           "Movies",
-          style: TextStyle(color: Colors.white),
+          style: TextStyle(
+            color: Colors.white,
+            fontFamily: 'Poppins-Medium',
+            fontSize: 24,
+          ),
         ),
         backgroundColor: Colors.black,
         bottom: TabBar(
@@ -90,55 +135,32 @@ class _ListMovieViewState extends State<ListMovieView>
           indicatorColor: Colors.white,
           labelColor: Colors.white,
           tabs: const [
-            Tab(text: "Now Playing"),
-            Tab(text: "Coming Soon"),
+            Tab(
+              child: Text(
+                "Now Playing",
+                style: TextStyle(
+                  fontFamily: 'Poppins-Semibold',
+                  fontSize: 16,
+                ),
+              ),
+            ),
+            Tab(
+              child: Text(
+                "Coming Soon",
+                style: TextStyle(
+                  fontFamily: 'Poppins-Semibold',
+                  fontSize: 16,
+                ),
+              ),
+            ),
           ],
         ),
       ),
       body: Column(
         children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 6.0),
-            child: Container(
-              decoration: BoxDecoration(
-                color: const Color(0xFF1F1F1F),
-                borderRadius: BorderRadius.circular(24.0),
-                border: Border.all(color: Colors.white, width: 1),
-              ),
-              child: Row(
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.search, color: Colors.white54),
-                    onPressed: () {},
-                  ),
-                  Expanded(
-                    child: TextField(
-                      onChanged: (value) {
-                        setState(() {
-                          _searchQuery = value;
-                        });
-                      },
-                      controller: TextEditingController(text: _searchQuery),
-                      decoration: const InputDecoration(
-                        border: InputBorder.none,
-                        hintText: 'Search movies...',
-                        hintStyle: TextStyle(color: Colors.white54),
-                      ),
-                      style: const TextStyle(color: Colors.white),
-                    ),
-                  ),
-                  IconButton(
-                    icon: Icon(
-                      _isListening ? Icons.mic : Icons.mic_none,
-                      color: Colors.white54,
-                    ),
-                    onPressed: _listen,
-                  ),
-                ],
-              ),
-            ),
-          ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 5),
+          _buildSearchBar(),
+          const SizedBox(height: 5),
           Expanded(
             child: token == null
                 ? const Center(
@@ -218,7 +240,7 @@ class MovieGrid extends StatelessWidget {
       padding: const EdgeInsets.all(8),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
-        childAspectRatio: 0.7,
+        childAspectRatio: 0.5,
         crossAxisSpacing: 8,
         mainAxisSpacing: 8,
       ),
@@ -231,7 +253,6 @@ class MovieGrid extends StatelessWidget {
   }
 }
 
-// Movie card widget
 class MovieCard extends StatelessWidget {
   final Film movie;
   final bool isComingSoon;
@@ -244,56 +265,86 @@ class MovieCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => MovieDetailPage(
-              movie: movie,
-              isComingSoon: isComingSoon,
+    return Container(
+      width: 365,
+      margin: const EdgeInsets.symmetric(horizontal: 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(12.0),
+            child: Image.asset(
+              movie.poster,
+              fit: BoxFit.cover,
+              width: 180,
+              height: 240,
             ),
           ),
-        );
-      },
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.grey[850],
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            ClipRRect(
-              borderRadius:
-                  const BorderRadius.vertical(top: Radius.circular(10)),
-              child: Image.asset(
-                movie.poster,
-                height: 200,
-                fit: BoxFit.cover,
-              ),
+          const SizedBox(height: 8),
+          Text(
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            movie.judul_film,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 18,
+              fontFamily: 'Poppins-SemiBold',
             ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Text(
-                    movie.judul_film,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 3),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.white10,
+                  borderRadius: BorderRadius.circular(7),
+                ),
+                padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 7),
+                margin: const EdgeInsets.only(right: 8),
+                child: Text(
+                  movie.durasi.toString() + ' mnt',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 14,
+                    fontFamily: 'Poppins-Medium',
                   ),
-                  const SizedBox(height: 8),
-                ],
+                ),
               ),
-            ),
-          ],
-        ),
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.white10,
+                  borderRadius: BorderRadius.circular(7),
+                ),
+                padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 7),
+                margin: const EdgeInsets.only(right: 8),
+                child: Text(
+                  movie.rating_umur,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 14,
+                    fontFamily: 'Poppins-Medium',
+                  ),
+                ),
+              ),
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.white10,
+                  borderRadius: BorderRadius.circular(7),
+                ),
+                padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 7),
+                child: Text(
+                  movie.dimensi,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 14,
+                    fontFamily: 'Poppins-Medium',
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
