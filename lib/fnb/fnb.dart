@@ -15,6 +15,8 @@ class _FnBPageState extends State<FnBPage> {
   int _selectedIndex = 0;
   late Future<List<Makananminuman>> _items;
   String? token;
+  final TextEditingController _searchController = TextEditingController();
+  String _searchQuery = '';
 
   @override
   void initState() {
@@ -33,6 +35,16 @@ class _FnBPageState extends State<FnBPage> {
       });
     } else {
       print('Token not found');
+    }
+  }
+
+  void _performSearch(String query) {
+    if (token != null) {
+      String category = _getCategoryByIndex(_selectedIndex);
+      setState(() {
+        _searchQuery = query;
+        _items = MakananMinumanClient.search(query, category, token!);
+      });
     }
   }
 
@@ -82,8 +94,14 @@ class _FnBPageState extends State<FnBPage> {
                       ),
                       Expanded(
                         child: TextField(
+                          controller: _searchController,
+                          onChanged: (query) {
+                            _performSearch(query);
+                          },
                           decoration: const InputDecoration(
                             border: InputBorder.none,
+                            hintText: 'Search...',
+                            hintStyle: TextStyle(color: Colors.white54),
                           ),
                           style: const TextStyle(color: Colors.white),
                         ),
@@ -123,7 +141,7 @@ class _FnBPageState extends State<FnBPage> {
           color: Colors.black,
         ),
         child: FutureBuilder<List<Makananminuman>>(
-          future: _items, // Use _items directly here, no null check needed
+          future: _items,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(child: CircularProgressIndicator());
@@ -146,7 +164,9 @@ class _FnBPageState extends State<FnBPage> {
       onTap: () {
         setState(() {
           _selectedIndex = index;
-          _loadItems(); // Reload items when category is changed
+          _searchController.clear();
+          _searchQuery = '';
+          _loadItems();
         });
       },
       child: Container(

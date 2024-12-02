@@ -46,18 +46,27 @@ class MakananMinumanClient {
     }
   }
 
-  static Future<List<Makananminuman>> searchItems(
+  static Future<List<Makananminuman>> search(
       String query, String kategori, String token) async {
-    final response = await get(
-      Uri.http(url, '$endpoint/kategori/$kategori/search'),
-      headers: {'Authorization': 'Bearer $token'},
-    );
+    try {
+      final response = await get(
+        Uri.http(
+            url, '$endpoint/search', {'query': query, 'category': kategori}),
+        headers: {'Authorization': 'Bearer $token'},
+      );
 
-    if (response.statusCode == 200) {
-      List jsonData = json.decode(response.body);
-      return jsonData.map((item) => Makananminuman.fromJson(item)).toList();
-    } else {
-      throw Exception('Failed to load items');
+      if (response.statusCode != 200) {
+        throw Exception(response.reasonPhrase);
+      }
+
+      final decodedResponse = json.decode(response.body);
+      print(decodedResponse);
+
+      Iterable list = decodedResponse;
+
+      return list.map((e) => Makananminuman.fromJson(e)).toList();
+    } catch (e) {
+      return Future.error(e.toString());
     }
   }
 }

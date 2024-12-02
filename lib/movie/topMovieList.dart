@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'movie.dart';
+import 'package:tubes/entity/Film.dart';
+import 'package:tubes/client/FilmClient.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class TopMovieList extends StatelessWidget {
   const TopMovieList({super.key});
@@ -22,31 +24,43 @@ class TopMovieList extends StatelessWidget {
         backgroundColor: Colors.black,
       ),
       body: Container(
-        padding: const EdgeInsets.all(16.0),
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [Color(0xFF000000), Color(0xFF000B6D)],
-            stops: [0.3, 0.7],
-          ),
-        ),
-        child: ListView.builder(
-          itemCount: nowPlayingMovies.length,
-          itemBuilder: (context, index) {
-            final movie = nowPlayingMovies[index];
-            return MovieItem(
-              posterUrl: movie.posterUrl,
-              title: movie.title,
-              rating: 4.8,
-              duration: '1h 20m',
-              ageRating: '17+',
-              format: '2D',
-            );
+        color: Colors.black,
+        child: FutureBuilder<List<Film>>(
+          future: _fetchNowPlayingMovies(), // Fetch data
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (snapshot.hasError) {
+              return Center(child: Text('Error: ${snapshot.error}'));
+            } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+              return const Center(child: Text('No movies found'));
+            } else {
+              return ListView.builder(
+                itemCount: snapshot.data!.length,
+                itemBuilder: (context, index) {
+                  final movie = snapshot.data![index];
+                  return MovieItem(
+                    posterUrl: movie.poster,
+                    title: movie.judul_film,
+                    rating: 2, // masih make dummy
+                    duration: '${movie.durasi} mnt',
+                    ageRating: movie.rating_umur,
+                    format: movie.dimensi,
+                  );
+                },
+              );
+            }
           },
         ),
       ),
     );
+  }
+
+  Future<List<Film>> _fetchNowPlayingMovies() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+    if (token == null) throw Exception('Token not found');
+    return FilmClient.fetchByStatus('now playing', token);
   }
 }
 
@@ -73,6 +87,7 @@ class MovieItem extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 16.0),
         decoration: BoxDecoration(
           color: const Color(0xFF0E1D39),
           borderRadius: BorderRadius.circular(16.0),
@@ -87,52 +102,57 @@ class MovieItem extends StatelessWidget {
               ),
               child: Image.asset(
                 posterUrl,
-                width: 80,
-                height: 120,
+                width: 120,
+                height: 160,
                 fit: BoxFit.cover,
               ),
             ),
             Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(12.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    const SizedBox(height: 8.0),
-                    Text(
-                      '$duration • $ageRating • $format',
-                      style: const TextStyle(
-                        color: Colors.white70,
-                        fontSize: 12,
-                      ),
-                    ),
-                    const SizedBox(height: 8.0),
-                    Row(
-                      children: [
-                        const Icon(
-                          Icons.star,
-                          color: Colors.yellow,
-                          size: 16,
+              child: Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text(
+                        title,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 23,
+                          fontWeight: FontWeight.w500,
                         ),
-                        const SizedBox(width: 4.0),
-                        Text(
-                          '$rating/5',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 12,
+                      ),
+                      const SizedBox(height: 8.0),
+                      Text(
+                        '$duration • $ageRating • $format',
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          color: Colors.white70,
+                          fontSize: 16,
+                        ),
+                      ),
+                      const SizedBox(height: 8.0),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(
+                            Icons.star,
+                            color: Colors.yellow,
+                            size: 16,
                           ),
-                        ),
-                      ],
-                    ),
-                  ],
+                          const SizedBox(width: 4.0),
+                          Text(
+                            '$rating/5',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 18,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
