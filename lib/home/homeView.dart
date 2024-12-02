@@ -553,83 +553,101 @@ class AtmaNewsCard extends StatelessWidget {
 }
 
 Widget buildTopMoviesSection(BuildContext context) {
-  return Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            const Text(
-              'Top Movies For You!',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => TopMovieList()),
-                );
-              },
-              child: Row(
-                children: const [
-                  Text(
-                    "See all",
-                    style: TextStyle(
-                      color: Colors.white70,
-                      fontSize: 16,
-                    ),
+  return FutureBuilder<String?>(
+    future: SharedPreferences.getInstance()
+        .then((prefs) => prefs.getString('token')),
+    builder: (context, tokenSnapshot) {
+      if (tokenSnapshot.connectionState == ConnectionState.waiting) {
+        return const Center(child: CircularProgressIndicator());
+      } else if (tokenSnapshot.hasError ||
+          !tokenSnapshot.hasData ||
+          tokenSnapshot.data == null) {
+        return const Center(child: Text('Error: Unable to fetch token.'));
+      }
+
+      final token = tokenSnapshot.data!;
+      Future<List<Film>> topMovies =
+          FilmClient.fetchByStatus('now playing', token);
+
+      return FutureBuilder<List<Film>>(
+        future: topMovies,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+            List<Film> movies = snapshot.data!;
+
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Top Movies For You!',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => TopMovieList()),
+                          );
+                        },
+                        child: Row(
+                          children: const [
+                            Text(
+                              "See all",
+                              style: TextStyle(
+                                color: Colors.white70,
+                                fontSize: 16,
+                              ),
+                            ),
+                            SizedBox(width: 4),
+                            Icon(
+                              Icons.arrow_forward_ios,
+                              color: Colors.white70,
+                              size: 16,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
-                  SizedBox(width: 4),
-                  Icon(
-                    Icons.arrow_forward_ios,
-                    color: Colors.white70,
-                    size: 16,
+                ),
+                const SizedBox(height: 12),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: Column(
+                    children: movies.map((movie) {
+                      return MovieListCard(
+                        imagePath: movie.poster ?? 'images/default_poster.jpg',
+                        title: movie.judul_film,
+                        duration: '${movie.durasi} mins',
+                        rating: '${movie.rating_umur}',
+                        ageRating: movie.rating_umur ?? 'N/A',
+                        format: movie.dimensi ?? 'N/A',
+                      );
+                    }).toList(),
                   ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-      const SizedBox(height: 12),
-      Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-        child: Column(
-          children: [
-            MovieListCard(
-              imagePath: 'images/bg2.jpg',
-              title: 'AVENGERS: ENDGAME',
-              duration: '1h 20m',
-              rating: '5/5',
-              ageRating: '17+',
-              format: '2D',
-            ),
-            MovieListCard(
-              imagePath: 'images/bg2.jpg',
-              title: 'AVENGERS: AGE OF ULTRON',
-              duration: '1h 20m',
-              rating: '4.9/5',
-              ageRating: '17+',
-              format: '2D',
-            ),
-            MovieListCard(
-              imagePath: 'images/bg2.jpg',
-              title: 'CAPTAIN AMERICA: CIVIL WAR',
-              duration: '1h 20m',
-              rating: '4.9/5',
-              ageRating: '17+',
-              format: '2D',
-            ),
-          ],
-        ),
-      ),
-    ],
+                ),
+              ],
+            );
+          } else {
+            return const Center(child: Text('No top movies found'));
+          }
+        },
+      );
+    },
   );
 }
 
@@ -653,7 +671,7 @@ class MovieListCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 16.0),
+      margin: const EdgeInsets.only(left: 20.0, bottom: 16.0),
       child: Row(
         children: [
           ClipRRect(

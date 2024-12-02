@@ -24,12 +24,7 @@ class NewsList extends StatelessWidget {
       body: Container(
         padding: const EdgeInsets.all(16.0),
         decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [Color(0xFF000000), Color(0xFF000B6D)],
-            stops: [0.3, 0.7],
-          ),
+          color: Colors.black,
         ),
         child: ListView(
           children: [

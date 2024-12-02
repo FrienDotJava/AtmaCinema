@@ -42,4 +42,27 @@ class FilmClient {
       return Future.error(e.toString());
     }
   }
+
+  //Fungsi untuk handle search movie
+  static Future<List<Film>> searchMovies(
+      String query, String status, String token) async {
+    try {
+      final response = await get(
+        Uri.http(url, '$endpoint/search', {'query': query, 'status': status}),
+        headers: {'Authorization': 'Bearer $token'},
+      );
+
+      if (response.statusCode != 200) {
+        throw Exception(response.reasonPhrase);
+      }
+
+      final data = json.decode(response.body);
+      final films =
+          (data['data'] as List).map((film) => Film.fromJson(film)).toList();
+
+      return films;
+    } catch (e) {
+      return Future.error('Failed to search movies: $e');
+    }
+  }
 }

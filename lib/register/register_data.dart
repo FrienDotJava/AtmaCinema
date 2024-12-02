@@ -341,7 +341,7 @@ class _RegisterDataState extends State<RegisterData> {
                   },
                 ),
                 const Text(
-                  'Man',
+                  'Male',
                   style: TextStyle(
                     color: Colors.white,
                     fontFamily: 'Poppins-Regular',

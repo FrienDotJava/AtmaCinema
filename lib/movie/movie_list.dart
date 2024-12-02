@@ -18,19 +18,43 @@ class _ListMovieViewState extends State<ListMovieView>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   late stt.SpeechToText _speech;
+  late TextEditingController _searchController; // Search controller
   bool _isListening = false;
   String _searchQuery = "";
-  late Future<List<Film>> nowPlayingMovies; // List<Film> for 'Now Playing'
-  late Future<List<Film>> comingSoonMovies; // List<Film> for 'Coming Soon'
+  late Future<List<Film>> nowPlayingMovies;
+  late Future<List<Film>> comingSoonMovies;
   String? token;
 
   @override
+  @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
-    _speech = stt.SpeechToText();
-    _loadToken(); //Buat ngambil token biar data bisa diambil
-    //Harus ambil token karena di laravel, untuk fungsi indexByStatus udah kena auth middleware
+    _searchController = TextEditingController(); // Initialize controller
+
+    try {
+      _tabController = TabController(length: 2, vsync: this);
+      _speech = stt.SpeechToText();
+      _loadToken();
+
+      _tabController.addListener(() {
+        if (_tabController.indexIsChanging) {
+          setState(() {
+            _searchQuery = "";
+            _searchController.clear();
+            _performSearch("");
+          });
+        }
+      });
+    } catch (e) {
+      print("Error initializing TabController: $e");
+    }
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    _tabController.dispose();
+    super.dispose();
   }
 
   // Fungsi untuk load token dari SharedPreferences
@@ -89,13 +113,14 @@ class _ListMovieViewState extends State<ListMovieView>
           ),
           Expanded(
             child: TextField(
+              controller: _searchController,
               style: const TextStyle(color: Colors.white),
               onChanged: (value) {
                 setState(() {
                   _searchQuery = value;
                 });
+                _performSearch(value);
               },
-              controller: TextEditingController(text: _searchQuery),
               decoration: const InputDecoration(
                 hintText: "Search for movies...",
                 hintStyle: TextStyle(color: Colors.white54),
@@ -103,16 +128,25 @@ class _ListMovieViewState extends State<ListMovieView>
               ),
             ),
           ),
-          IconButton(
-            icon: Icon(
-              _isListening ? Icons.mic : Icons.mic_none,
-              color: Colors.white54,
-            ),
-            onPressed: _listen,
-          ),
         ],
       ),
     );
+  }
+
+  void _performSearch(String query) {
+    if (token != null) {
+      String status = _tabController.index == 0 ? 'now playing' : 'coming soon';
+      try {
+        print('Searching for: $query in $status');
+        if (status == 'now playing') {
+          nowPlayingMovies = FilmClient.searchMovies(query, status, token!);
+        } else {
+          comingSoonMovies = FilmClient.searchMovies(query, status, token!);
+        }
+      } catch (e) {
+        print('Search error: $e');
+      }
+    }
   }
 
   @override

@@ -66,7 +66,8 @@ class _FnBPageState extends State<FnBPage> {
           child: Column(
             children: [
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
                 child: Container(
                   decoration: BoxDecoration(
                     color: const Color(0xFF1F1F1F),
@@ -184,7 +185,8 @@ class FnBItemCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final formattedPrice = NumberFormat.currency(locale: 'id_ID', symbol: 'Rp ').format(item.harga_item);
+    final formattedPrice = NumberFormat.currency(locale: 'id_ID', symbol: 'Rp ')
+        .format(item.harga_item);
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Container(
