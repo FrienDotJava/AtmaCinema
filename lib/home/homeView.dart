@@ -1,11 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:tubes/profile/profile.dart';
 import 'package:tubes/movie/movie_list.dart';
-import 'package:tubes/movie/movie.dart';
-import 'package:tubes/movie/movieDetail.dart';
 import 'package:tubes/movie/topMovieList.dart';
-import 'package:tubes/home/home.dart';
-import 'package:tubes/profile/profile.dart';
 import 'package:tubes/news/news_list.dart';
 import 'package:tubes/news/news_detail.dart';
 import 'package:tubes/client/FilmClient.dart';
@@ -22,7 +18,7 @@ class MyHomeView extends StatefulWidget {
 class _MyHomeViewState extends State<MyHomeView> {
   late Future<List<Film>> nowPlayingMovies = Future.value([]);
   late Future<List<Film>> comingSoonMovies = Future.value([]);
-
+  final FocusNode _focusNode = FocusNode();
   String? token;
 
   @override
@@ -100,7 +96,7 @@ class _MyHomeViewState extends State<MyHomeView> {
         ),
         body: Column(
           children: [
-            _buildSearchBar(),
+            _buildSearchBar(context),
             const SizedBox(height: 15),
             Expanded(
               child: SingleChildScrollView(
@@ -127,37 +123,49 @@ class _MyHomeViewState extends State<MyHomeView> {
     );
   }
 
-  Widget _buildSearchBar() {
-    return Container(
-      margin: const EdgeInsets.all(16.0),
-      decoration: BoxDecoration(
-        color: const Color(0xFF0A2038),
-        borderRadius: BorderRadius.circular(30),
-      ),
-      child: Row(
-        children: [
-          IconButton(
-            icon: const Icon(Icons.search, color: Colors.white54),
-            onPressed: () {},
-          ),
-          Expanded(
-            child: TextField(
-              style: const TextStyle(color: Colors.white),
-              decoration: const InputDecoration(
-                hintText: "Search for movies...",
-                hintStyle: TextStyle(color: Colors.white54),
-                border: InputBorder.none,
+  Widget _buildSearchBar(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        _focusNode.unfocus();
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const ListMovieView()),
+        );
+      },
+      child: Container(
+        margin: const EdgeInsets.all(16.0),
+        decoration: BoxDecoration(
+          color: const Color(0xFF0A2038),
+          borderRadius: BorderRadius.circular(30),
+        ),
+        child: Row(
+          children: [
+            IconButton(
+              icon: const Icon(Icons.search, color: Colors.white54),
+              onPressed: () {},
+            ),
+            Expanded(
+              child: TextField(
+                enabled: false,
+                focusNode: _focusNode,
+                style: const TextStyle(color: Colors.white),
+                decoration: const InputDecoration(
+                  hintText: "Search for movies...",
+                  hintStyle: TextStyle(color: Colors.white54),
+                  border: InputBorder.none,
+                ),
               ),
             ),
-          ),
-          IconButton(
-            icon: const Icon(Icons.mic, color: Colors.white54),
-            onPressed: () {},
-          ),
-        ],
+            IconButton(
+              icon: const Icon(Icons.mic, color: Colors.white54),
+              onPressed: () {},
+            ),
+          ],
+        ),
       ),
     );
   }
+
 
   Widget _buildSectionHeader(String title, bool showNowPlaying) {
     return Padding(
