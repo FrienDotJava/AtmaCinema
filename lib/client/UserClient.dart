@@ -111,6 +111,37 @@ class UserClient {
     }
   }
 
+  static Future<bool> updateProfile(String token,
+      String first_name, String last_name, String no_telp, String gender, String tanggal_lahir) async {
+    final Uri apiUrl = Uri.parse('$url/api/user/profile');
+    try {
+      final response = await http.put(
+        apiUrl,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token', // Mengirim token untuk autentikasi
+        },
+        body: json.encode({
+          'first_name': first_name,
+          'last_name': last_name,
+          'no_telp': no_telp,
+          'gender': gender,
+          'tanggal_lahir': tanggal_lahir,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        return true;
+      } else {
+        print('Failed to update profile: ${response.body}');
+        return false;
+      }
+    } catch (e) {
+      print('Error: $e');
+      return false;
+    }
+  }
+
   static Future<String?> logout(String token) async {
     final Uri apiUrl = Uri.parse('$url/api/logout');
     try {

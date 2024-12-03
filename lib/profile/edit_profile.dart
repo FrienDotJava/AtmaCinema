@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:tubes/entity/User.dart';
+
+import '../client/UserClient.dart';
 
 enum Gender { man, female }
 
@@ -284,8 +287,16 @@ class _EditProfileState extends State<EditProfile> {
   Widget _buildRegisterButton() {
     return ElevatedButton(
       onPressed: () async {
-        await _saveUserData();
-        Navigator.pop(context);
+        if (_isValidInput()) {
+          bool success = await _updateUserProfile();
+          if (success) {
+            _showSuccessDialog();
+          } else {
+            _showErrorDialog("Failed to update profile. Please try again.");
+          }
+        } else {
+          _showErrorDialog("Please fill out all fields correctly.");
+        }
       },
       style: ElevatedButton.styleFrom(
         shape: const StadiumBorder(),
@@ -310,6 +321,119 @@ class _EditProfileState extends State<EditProfile> {
     await prefs.setString('dob', dobController.text);
     await prefs.setString(
         'gender', _selectedGender == Gender.man ? 'Male' : 'Female');
-    await prefs.setString('profile_picture', profilePicturePath ?? '');
+    await prefs.setString('profile_picture', profilePicturePath ?? "");
   }
+
+  bool _isValidInput() {
+    return nameController.text.isNotEmpty &&
+        lastNameController.text.isNotEmpty &&
+        phoneController.text.isNotEmpty &&
+        dobController.text.isNotEmpty &&
+        _selectedGender != null;
+  }
+
+  void _showConfirmationDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Confirm Changes"),
+          content: const Text("Are you sure you want to save the changes?"),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text("Cancel"),
+            ),
+            TextButton(
+              onPressed: () async {
+                await _saveUserData();
+                Navigator.pop(context);
+                _showSuccessDialog();
+              },
+              child: const Text("Confirm"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Error"),
+          content: Text(message),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text("OK"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showSuccessDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Success"),
+          content: const Text("Profile updated successfully!"),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text("OK"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<bool> _updateUserProfile() async {
+    String first_name = nameController.text;
+    String last_name = lastNameController.text;
+    String no_telp = phoneController.text;
+    String tanggal_lahir = dobController.text;
+    String gender = _selectedGender == Gender.man ? 'Male' : 'Female';
+
+    File? profilePicture;
+    if (profilePicturePath != null) {
+      profilePicture = File(profilePicturePath!);
+    }
+
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
+
+    bool success = await UserClient.updateProfile(token!, first_name, last_name, no_telp, gender, tanggal_lahir);
+
+    if (mounted) {
+      if (success) {
+        _showSuccessDialog();
+
+        Future.delayed(const Duration(seconds: 1), () {
+          if (mounted) {
+            Navigator.pop(context);
+            Navigator.pop(context);
+          }
+        });
+      } else {
+        _showErrorDialog("Failed to update profile. Please try again.");
+      }
+    }
+
+    return success;
+  }
+
+
 }
