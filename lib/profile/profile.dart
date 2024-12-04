@@ -23,6 +23,7 @@ class _ProfilePageState extends State<ProfilePage> {
   String? gender;
   String? dob;
   String? token; // Menyimpan token untuk autentikasi
+  String? profilePicturePath;
 
   @override
   void initState() {
@@ -46,6 +47,7 @@ class _ProfilePageState extends State<ProfilePage> {
           phoneNumber = user.no_telp;
           gender = user.gender;
           dob = user.tanggal_lahir;
+          profilePicturePath = user.profile_picture;
         });
       } else {
         // Handle error, jika data gagal diambil
@@ -58,6 +60,13 @@ class _ProfilePageState extends State<ProfilePage> {
         MaterialPageRoute(builder: (context) => const LoginPage()),
       );
     }
+  }
+
+  Future<String?> _fetchProfilePicture() async {
+    //Tunggu 2 detik
+    await Future.delayed(const Duration(seconds: 2));
+
+    return profilePicturePath!;
   }
 
   @override
@@ -76,14 +85,41 @@ class _ProfilePageState extends State<ProfilePage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              CircleAvatar(
-                radius: 50,
-                backgroundColor: Colors.white,
-                child: const Icon(
-                  Icons.person,
-                  size: 50,
-                  color: Colors.black,
-                ),
+              FutureBuilder<String?>(
+                future: _fetchProfilePicture(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    // Munculkan animasi loading sambil nunggu gambar
+                    return const CircleAvatar(
+                      radius: 50,
+                      backgroundColor: Colors.white,
+                      child: CircularProgressIndicator(),
+                    );
+                  } else if (snapshot.hasError) {
+                    //Kalo error
+                    return const CircleAvatar(
+                      radius: 50,
+                      backgroundColor: Colors.white,
+                      child: Icon(Icons.error, size: 50, color: Colors.black),
+                    );
+                  } else if (snapshot.hasData && snapshot.data != null) {
+                    //Menampilkan gambar kalau path ditemukan
+                    return CircleAvatar(
+                      radius: 50,
+                      backgroundColor: Colors.white,
+                      backgroundImage: NetworkImage(
+                          "http://10.0.2.2:8000/storage/" + snapshot.data!),
+                    );
+                  } else {
+                    //Jika tidak ada profule picture, tampilkan icon default
+                    return CircleAvatar(
+                      radius: 50,
+                      backgroundColor: Colors.white,
+                      backgroundImage: const AssetImage('assets/images/blank-profile-picture.jpg') as ImageProvider,
+                      child: const Icon(Icons.person, size: 50, color: Colors.black),
+                    );
+                  }
+                },
               ),
               const SizedBox(height: 20),
               Text(

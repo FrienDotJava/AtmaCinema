@@ -26,6 +26,9 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
+      routes: {
+        '/camera': (context) => CameraScreen(cameras: cameras),
+      },
       home: FutureBuilder(
         future: checkLoginStatus(),
         builder: (context, snapshot) {

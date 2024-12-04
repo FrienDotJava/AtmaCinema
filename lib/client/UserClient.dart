@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:tubes/entity/User.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class UserClient {
@@ -111,29 +112,43 @@ class UserClient {
     }
   }
 
-  static Future<bool> updateProfile(String token,
-      String first_name, String last_name, String no_telp, String gender, String tanggal_lahir) async {
+  static Future<bool> updateProfileWithImage(
+      String token,
+      String first_name,
+      String last_name,
+      String no_telp,
+      String gender,
+      String tanggal_lahir,
+      XFile? profilePicture // Expecting the image file
+      ) async {
     final Uri apiUrl = Uri.parse('$url/api/user/profile');
-    try {
-      final response = await http.put(
-        apiUrl,
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token', // Mengirim token untuk autentikasi
-        },
-        body: json.encode({
-          'first_name': first_name,
-          'last_name': last_name,
-          'no_telp': no_telp,
-          'gender': gender,
-          'tanggal_lahir': tanggal_lahir,
-        }),
+    var request = http.MultipartRequest('POST', apiUrl);
+
+    // Add user data
+    request.fields['first_name'] = first_name;
+    request.fields['last_name'] = last_name;
+    request.fields['no_telp'] = no_telp;
+    request.fields['gender'] = gender;
+    request.fields['tanggal_lahir'] = tanggal_lahir;
+
+    // Add the profile picture if available
+    if (profilePicture != null) {
+      request.files.add(
+          await http.MultipartFile.fromPath('profile_picture', profilePicture.path)
       );
+    }
+
+    // Add Authorization header
+    request.headers['Authorization'] = 'Bearer $token';
+
+    try {
+      final response = await request.send();
 
       if (response.statusCode == 200) {
         return true;
       } else {
-        print('Failed to update profile: ${response.body}');
+        final responseBody = await response.stream.bytesToString();
+        print('Failed to update profile: ${response.statusCode} ${responseBody}');
         return false;
       }
     } catch (e) {

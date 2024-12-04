@@ -47,6 +47,10 @@ class _CameraScreenState extends State<CameraScreen> {
           if (snapshot.connectionState == ConnectionState.done) {
             final aspectRatio = _controller!.value.aspectRatio;
 
+            // Get the correct rotation angle from the camera controller
+            final deviceOrientation = _controller!.description.sensorOrientation;
+            final rotationAngle = _getRotationAngle(deviceOrientation);
+
             return Stack(
               children: [
                 Positioned.fill(
@@ -85,6 +89,14 @@ class _CameraScreenState extends State<CameraScreen> {
     );
   }
 
+  // Function to get the rotation angle based on the camera's sensor orientation
+  int _getRotationAngle(int deviceOrientation) {
+    if (deviceOrientation == 90 || deviceOrientation == 270) {
+      return 90; // Rotate 90 degrees if the device is in portrait mode
+    }
+    return 0; // No rotation required for landscape mode
+  }
+
   Widget _buildControls(BuildContext context) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -92,7 +104,7 @@ class _CameraScreenState extends State<CameraScreen> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            SizedBox(width: 45,),
+            SizedBox(width: 45),
             GestureDetector(
               onTap: () async {
                 try {
@@ -137,7 +149,6 @@ class _CameraScreenState extends State<CameraScreen> {
   }
 }
 
-
 class ImagePreviewScreen extends StatelessWidget {
   final String imagePath;
 
@@ -150,9 +161,12 @@ class ImagePreviewScreen extends StatelessWidget {
       body: Column(
         children: [
           Expanded(
-            child: Image.file(
-              File(imagePath),
-              fit: BoxFit.contain,
+            child: Transform.rotate(
+              angle: 0.0, // Set the rotation angle to match the preview angle
+              child: Image.file(
+                File(imagePath),
+                fit: BoxFit.contain,
+              ),
             ),
           ),
           Row(
@@ -178,4 +192,3 @@ class ImagePreviewScreen extends StatelessWidget {
     );
   }
 }
-

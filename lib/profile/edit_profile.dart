@@ -7,7 +7,7 @@ import 'package:tubes/entity/User.dart';
 
 import '../client/UserClient.dart';
 
-enum Gender { man, female }
+enum Gender { Male, Female }
 
 class EditProfile extends StatefulWidget {
   const EditProfile({super.key});
@@ -248,7 +248,7 @@ class _EditProfileState extends State<EditProfile> {
             Row(
               children: [
                 Radio<Gender>(
-                  value: Gender.man,
+                  value: Gender.Male,
                   groupValue: _selectedGender,
                   onChanged: (Gender? value) {
                     setState(() {
@@ -265,7 +265,7 @@ class _EditProfileState extends State<EditProfile> {
             Row(
               children: [
                 Radio<Gender>(
-                  value: Gender.female,
+                  value: Gender.Female,
                   groupValue: _selectedGender,
                   onChanged: (Gender? value) {
                     setState(() {
@@ -287,31 +287,43 @@ class _EditProfileState extends State<EditProfile> {
   Widget _buildRegisterButton() {
     return ElevatedButton(
       onPressed: () async {
-        if (_isValidInput()) {
-          bool success = await _updateUserProfile();
+        // Check that all fields are filled
+        if (nameController.text.isEmpty || lastNameController.text.isEmpty || phoneController.text.isEmpty || dobController.text.isEmpty) {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Please fill in all fields')));
+          return;
+        }
+
+        // Retrieve the token from SharedPreferences
+        String? token = await UserClient.getToken();
+        if (token != null) {
+          bool success = await UserClient.updateProfileWithImage(
+            token,
+            nameController.text,
+            lastNameController.text,
+            phoneController.text,
+            _selectedGender?.toString().split('.').last ?? '',
+            dobController.text,
+            profilePicturePath != null ? XFile(profilePicturePath!) : null, // Send the image if available
+          );
+
           if (success) {
-            _showSuccessDialog();
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Profile updated successfully')));
+            Navigator.pop(context); // Go back after successful update
           } else {
-            _showErrorDialog("Failed to update profile. Please try again.");
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to update profile')));
           }
-        } else {
-          _showErrorDialog("Please fill out all fields correctly.");
         }
       },
       style: ElevatedButton.styleFrom(
-        shape: const StadiumBorder(),
-        backgroundColor: Colors.white,
-        minimumSize: const Size.fromHeight(50),
+        backgroundColor: Colors.white24, // Set the color
       ),
       child: const Text(
-        "SAVE CHANGES",
-        style: TextStyle(
-          color: Colors.black,
-          fontSize: 16,
-        ),
+          'Update Profile',
+        style: TextStyle(color: Colors.white),
       ),
     );
   }
+
 
   Future<void> _saveUserData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -320,7 +332,7 @@ class _EditProfileState extends State<EditProfile> {
     await prefs.setString('phone_number', phoneController.text);
     await prefs.setString('dob', dobController.text);
     await prefs.setString(
-        'gender', _selectedGender == Gender.man ? 'Male' : 'Female');
+        'gender', _selectedGender == Gender.Male ? 'Male' : 'Female');
     await prefs.setString('profile_picture', profilePicturePath ?? "");
   }
 
@@ -399,41 +411,4 @@ class _EditProfileState extends State<EditProfile> {
       },
     );
   }
-
-  Future<bool> _updateUserProfile() async {
-    String first_name = nameController.text;
-    String last_name = lastNameController.text;
-    String no_telp = phoneController.text;
-    String tanggal_lahir = dobController.text;
-    String gender = _selectedGender == Gender.man ? 'Male' : 'Female';
-
-    File? profilePicture;
-    if (profilePicturePath != null) {
-      profilePicture = File(profilePicturePath!);
-    }
-
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? token = prefs.getString('token');
-
-    bool success = await UserClient.updateProfile(token!, first_name, last_name, no_telp, gender, tanggal_lahir);
-
-    if (mounted) {
-      if (success) {
-        _showSuccessDialog();
-
-        Future.delayed(const Duration(seconds: 1), () {
-          if (mounted) {
-            Navigator.pop(context);
-            Navigator.pop(context);
-          }
-        });
-      } else {
-        _showErrorDialog("Failed to update profile. Please try again.");
-      }
-    }
-
-    return success;
-  }
-
-
 }
