@@ -37,6 +37,7 @@ class _MovieReviewPageState extends State<MovieReviewPage> {
 
       setState(() {
         review = Future.value(res);
+        print("Schedule data received: $review");
         isDataLoaded = true;
       });
     } catch (e) {

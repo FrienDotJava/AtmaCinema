@@ -97,8 +97,7 @@ class MovieDetailPage extends StatelessWidget {
                             const SizedBox(width: 4),
                             const Text("4.8",
                                 style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 16)),
+                                    color: Colors.white, fontSize: 16)),
                           ],
                         ),
                         const SizedBox(height: 8),
@@ -113,13 +112,13 @@ class MovieDetailPage extends StatelessWidget {
                                 onPressed: isComingSoon
                                     ? null
                                     : () {
-                                        // Navigator.push(
-                                        //   context,
-                                        //   MaterialPageRoute(
-                                        //     builder: (context) =>
-                                        //         MovieShowtimePage(movie: movie),
-                                        //   ),
-                                        // );
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                MovieShowtimePage(movie: movie),
+                                          ),
+                                        );
                                       },
                                 style: ButtonStyle(
                                   backgroundColor:
@@ -211,7 +210,7 @@ class MovieDetailPage extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               Text(
-                movie.sinopsis, 
+                movie.sinopsis,
                 style: const TextStyle(color: Colors.white70),
               ),
               const SizedBox(height: 16),
@@ -226,7 +225,7 @@ class MovieDetailPage extends StatelessWidget {
               ),
               const SizedBox(height: 4),
               Text(
-                movie.producer, 
+                movie.producer,
                 style: const TextStyle(color: Colors.white70),
               ),
               const SizedBox(height: 16),
@@ -241,7 +240,7 @@ class MovieDetailPage extends StatelessWidget {
               ),
               const SizedBox(height: 4),
               Text(
-                movie.director, 
+                movie.director,
                 style: const TextStyle(color: Colors.white70),
               ),
               const SizedBox(height: 16),
@@ -256,7 +255,7 @@ class MovieDetailPage extends StatelessWidget {
               ),
               const SizedBox(height: 4),
               Text(
-                movie.writers, 
+                movie.writers,
                 style: const TextStyle(color: Colors.white70),
               ),
               const SizedBox(height: 16),
@@ -271,7 +270,7 @@ class MovieDetailPage extends StatelessWidget {
               ),
               const SizedBox(height: 4),
               Text(
-                movie.cast, 
+                movie.cast,
                 style: const TextStyle(color: Colors.white70),
               ),
             ],

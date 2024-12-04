@@ -257,7 +257,6 @@ class _ListMovieViewState extends State<ListMovieView>
   }
 }
 
-// Movie grid buat menampilkan list film
 class MovieGrid extends StatelessWidget {
   final List<Film> movies;
   final bool isComingSoon;
@@ -281,7 +280,22 @@ class MovieGrid extends StatelessWidget {
       itemCount: movies.length,
       itemBuilder: (context, index) {
         final movie = movies[index];
-        return MovieCard(movie: movie, isComingSoon: isComingSoon);
+
+        return GestureDetector(
+          onTap: () {
+            // Ketika film diklik, arahkan ke MovieDetailPage
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => MovieDetailPage(movie: movie),
+              ),
+            );
+          },
+          child: MovieCard(
+              movie: movie,
+              isComingSoon:
+                  isComingSoon), // Memanggil MovieCard di dalam GestureDetector
+        );
       },
     );
   }
