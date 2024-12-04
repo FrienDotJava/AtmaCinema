@@ -8,7 +8,9 @@ import 'package:tubes/entity/Film.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ListMovieView extends StatefulWidget {
-  const ListMovieView({Key? key}) : super(key: key);
+  final int initialIndex;
+
+  const ListMovieView({Key? key, this.initialIndex = 0}) : super(key: key);
 
   @override
   _ListMovieViewState createState() => _ListMovieViewState();
@@ -18,7 +20,7 @@ class _ListMovieViewState extends State<ListMovieView>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   late stt.SpeechToText _speech;
-  late TextEditingController _searchController; // Search controller
+  late TextEditingController _searchController;
   bool _isListening = false;
   String _searchQuery = "";
   late Future<List<Film>> nowPlayingMovies;
@@ -26,28 +28,26 @@ class _ListMovieViewState extends State<ListMovieView>
   String? token;
 
   @override
-  @override
   void initState() {
     super.initState();
-    _searchController = TextEditingController(); // Initialize controller
+    _tabController = TabController(
+      length: 2,
+      vsync: this,
+      initialIndex: widget.initialIndex,
+    );
+    _speech = stt.SpeechToText();
+    _searchController = TextEditingController();
+    _loadToken();
 
-    try {
-      _tabController = TabController(length: 2, vsync: this);
-      _speech = stt.SpeechToText();
-      _loadToken();
-
-      _tabController.addListener(() {
-        if (_tabController.indexIsChanging) {
-          setState(() {
-            _searchQuery = "";
-            _searchController.clear();
-            _performSearch("");
-          });
-        }
-      });
-    } catch (e) {
-      print("Error initializing TabController: $e");
-    }
+    _tabController.addListener(() {
+      if (_tabController.indexIsChanging) {
+        setState(() {
+          _searchQuery = "";
+          _searchController.clear();
+          _performSearch("");
+        });
+      }
+    });
   }
 
   @override

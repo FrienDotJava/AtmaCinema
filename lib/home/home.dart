@@ -19,7 +19,6 @@ class homePageState extends State<homePage> {
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
-      if (index == 1) showNowPlaying = true;
     });
   }
 
@@ -30,16 +29,16 @@ class homePageState extends State<homePage> {
     });
   }
 
-  static const List<Widget> _widgetOptions = <Widget>[
-    Center(child: MyHomeView()),
-    Center(child: ListMovieView()),
-    Center(child: FnBPage()),
-    Center(child: TicketsPage()),
-    Center(child: ProfilePage()),
-  ];
-
   @override
   Widget build(BuildContext context) {
+    final List<Widget> _widgetOptions = <Widget>[
+      MyHomeView(navigateToMovies: navigateToMovies),
+      ListMovieView(initialIndex: showNowPlaying ? 0 : 1),
+      FnBPage(),
+      TiketPage(),
+      ProfilePage(),
+    ];
+
     return Scaffold(
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: Colors.black,
@@ -74,14 +73,13 @@ class homePageState extends State<homePage> {
         currentIndex: _selectedIndex,
         selectedItemColor: Colors.white,
         unselectedItemColor: Colors.white,
-        selectedLabelStyle: TextStyle(fontFamily: 'Poppins-Bold', fontSize: 14),
+        selectedLabelStyle:
+            const TextStyle(fontFamily: 'Poppins-Bold', fontSize: 14),
         unselectedLabelStyle:
-            TextStyle(fontFamily: 'Poppins-Medium', fontSize: 12),
+            const TextStyle(fontFamily: 'Poppins-Medium', fontSize: 12),
         onTap: _onItemTapped,
       ),
-      body: _selectedIndex == 1
-          ? ListMovieView()
-          : _widgetOptions.elementAt(_selectedIndex),
+      body: _widgetOptions[_selectedIndex],
     );
   }
 }

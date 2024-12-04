@@ -1,46 +1,45 @@
 import 'package:flutter/material.dart';
-import 'package:speech_to_text/speech_to_text.dart' as stt;
-import '../transaction/ticketDetails.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:tubes/client/TiketClient.dart';
+import 'package:tubes/entity/Tiket.dart';
+import 'package:tubes/transaction/ticketDetails.dart';
+import 'package:intl/intl.dart';
 
-class TicketsPage extends StatefulWidget {
-  const TicketsPage({Key? key}) : super(key: key);
+class TiketPage extends StatefulWidget {
+  const TiketPage({Key? key}) : super(key: key);
+
   @override
-  _TicketsPageState createState() => _TicketsPageState();
+  _TiketPageState createState() => _TiketPageState();
 }
 
-class _TicketsPageState extends State<TicketsPage> with SingleTickerProviderStateMixin {
+class _TiketPageState extends State<TiketPage>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  late stt.SpeechToText _speech;
-  bool _isListening = false;
-  String _searchQuery = "";
+  Future<List<Tiket>>? _onProgressTickets;
+  Future<List<Tiket>>? _historyTickets;
+  String? token;
+  int? userId;
+  final TextEditingController _searchController = TextEditingController();
+  String _searchQuery = '';
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
-    _speech = stt.SpeechToText();
+    _loadTickets();
   }
 
-  void _listen() async {
-    if (!_isListening) {
-      bool available = await _speech.initialize(
-        onStatus: (status) => print("onStatus: $status"),
-        onError: (error) => print("onError: $error"),
-      );
+  void _loadTickets() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    token = prefs.getString('token');
+    userId = prefs.getInt('user_id');
 
-      if (available) {
-        setState(() => _isListening = true);
-        _speech.listen(
-          onResult: (result) {
-            setState(() {
-              _searchQuery = result.recognizedWords;
-            });
-          },
-        );
-      }
-    } else {
-      setState(() => _isListening = false);
-      _speech.stop();
+    if (token != null && userId != null) {
+      setState(() {
+        _onProgressTickets = TiketClient.fetchByUser(userId!, token!);
+        _historyTickets = TiketClient.fetchByUser(
+            userId!, token!); // Update this with actual logic for history
+      });
     }
   }
 
@@ -49,13 +48,13 @@ class _TicketsPageState extends State<TicketsPage> with SingleTickerProviderStat
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
-        title: Text("Tickets", style: TextStyle(color: Colors.white)),
+        title: const Text("Tickets", style: TextStyle(color: Colors.white)),
         backgroundColor: Colors.black,
         elevation: 0,
         automaticallyImplyLeading: false,
         bottom: TabBar(
           controller: _tabController,
-          tabs: [
+          tabs: const [
             Tab(text: "On Progress"),
             Tab(text: "History"),
           ],
@@ -82,26 +81,19 @@ class _TicketsPageState extends State<TicketsPage> with SingleTickerProviderStat
                   ),
                   Expanded(
                     child: TextField(
+                      controller: _searchController,
                       onChanged: (value) {
                         setState(() {
                           _searchQuery = value;
                         });
                       },
-                      controller: TextEditingController(text: _searchQuery),
                       decoration: const InputDecoration(
                         border: InputBorder.none,
-                        hintText: 'Search movies...',
+                        hintText: 'Search tickets...',
                         hintStyle: TextStyle(color: Colors.white54),
                       ),
                       style: const TextStyle(color: Colors.white),
                     ),
-                  ),
-                  IconButton(
-                    icon: Icon(
-                      _isListening ? Icons.mic : Icons.mic_none,
-                      color: Colors.white54,
-                    ),
-                    onPressed: _listen,
                   ),
                 ],
               ),
@@ -111,13 +103,8 @@ class _TicketsPageState extends State<TicketsPage> with SingleTickerProviderStat
             child: TabBarView(
               controller: _tabController,
               children: [
-                _buildTicketList(),
-                Center(
-                  child: Text(
-                    "No tickets in history",
-                    style: TextStyle(color: Colors.white),
-                  ),
-                ),
+                _buildTicketListView(_onProgressTickets),
+                _buildTicketListView(_historyTickets),
               ],
             ),
           ),
@@ -126,123 +113,108 @@ class _TicketsPageState extends State<TicketsPage> with SingleTickerProviderStat
     );
   }
 
-  Widget _buildTicketList() {
-    return ListView.builder(
-      itemCount: 1,
-      itemBuilder: (context, index) {
-        return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-          child: Container(
-            decoration: BoxDecoration(
-              color: Colors.black,
-              borderRadius: BorderRadius.circular(16.0),
-              border: Border.all(color: Colors.grey, width: 2.0),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(12.0),
-              child: Row(
-                children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
-                    child: Image.asset(
-                      'images/img_poster/avengers.jpg',
-                      width: 80,
-                      height: 120,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                  SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "AVENGERS",
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        ),
-                        SizedBox(height: 8),
-                        Row(
-                          children: [
-                            Icon(Icons.location_on, color: Colors.white, size: 16),
-                            SizedBox(width: 4),
-                            Text(
-                              "ATMA Cinema, Studio 1",
-                              style: TextStyle(color: Colors.white70, fontSize: 14),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 4),
-                        Row(
-                          children: [
-                            Icon(Icons.calendar_today, color: Colors.white, size: 16),
-                            SizedBox(width: 4),
-                            Text(
-                              "Sunday, 6 October 2024",
-                              style: TextStyle(color: Colors.white70, fontSize: 14),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 4),
-                        Row(
-                          children: [
-                            Icon(Icons.access_time, color: Colors.white, size: 16),
-                            SizedBox(width: 4),
-                            Text(
-                              "11.00",
-                              style: TextStyle(color: Colors.white70, fontSize: 14),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 4),
-                        Text(
-                          "Reguler 2D",
-                          style: TextStyle(color: Colors.white70, fontSize: 14),
-                        ),
-                        SizedBox(height: 12),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              "IN PROGRESS",
-                              style: TextStyle(
-                                color: Colors.amber,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 14,
-                              ),
-                            ),
-                            ElevatedButton(
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => MovieTicketDetails(),
-                                  ),
-                                );
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.white,
-                                foregroundColor: Colors.black,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                              ),
-                              child: Text("TICKET"),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        );
+  Widget _buildTicketListView(Future<List<Tiket>>? ticketList) {
+    return FutureBuilder<List<Tiket>>(
+      future: ticketList,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return Center(child: Text('Error: ${snapshot.error}'));
+        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          return const Center(child: Text('No tickets available.'));
+        } else {
+          final filteredTickets = snapshot.data!
+              .where((tiket) =>
+                  tiket.nomor_kursi.toString().contains(_searchQuery))
+              .toList();
+
+          return ListView.builder(
+            itemCount: filteredTickets.length,
+            itemBuilder: (context, index) {
+              return _buildTicketCard(filteredTickets[index]);
+            },
+          );
+        }
       },
+    );
+  }
+
+  Widget _buildTicketCard(Tiket tiket) {
+    final formattedPrice = NumberFormat.currency(locale: 'id_ID', symbol: 'Rp ')
+        .format(tiket.nomor_kursi);
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.black,
+          borderRadius: BorderRadius.circular(16.0),
+          border: Border.all(color: Colors.grey, width: 2.0),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(12.0),
+          child: Row(
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: Image.asset(
+                  '/images/bg2.jpg',
+                  width: 80,
+                  height: 120,
+                  fit: BoxFit.cover,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Tiket #${tiket.id_tiket}",
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Seat: ${tiket.nomor_kursi}',
+                      style:
+                          const TextStyle(color: Colors.white70, fontSize: 14),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      formattedPrice,
+                      style: const TextStyle(
+                          color: Colors.white, fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => MovieTicketDetails(),
+                    ),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.white,
+                  foregroundColor: Colors.black,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                child: const Text("Details"),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
