@@ -25,6 +25,17 @@ class FilmClient {
     }
   }
 
+  // Fungsi untuk mengambil jadwal film berdasarkan ID film
+  static Future<Map<String, dynamic>> getFilmSchedule(int filmId) async {
+    final response = await get(Uri.http(url, '$endpoint/schedule/$filmId'));
+
+    if (response.statusCode == 200) {
+      return json.decode(response.body);
+    } else {
+      throw Exception('Failed to load film schedule');
+    }
+  }
+
   // Fungsi untuk mengambil detail film berdasarkan ID
   static Future<Film> find(int id) async {
     try {
