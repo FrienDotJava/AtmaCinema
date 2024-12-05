@@ -115,8 +115,11 @@ class _ProfilePageState extends State<ProfilePage> {
                     return CircleAvatar(
                       radius: 50,
                       backgroundColor: Colors.white,
-                      backgroundImage: const AssetImage('assets/images/blank-profile-picture.jpg') as ImageProvider,
-                      child: const Icon(Icons.person, size: 50, color: Colors.black),
+                      backgroundImage: const AssetImage(
+                              'assets/images/blank-profile-picture.jpg')
+                          as ImageProvider,
+                      child: const Icon(Icons.person,
+                          size: 50, color: Colors.black),
                     );
                   }
                 },

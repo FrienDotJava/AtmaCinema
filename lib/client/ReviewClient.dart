@@ -27,7 +27,7 @@ class ReviewClient {
     }
   }
 
-  static Future<bool> storeReview(int idFilm, int idUser, int ratingReview,
+  static Future<bool> storeReview(int? idFilm, int? idUser, int ratingReview,
       String description, String? token) async {
     try {
       final response = await post(
