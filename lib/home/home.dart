@@ -35,7 +35,7 @@ class homePageState extends State<homePage> {
       MyHomeView(navigateToMovies: navigateToMovies),
       ListMovieView(initialIndex: showNowPlaying ? 0 : 1),
       FnBPage(),
-      TiketPage(),
+      TicketsPage(),
       ProfilePage(),
     ];
 

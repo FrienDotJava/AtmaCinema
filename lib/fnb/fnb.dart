@@ -31,7 +31,7 @@ class _FnBPageState extends State<FnBPage> with SingleTickerProviderStateMixin {
   void _loadItems() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     token = prefs.getString('token');
-
+    debugPrint('$token');
     if (token != null) {
       setState(() {
         _bundleItems = MakananMinumanClient.fetchByKategori('bundle', token!);
@@ -90,7 +90,7 @@ class _FnBPageState extends State<FnBPage> with SingleTickerProviderStateMixin {
             children: [
               Padding(
                 padding:
-                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                    const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
                 child: Container(
                   decoration: BoxDecoration(
                     color: const Color(0xFF1F1F1F),

@@ -98,7 +98,7 @@ class _MyHomeViewState extends State<MyHomeView> {
         ),
         body: Column(
           children: [
-            _buildSearchBar(context),
+            _buildSearchBar(context, true, widget.navigateToMovies),
             const SizedBox(height: 15),
             Expanded(
               child: SingleChildScrollView(
@@ -114,9 +114,9 @@ class _MyHomeViewState extends State<MyHomeView> {
                     const SizedBox(height: 15),
                     _buildComingSoonList(),
                     const SizedBox(height: 15),
-                    // buildAtmaNewsSection(context),
+                    buildAtmaNewsSection(context),
                     const SizedBox(height: 30),
-                    // buildTopMoviesSection(context),
+                    buildTopMoviesSection(context),
                   ],
                 ),
               ),
@@ -127,14 +127,15 @@ class _MyHomeViewState extends State<MyHomeView> {
     );
   }
 
-  Widget _buildSearchBar(BuildContext context) {
+  Widget _buildSearchBar(
+    BuildContext context,
+    bool showNowPlaying,
+    Function({required bool nowPlaying}) navigateToMovies,
+  ) {
     return GestureDetector(
       onTap: () {
         _focusNode.unfocus();
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const ListMovieView()),
-        );
+        navigateToMovies(nowPlaying: showNowPlaying);
       },
       child: Container(
         margin: const EdgeInsets.all(16.0),
@@ -431,332 +432,332 @@ class ComingSoonCard extends StatelessWidget {
   }
 }
 
-// Widget buildAtmaNewsSection(BuildContext context) {
-//   return Column(
-//     crossAxisAlignment: CrossAxisAlignment.start,
-//     children: [
-//       Padding(
-//         padding: const EdgeInsets.symmetric(horizontal: 16.0),
-//         child: Row(
-//           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//           children: [
-//             const Text(
-//               'ATMA news',
-//               style: TextStyle(
-//                 color: Colors.white,
-//                 fontSize: 24,
-//                 fontWeight: FontWeight.bold,
-//               ),
-//             ),
-//             GestureDetector(
-//               onTap: () {
-//                 Navigator.push(
-//                   context,
-//                   MaterialPageRoute(builder: (context) => const NewsList()),
-//                 );
-//               },
-//               child: Row(
-//                 children: const [
-//                   Text(
-//                     "See all",
-//                     style: TextStyle(
-//                       color: Colors.white70,
-//                       fontSize: 16,
-//                     ),
-//                   ),
-//                   SizedBox(width: 4),
-//                   Icon(
-//                     Icons.arrow_forward_ios,
-//                     color: Colors.white70,
-//                     size: 16,
-//                   ),
-//                 ],
-//               ),
-//             ),
-//           ],
-//         ),
-//       ),
-//       const SizedBox(height: 12),
-//       Padding(
-//         padding: const EdgeInsets.symmetric(horizontal: 16.0),
-//         child: Column(
-//           children: [
-//             AtmaNewsCard(
-//               imagePath: 'images/bg2.jpg',
-//               description:
-//                   'Spider-Man: Way Back Home Confirmed for 2025 Release!',
-//             ),
-//             AtmaNewsCard(
-//               imagePath: 'images/bg2.jpg',
-//               description:
-//                   'Robert Downey Jr. Officially Returns as Iron Man: Announcement Delights Marvel Fans!',
-//             ),
-//             AtmaNewsCard(
-//               imagePath: 'images/bg2.jpg',
-//               description:
-//                   'Chris Evans Wields the Shield Again: Marvel Fans Cheer for the Return of Captain America!',
-//             ),
-//           ],
-//         ),
-//       ),
-//     ],
-//   );
-// }
+Widget buildAtmaNewsSection(BuildContext context) {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Text(
+              'ATMA news',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const NewsList()),
+                );
+              },
+              child: Row(
+                children: const [
+                  Text(
+                    "See all",
+                    style: TextStyle(
+                      color: Colors.white70,
+                      fontSize: 16,
+                    ),
+                  ),
+                  SizedBox(width: 4),
+                  Icon(
+                    Icons.arrow_forward_ios,
+                    color: Colors.white70,
+                    size: 16,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+      const SizedBox(height: 12),
+      Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+        child: Column(
+          children: [
+            AtmaNewsCard(
+              imagePath: 'images/img_poster/endgame.jpg',
+              description:
+                  'Spider-Man: Way Back Home Confirmed for 2025 Release!',
+            ),
+            AtmaNewsCard(
+              imagePath: 'images/img_poster/avengers.jpg',
+              description:
+                  'Robert Downey Jr. Officially Returns as Iron Man: Announcement Delights Marvel Fans!',
+            ),
+            AtmaNewsCard(
+              imagePath: 'images/img_poster/infinity_war.jpg',
+              description:
+                  'Chris Evans Wields the Shield Again: Marvel Fans Cheer for the Return of Captain America!',
+            ),
+          ],
+        ),
+      ),
+    ],
+  );
+}
 
 // ATMA News Card Widget
-// class AtmaNewsCard extends StatelessWidget {
-//   final String imagePath;
-//   final String description;
+class AtmaNewsCard extends StatelessWidget {
+  final String imagePath;
+  final String description;
 
-//   const AtmaNewsCard({
-//     required this.imagePath,
-//     required this.description,
-//     Key? key,
-//   }) : super(key: key);
+  const AtmaNewsCard({
+    required this.imagePath,
+    required this.description,
+    Key? key,
+  }) : super(key: key);
 
-//   @override
-//   Widget build(BuildContext context) {
-//     return GestureDetector(
-//       onTap: () {
-//         Navigator.push(
-//           context,
-//           MaterialPageRoute(
-//             builder: (context) => NewsDetail(
-//               imagePath: imagePath,
-//               title: description,
-//             ),
-//           ),
-//         );
-//       },
-//       child: Container(
-//         margin: const EdgeInsets.only(bottom: 16.0),
-//         child: Row(
-//           children: [
-//             ClipRRect(
-//               borderRadius: BorderRadius.circular(12.0),
-//               child: Image.asset(
-//                 imagePath,
-//                 fit: BoxFit.cover,
-//                 width: 80,
-//                 height: 80,
-//               ),
-//             ),
-//             const SizedBox(width: 12),
-//             Expanded(
-//               child: Text(
-//                 description,
-//                 style: const TextStyle(
-//                   color: Colors.white,
-//                   fontSize: 14,
-//                   fontWeight: FontWeight.bold,
-//                 ),
-//               ),
-//             ),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => NewsDetail(
+              imagePath: imagePath,
+              title: description,
+            ),
+          ),
+        );
+      },
+      child: Container(
+        margin: const EdgeInsets.only(left: 20.0, bottom: 16.0),
+        child: Row(
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(12.0),
+              child: Image.asset(
+                imagePath,
+                fit: BoxFit.cover,
+                width: 80,
+                height: 80,
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                description,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
 
-// Widget buildTopMoviesSection(BuildContext context) {
-//   return FutureBuilder<String?>(
-//     future: SharedPreferences.getInstance()
-//         .then((prefs) => prefs.getString('token')),
-//     builder: (context, tokenSnapshot) {
-//       if (tokenSnapshot.connectionState == ConnectionState.waiting) {
-//         return const Center(child: CircularProgressIndicator());
-//       } else if (tokenSnapshot.hasError ||
-//           !tokenSnapshot.hasData ||
-//           tokenSnapshot.data == null) {
-//         return const Center(child: Text('Error: Unable to fetch token.'));
-//       }
+Widget buildTopMoviesSection(BuildContext context) {
+  return FutureBuilder<String?>(
+    future: SharedPreferences.getInstance()
+        .then((prefs) => prefs.getString('token')),
+    builder: (context, tokenSnapshot) {
+      if (tokenSnapshot.connectionState == ConnectionState.waiting) {
+        return const Center(child: CircularProgressIndicator());
+      } else if (tokenSnapshot.hasError ||
+          !tokenSnapshot.hasData ||
+          tokenSnapshot.data == null) {
+        return const Center(child: Text('Error: Unable to fetch token.'));
+      }
 
-//       final token = tokenSnapshot.data!;
-//       Future<List<Film>> topMovies =
-//           FilmClient.fetchByStatus('now playing', token);
+      final token = tokenSnapshot.data!;
+      Future<List<Film>> topMovies =
+          FilmClient.fetchByStatus('now playing', token);
 
-//       return FutureBuilder<List<Film>>(
-//         future: topMovies,
-//         builder: (context, snapshot) {
-//           if (snapshot.connectionState == ConnectionState.waiting) {
-//             return const Center(child: CircularProgressIndicator());
-//           } else if (snapshot.hasError) {
-//             return Center(child: Text('Error: ${snapshot.error}'));
-//           } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
-//             List<Film> movies = snapshot.data!;
+      return FutureBuilder<List<Film>>(
+        future: topMovies,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+            List<Film> movies = snapshot.data!;
 
-//             return Column(
-//               crossAxisAlignment: CrossAxisAlignment.start,
-//               children: [
-//                 Padding(
-//                   padding: const EdgeInsets.symmetric(horizontal: 16.0),
-//                   child: Row(
-//                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//                     children: [
-//                       const Text(
-//                         'Top Movies For You!',
-//                         style: TextStyle(
-//                           color: Colors.white,
-//                           fontSize: 24,
-//                           fontWeight: FontWeight.bold,
-//                         ),
-//                       ),
-//                       GestureDetector(
-//                         onTap: () {
-//                           Navigator.push(
-//                             context,
-//                             MaterialPageRoute(
-//                                 builder: (context) => TopMovieList()),
-//                           );
-//                         },
-//                         child: Row(
-//                           children: const [
-//                             Text(
-//                               "See all",
-//                               style: TextStyle(
-//                                 color: Colors.white70,
-//                                 fontSize: 16,
-//                               ),
-//                             ),
-//                             SizedBox(width: 4),
-//                             Icon(
-//                               Icons.arrow_forward_ios,
-//                               color: Colors.white70,
-//                               size: 16,
-//                             ),
-//                           ],
-//                         ),
-//                       ),
-//                     ],
-//                   ),
-//                 ),
-//                 const SizedBox(height: 12),
-//                 Padding(
-//                   padding: const EdgeInsets.symmetric(horizontal: 16.0),
-//                   child: Column(
-//                     children: movies.map((movie) {
-//                       return MovieListCard(
-//                         imagePath: movie.poster ?? 'images/default_poster.jpg',
-//                         title: movie.judul_film,
-//                         duration: '${movie.durasi} mins',
-//                         rating: '${movie.rating_umur}',
-//                         ageRating: movie.rating_umur ?? 'N/A',
-//                         format: movie.dimensi ?? 'N/A',
-//                       );
-//                     }).toList(),
-//                   ),
-//                 ),
-//               ],
-//             );
-//           } else {
-//             return const Center(child: Text('No top movies found'));
-//           }
-//         },
-//       );
-//     },
-//   );
-// }
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Top Movies For You!',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => TopMovieList()),
+                          );
+                        },
+                        child: Row(
+                          children: const [
+                            Text(
+                              "See all",
+                              style: TextStyle(
+                                color: Colors.white70,
+                                fontSize: 16,
+                              ),
+                            ),
+                            SizedBox(width: 4),
+                            Icon(
+                              Icons.arrow_forward_ios,
+                              color: Colors.white70,
+                              size: 16,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: Column(
+                    children: movies.map((movie) {
+                      return MovieListCard(
+                        imagePath: movie.poster ?? 'images/default_poster.jpg',
+                        title: movie.judul_film,
+                        duration: '${movie.durasi} mins',
+                        rating: '${movie.rating_umur}',
+                        ageRating: movie.rating_umur ?? 'N/A',
+                        format: movie.dimensi ?? 'N/A',
+                      );
+                    }).toList(),
+                  ),
+                ),
+              ],
+            );
+          } else {
+            return const Center(child: Text('No top movies found'));
+          }
+        },
+      );
+    },
+  );
+}
 
-// class MovieListCard extends StatelessWidget {
-//   final String imagePath;
-//   final String title;
-//   final String duration;
-//   final String rating;
-//   final String ageRating;
-//   final String format;
+class MovieListCard extends StatelessWidget {
+  final String imagePath;
+  final String title;
+  final String duration;
+  final String rating;
+  final String ageRating;
+  final String format;
 
-//   const MovieListCard({
-//     required this.imagePath,
-//     required this.title,
-//     required this.duration,
-//     required this.rating,
-//     required this.ageRating,
-//     required this.format,
-//   });
+  const MovieListCard({
+    required this.imagePath,
+    required this.title,
+    required this.duration,
+    required this.rating,
+    required this.ageRating,
+    required this.format,
+  });
 
-//   @override
-//   Widget build(BuildContext context) {
-//     return Container(
-//       margin: const EdgeInsets.only(left: 20.0, bottom: 16.0),
-//       child: Row(
-//         children: [
-//           ClipRRect(
-//             borderRadius: BorderRadius.circular(12.0),
-//             child: Image.asset(
-//               imagePath,
-//               fit: BoxFit.cover,
-//               width: 100,
-//               height: 120,
-//             ),
-//           ),
-//           const SizedBox(width: 16),
-//           Expanded(
-//             child: Column(
-//               crossAxisAlignment: CrossAxisAlignment.start,
-//               children: [
-//                 Text(
-//                   title,
-//                   style: const TextStyle(
-//                     color: Colors.white,
-//                     fontSize: 18,
-//                     fontWeight: FontWeight.bold,
-//                   ),
-//                 ),
-//                 const SizedBox(height: 8),
-//                 Row(
-//                   children: [
-//                     MovieTag(text: duration),
-//                     const SizedBox(width: 8),
-//                     MovieTag(text: ageRating),
-//                     const SizedBox(width: 8),
-//                     MovieTag(text: format),
-//                   ],
-//                 ),
-//                 const SizedBox(height: 8),
-//                 Row(
-//                   children: [
-//                     const Icon(Icons.star, color: Colors.yellow, size: 16),
-//                     const SizedBox(width: 4),
-//                     Text(
-//                       rating,
-//                       style: const TextStyle(
-//                         color: Colors.white,
-//                         fontSize: 14,
-//                       ),
-//                     ),
-//                   ],
-//                 ),
-//               ],
-//             ),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-// }
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(left: 20.0, bottom: 16.0),
+      child: Row(
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(12.0),
+            child: Image.asset(
+              imagePath,
+              fit: BoxFit.cover,
+              width: 100,
+              height: 120,
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    MovieTag(text: duration),
+                    const SizedBox(width: 8),
+                    MovieTag(text: ageRating),
+                    const SizedBox(width: 8),
+                    MovieTag(text: format),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    const Icon(Icons.star, color: Colors.yellow, size: 16),
+                    const SizedBox(width: 4),
+                    Text(
+                      rating,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
 
 // // MovieTag Widget
-// class MovieTag extends StatelessWidget {
-//   final String text;
+class MovieTag extends StatelessWidget {
+  final String text;
 
-//   const MovieTag({super.key, required this.text});
+  const MovieTag({super.key, required this.text});
 
-//   @override
-//   Widget build(BuildContext context) {
-//     return Container(
-//       padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
-//       decoration: BoxDecoration(
-//         color: const Color(0xFF1F1F1F),
-//         borderRadius: BorderRadius.circular(10.0),
-//       ),
-//       child: Text(
-//         text,
-//         style: const TextStyle(
-//           fontSize: 12,
-//           color: Colors.white,
-//         ),
-//       ),
-//     );
-//   }
-// }
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+      decoration: BoxDecoration(
+        color: const Color(0xFF1F1F1F),
+        borderRadius: BorderRadius.circular(10.0),
+      ),
+      child: Text(
+        text,
+        style: const TextStyle(
+          fontSize: 12,
+          color: Colors.white,
+        ),
+      ),
+    );
+  }
+}

@@ -26,4 +26,34 @@ class ReviewClient {
       return Future.error(e.toString());
     }
   }
+
+  static Future<bool> storeReview(int idFilm, int idUser, int ratingReview,
+      String description, String? token) async {
+    try {
+      final response = await post(
+        Uri.http(url, endpoint),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body: json.encode({
+          'id_film': idFilm,
+          'id_user': idUser,
+          'rating_review': ratingReview,
+          'deskripsi_review': description,
+        }),
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        print("Review successfully added.");
+        return true;
+      } else {
+        print("Failed to add review: ${response.reasonPhrase}");
+        return false;
+      }
+    } catch (e) {
+      print("Error occurred: ${e.toString()}");
+      return Future.error(e.toString());
+    }
+  }
 }

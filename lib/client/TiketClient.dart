@@ -1,58 +1,91 @@
 import 'dart:convert';
-
-import 'package:http/http.dart';
+import 'package:http/http.dart' as http;
 import 'package:tubes/entity/Tiket.dart';
+import 'package:tubes/entity/JadwalTayang.dart';
+import 'FilmClient.dart';
 
 class TiketClient {
-  static final String url = '10.0.2.2:8000';
-  static final String endpoint = '/api/tiket';
+  static const String _baseUrl = '10.0.2.2:8000';
+  static const String _endpoint = '/api/tiket';
 
-  // Fungsi untuk mengambil daftar tiket berdasarkan user
-  static Future<List<Tiket>> fetchByUser(int userId, String token) async {
+  /// Fetch tickets by user ID and compute the `status`
+
+  static Future<List<Tiket>> fetchByUser(
+      int? userId, String token, int? idFilm) async {
     try {
-      final response = await get(
-        Uri.http(url, '$endpoint/user/$userId'),
+      // Step 1: Fetch Tikets
+      final response = await http.get(
+        Uri.http(_baseUrl, '$_endpoint/user/$userId'),
         headers: {'Authorization': 'Bearer $token'},
       );
 
       if (response.statusCode != 200) {
-        throw Exception(response.reasonPhrase);
+        print(Tiket);
+        throw Exception('Failed to fetch tickets: ${response.reasonPhrase}');
       }
 
-      Iterable list = json.decode(response.body)['data'];
-      return list.map((e) => Tiket.fromJson(e)).toList();
+      // Step 2: Map JSON response to Tiket objects
+      Iterable jsonList = json.decode(response.body)['data'];
+
+      List<Tiket> tikets = [];
+
+      for (var data in jsonList) {
+        Tiket tiket = Tiket.fromJson(data);
+
+        // Step 3: Fetch the film schedule for the specific film
+        Map<String, dynamic> jadwalData =
+            await FilmClient.getFilmSchedule(idFilm!);
+
+        // Assuming jadwalData contains the necessary information
+        Jadwaltayang jadwal = Jadwaltayang.fromJson(jadwalData);
+
+        // Default film duration to 120 minutes (2 hours)
+        int filmDuration = 120;
+
+        // Calculate the status
+        tiket.status = tiket.calculateStatus(jadwal, filmDuration);
+
+        tikets.add(tiket);
+      }
+
+      return tikets;
     } catch (e) {
-      return Future.error(e.toString());
+      return Future.error('Error fetching tickets: $e');
     }
   }
 
-  // Fungsi untuk mengambil detail tiket berdasarkan ID
-  static Future<Tiket> find(int id, String token) async {
+  static Future<Tiket> find(int id, String token, Jadwaltayang jadwal) async {
     try {
-      final response = await get(
-        Uri.http(url, '$endpoint/$id'),
+      final response = await http.get(
+        Uri.http(_baseUrl, '$_endpoint/$id'),
         headers: {'Authorization': 'Bearer $token'},
       );
 
       if (response.statusCode != 200) {
-        throw Exception(response.reasonPhrase);
+        throw Exception('Failed to fetch ticket: ${response.reasonPhrase}');
       }
 
-      final jsonResponse = json.decode(response.body);
-      final data = jsonResponse['data'];
+      final jsonData = json.decode(response.body)['data'];
+      Tiket tiket = Tiket.fromJson(jsonData);
 
-      return Tiket.fromJson(data);
+      // Default film duration to 120 minutes (2 hours)
+      int filmDuration = 120;
+
+      // Calculate and assign the status
+      tiket.status = tiket.calculateStatus(jadwal, filmDuration);
+
+      return tiket;
     } catch (e) {
-      return Future.error(e.toString());
+      return Future.error('Error fetching ticket: $e');
     }
   }
 
-  // Fungsi untuk membuat tiket baru
+  /// Create a new ticket
   static Future<Tiket> create(
       Map<String, dynamic> tiketData, String token) async {
     try {
-      final response = await post(
-        Uri.http(url, endpoint),
+      final response = await http.post(
+        Uri.http(_baseUrl, _endpoint),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
@@ -61,22 +94,22 @@ class TiketClient {
       );
 
       if (response.statusCode != 201) {
-        throw Exception(response.reasonPhrase);
+        throw Exception('Failed to create ticket: ${response.reasonPhrase}');
       }
 
-      final data = json.decode(response.body)['data'];
-      return Tiket.fromJson(data);
+      final jsonData = json.decode(response.body)['data'];
+      return Tiket.fromJson(jsonData);
     } catch (e) {
-      return Future.error(e.toString());
+      return Future.error('Error creating ticket: $e');
     }
   }
 
-  // Fungsi untuk mengupdate tiket berdasarkan ID
+  /// Update an existing ticket by ID
   static Future<Tiket> update(
       int id, Map<String, dynamic> tiketData, String token) async {
     try {
-      final response = await put(
-        Uri.http(url, '$endpoint/$id'),
+      final response = await http.put(
+        Uri.http(_baseUrl, '$_endpoint/$id'),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
@@ -85,16 +118,29 @@ class TiketClient {
       );
 
       if (response.statusCode != 200) {
-        throw Exception(response.reasonPhrase);
+        throw Exception('Failed to update ticket: ${response.reasonPhrase}');
       }
 
-      final data = json.decode(response.body)['data'];
-      return Tiket.fromJson(data);
+      final jsonData = json.decode(response.body)['data'];
+      return Tiket.fromJson(jsonData);
     } catch (e) {
-      return Future.error(e.toString());
+      return Future.error('Error updating ticket: $e');
     }
   }
 
-  // Fungsi untuk menghapus tiket berdasarkan ID
-  static Future<void> delete(int id, String token) async {}
+  /// Delete a ticket by ID
+  static Future<void> delete(int id, String token) async {
+    try {
+      final response = await http.delete(
+        Uri.http(_baseUrl, '$_endpoint/$id'),
+        headers: {'Authorization': 'Bearer $token'},
+      );
+
+      if (response.statusCode != 200) {
+        throw Exception('Failed to delete ticket: ${response.reasonPhrase}');
+      }
+    } catch (e) {
+      return Future.error('Error deleting ticket: $e');
+    }
+  }
 }
