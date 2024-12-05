@@ -2,6 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'dart:convert';
 import 'package:tubes/client/ReviewClient.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import 'package:tubes/client/UserClient.dart';
+import 'package:tubes/entity/User.dart';
+import 'package:tubes/client/FilmClient.dart';
+import 'package:tubes/entity/Film.dart';
 
 class ReviewPage extends StatefulWidget {
   @override
@@ -11,10 +17,35 @@ class ReviewPage extends StatefulWidget {
 class _ReviewPageState extends State<ReviewPage> {
   int _rating = 0;
   final TextEditingController _reviewController = TextEditingController();
-  final int _idFilm = 5; // Example film ID
-  final int _idUser = 13; // Example user ID
-  final String _token =
-      "39|Ki25V66u6yciXtkCRntTRdFCJN0AQm7fG25bHlXXd2424518"; // Replace with your actual token
+  int? _idFilm; // Example film ID
+  int? _idUser; // Example user ID
+  String? _token;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData();
+  }
+
+  _loadUserData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    _token = prefs.getString('token'); // Mendapatkan token pengguna
+
+    if (_token != null) {
+      // Ambil data profil menggunakan UserClient
+      User? user = await UserClient.getProfile(_token!);
+      if (user != null) {
+        // Mengisi data pengguna ke variabel state dari data yang didapat (database)
+        setState(() {
+          _idUser = user.id_user;
+          _idFilm = 5;
+        });
+      } else {
+        // Handle error, jika data gagal diambil
+        print('Failed to load user data');
+      }
+    }
+  }
 
   void _setRating(int rating) {
     setState(() {
