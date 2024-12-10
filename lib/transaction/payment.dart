@@ -1,8 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:tubes/client/TransaksiClient.dart';
+import 'package:tubes/client/TiketClient.dart';
+import '../entity/Transaksi.dart';
 import '../movie/movie.dart';
 import 'paymentConfirmation.dart';
 import 'package:intl/intl.dart';
 import 'package:tubes/entity/Film.dart';
+import 'package:tubes/entity/User.dart';
+import 'package:tubes/entity/Tiket.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:tubes/client/UserClient.dart';
 
 class Payment extends StatefulWidget {
   final Film movie;
@@ -12,6 +19,7 @@ class Payment extends StatefulWidget {
   final String selectedTime;
   final String selectedCinemaFormat;
   final DateTime selectedDate;
+  final int idJadwal;
 
   const Payment({
     Key? key,
@@ -22,6 +30,7 @@ class Payment extends StatefulWidget {
     required this.selectedTime,
     required this.selectedCinemaFormat,
     required this.selectedDate,
+    required this.idJadwal,
   }) : super(key: key);
 
   @override
@@ -31,11 +40,14 @@ class Payment extends StatefulWidget {
 class _PaymentState extends State<Payment> {
   String? _selectedPaymentMethod;
   late String _paymentExpiryTime;
+  int? _idUser;
+  String? _token;
 
   @override
   void initState() {
     super.initState();
     _setPaymentExpiryTime();
+    _loadUserData();
   }
 
   //Ini prosedur buat expiry time pembayaran
@@ -45,6 +57,67 @@ class _PaymentState extends State<Payment> {
     final now = widget.selectedDate;
     final expiryTime = now.add(const Duration(minutes: 15));
     _paymentExpiryTime = DateFormat('d MMMM yyyy, hh:mm a').format(expiryTime);
+  }
+
+  _loadUserData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    _token = prefs.getString('token'); // Mendapatkan token pengguna
+
+    if (_token != null) {
+      // Ambil data profil menggunakan UserClient
+      User? user = await UserClient.getProfile(_token!);
+      if (user != null) {
+        // Mengisi data pengguna ke variabel state dari data yang didapat (database)
+        setState(() {
+          _idUser = user.id_user;
+        });
+      } else {
+        // Handle error, jika data gagal diambil
+        print('Failed to load user data');
+      }
+    }
+  }
+
+  Future<void> _saveTransaksi() async {
+    try{
+      int? id_transaksi = await TransaksiClient.storeTransaksi(
+          _idUser,
+          widget.totalPrice,
+          "1",
+          _token
+      );
+      if(id_transaksi != null) {
+        final Map<String, dynamic> tiketData = {
+          'id_transaksi': id_transaksi,
+          'id_jadwal': widget.idJadwal,
+          'jumlah_kursi': widget.ticketCount,
+          'id_user': _idUser
+        };
+        Tiket hasil = await TiketClient.create(tiketData, _token);
+
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => PaymentConfirmation(
+              movie: widget.movie,
+              ticketCount: widget.ticketCount,
+              ticketPrice: widget.ticketPrice,
+              totalPrice: widget.totalPrice,
+              selectedTime: widget.selectedTime,
+              selectedCinemaFormat: widget.selectedCinemaFormat,
+              selectedDate: widget.selectedDate,
+            ),
+          ),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Error occurred: $e"),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 
   @override
@@ -241,23 +314,8 @@ class _PaymentState extends State<Payment> {
               const SizedBox(height: 12),
               //ini button untuk konfirmasi pembayaran
               ElevatedButton(
-                onPressed: () {
-                  // Mengirimkan data ke halaman paymentConfirmation
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => PaymentConfirmation(
-                        movie: widget.movie,
-                        ticketCount: widget.ticketCount,
-                        ticketPrice: widget.ticketPrice,
-                        totalPrice: widget.totalPrice,
-                        selectedTime: widget.selectedTime,
-                        selectedCinemaFormat: widget.selectedCinemaFormat,
-                        selectedDate: widget.selectedDate,
-                      ),
-                    ),
-                  );
-                },
+                onPressed: _saveTransaksi,
+
                 child: Text(
                   "CONFIRM PAYMENT Rp ${widget.totalPrice.toStringAsFixed(3)}",
                   style: const TextStyle(color: Colors.black),

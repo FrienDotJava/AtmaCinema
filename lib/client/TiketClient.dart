@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:http/http.dart';
 import 'package:tubes/entity/Tiket.dart';
 import 'package:tubes/entity/JadwalTayang.dart';
 import 'FilmClient.dart';
@@ -82,9 +83,12 @@ class TiketClient {
 
   /// Create a new ticket
   static Future<Tiket> create(
-      Map<String, dynamic> tiketData, String token) async {
+      Map<String, dynamic> tiketData, String? token) async {
     try {
-      final response = await http.post(
+      print("Sending POST request to: $_baseUrl$_endpoint");
+      print("Headers: {Content-Type: application/json, Authorization: Bearer $token}");
+      print("Body: ${json.encode(tiketData)}");
+      final response = await post(
         Uri.http(_baseUrl, _endpoint),
         headers: {
           'Content-Type': 'application/json',
@@ -93,7 +97,7 @@ class TiketClient {
         body: json.encode(tiketData),
       );
 
-      if (response.statusCode != 201) {
+      if (response.statusCode != 201 && response.statusCode != 200) {
         throw Exception('Failed to create ticket: ${response.reasonPhrase}');
       }
 

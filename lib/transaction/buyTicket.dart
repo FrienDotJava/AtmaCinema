@@ -433,6 +433,15 @@ class _MovieShowtimePageState extends State<MovieShowtimePage> {
                             const SizedBox(height: 16),
                             ElevatedButton(
                               onPressed: () {
+                                print('Navigating to Payment');
+                                print('Movie: ${widget.movie}');
+                                print('Seat Count: $seatCount');
+                                print('Ticket Price: $ticketPrice');
+                                print('Total Price: $totalPrice');
+                                print('Selected Time: $time');
+                                print('Selected Cinema Format: ${widget.movie.dimensi}');
+                                print('Selected Date: $selectedDate');
+                                print('ID Jadwal: $idJadwal');
                                 Navigator.of(context).push(MaterialPageRoute(
                                   builder: (context) => Payment(
                                     movie: widget.movie,
@@ -442,6 +451,7 @@ class _MovieShowtimePageState extends State<MovieShowtimePage> {
                                     selectedTime: time,
                                     selectedCinemaFormat: widget.movie.dimensi,
                                     selectedDate: selectedDate!,
+                                    idJadwal: idJadwal,
                                   ),
                                 ));
                               },

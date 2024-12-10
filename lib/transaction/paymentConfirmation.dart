@@ -58,7 +58,15 @@ class PaymentConfirmation extends StatelessWidget {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => MovieTicketDetails(),
+                      builder: (context) => MovieTicketDetails(
+                        movie: movie,  // Pass the movie object
+                        ticketCount: ticketCount,
+                        ticketPrice: ticketPrice,
+                        totalPrice: totalPrice,
+                        selectedTime: selectedTime,
+                        selectedCinemaFormat: selectedCinemaFormat,
+                        selectedDate: selectedDate,
+                      ),
                     ),
                   );
                 },

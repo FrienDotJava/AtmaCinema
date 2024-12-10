@@ -1,13 +1,13 @@
 import 'dart:convert';
 
 class Transaksi {
-  int id_transaksi;
+  int? id_transaksi;
   int id_user;
   double total_harga;
   bool status;
 
   Transaksi({
-    required this.id_transaksi,
+    this.id_transaksi,
     required this.id_user,
     required this.total_harga,
     required this.status,

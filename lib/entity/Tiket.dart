@@ -2,18 +2,18 @@ import 'dart:convert';
 import 'JadwalTayang.dart';
 
 class Tiket {
-  int id_tiket;
+  int? id_tiket;
   int id_transaksi;
   int id_jadwal;
-  int nomor_kursi;
+  int jumlah_kursi;
   String? status;
   int id_user;
 
   Tiket({
-    required this.id_tiket,
+    this.id_tiket,
     required this.id_transaksi,
     required this.id_jadwal,
-    required this.nomor_kursi,
+    required this.jumlah_kursi,
     this.status,
     required this.id_user,
   });
@@ -23,7 +23,7 @@ class Tiket {
       id_tiket: json["id_tiket"],
       id_transaksi: json["id_transaksi"],
       id_jadwal: json["id_jadwal"],
-      nomor_kursi: json["nomor_kursi"],
+      jumlah_kursi: json["jumlah_kursi"],
       id_user: json["id_user"]);
 
   String toRawJson() => json.encode(toJson());
@@ -31,7 +31,7 @@ class Tiket {
         "id_tiket": id_tiket,
         "id_transaksi": id_transaksi,
         "id_jadwal": id_jadwal,
-        "nomor_kursi": nomor_kursi,
+        "jumlah_kursi": jumlah_kursi,
         "id_user": id_user
       };
 
