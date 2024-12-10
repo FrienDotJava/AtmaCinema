@@ -5,9 +5,10 @@ import 'package:intl/intl.dart';
 // import 'package:tubes/transaction/invoice_pdf.dart';
 import '../transaction/ticketDetails.dart';
 import '../transaction/invoice_pdf.dart';
+import 'package:tubes/entity/Film.dart';
 
 class PaymentConfirmation extends StatelessWidget {
-  final Movie movie;
+  final Film movie;
   final int ticketCount;
   final double ticketPrice;
   final double totalPrice;
@@ -92,7 +93,7 @@ class PaymentConfirmation extends StatelessWidget {
                   ClipRRect(
                     borderRadius: BorderRadius.circular(8.0),
                     child: Image.asset(
-                      movie.posterUrl,
+                      movie.poster,
                       height: 150,
                       fit: BoxFit.cover,
                     ),
@@ -103,7 +104,7 @@ class PaymentConfirmation extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          movie.title,
+                          movie.judul_film,
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 20,

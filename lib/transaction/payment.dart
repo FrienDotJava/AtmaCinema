@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import '../movie/movie.dart';
 import 'paymentConfirmation.dart';
 import 'package:intl/intl.dart';
+import 'package:tubes/entity/Film.dart';
 
 class Payment extends StatefulWidget {
-  final Movie movie;
+  final Film movie;
   final int ticketCount;
   final double ticketPrice;
   final double totalPrice;
@@ -72,7 +73,7 @@ class _PaymentState extends State<Payment> {
                   ClipRRect(
                     borderRadius: BorderRadius.circular(8.0),
                     child: Image.asset(
-                      widget.movie.posterUrl,
+                      widget.movie.poster,
                       height: 150,
                       fit: BoxFit.cover,
                     ),
@@ -83,7 +84,7 @@ class _PaymentState extends State<Payment> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          widget.movie.title,
+                          widget.movie.judul_film,
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 24,

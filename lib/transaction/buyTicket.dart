@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:tubes/entity/Film.dart';
+import 'package:tubes/client/StudioClient.dart';
 import 'package:tubes/client/FilmClient.dart';
+import 'package:tubes/transaction/payment.dart';
 
 class MovieShowtimePage extends StatefulWidget {
   final Film movie;
@@ -14,11 +16,30 @@ class MovieShowtimePage extends StatefulWidget {
   State<MovieShowtimePage> createState() => _MovieShowtimePageState();
 }
 
+class Jadwal {
+  int nomorStudio;
+  List<String> showtimes;
+
+  Jadwal({
+    required this.nomorStudio,
+    required this.showtimes,
+  });
+}
+
+class Showtime {
+  final String id;
+  final String time;
+  final String price;
+
+  Showtime({required this.id, required this.time, required this.price});
+}
+
 class _MovieShowtimePageState extends State<MovieShowtimePage> {
   int selectedDateIndex = 0;
   DateTime? selectedDate;
   String? selectedTime;
   Map<String, dynamic> filmSchedule = {}; // Untuk menyimpan jadwal film
+  Future<int> availableSeats = Future.value(0);
 
   @override
   void initState() {
@@ -62,26 +83,35 @@ class _MovieShowtimePageState extends State<MovieShowtimePage> {
     return months[month - 1];
   }
 
-  // Bagian membuat UI dari list showtimes yang didapat dari API dengan button button
+  Future<int> countSeat(int idJadwal, int idFilm) async {
+    try {
+      var response = await StudioClient.countBookedDate(idJadwal, idFilm);
+      int availableSeats = response['data'];
+      print("Available seats: $availableSeats");
+      return availableSeats;
+    } catch (e) {
+      print("Error fetching seat count: $e");
+      return 0;
+    }
+  }
+
   Widget _buildShowtimesList() {
     if (filmSchedule.isEmpty) {
-      return Center(
-          child: CircularProgressIndicator()); // Buat loading biar gak null
+      return Center(child: CircularProgressIndicator());
     }
 
     // List untuk menyimpan showtimes
-    List<String> showtimes = [];
+    List<Showtime> showtimes = [];
 
-    // Melakukan iterasi pada data jadwal film
     filmSchedule.forEach((key, value) {
-      // Mengecek apakah value merupakan list
       if (value is List) {
-        // Perulangan tiap item di list
         for (var item in value) {
-          // Pengecekan apakah item merupakan map dan memiliki key 'jam_tayang'
           if (item is Map && item.containsKey('jam_tayang')) {
-            showtimes.add(item['jam_tayang']
-                .toString()); // Menambahkan jam tayang ke list showtimes
+            showtimes.add(Showtime(
+              id: item['id_jadwal'].toString(),
+              time: item['jam_tayang'].toString(),
+              price: item['harga'].toString(),
+            ));
           }
         }
       } else {
@@ -94,7 +124,6 @@ class _MovieShowtimePageState extends State<MovieShowtimePage> {
       return Center(child: Text('No showtimes available.'));
     }
 
-    // Proses membuat button button showtimes
     return Wrap(
       alignment: WrapAlignment.start,
       spacing: 16.0,
@@ -105,8 +134,10 @@ class _MovieShowtimePageState extends State<MovieShowtimePage> {
           child: ElevatedButton(
             onPressed: () {
               setState(() {
-                selectedTime = showtime;
+                selectedTime = showtime.time;
               });
+              _showTicketSelectionModal(
+                  showtime.id, showtime.time, showtime.price);
             },
             style: ElevatedButton.styleFrom(
               backgroundColor:
@@ -124,7 +155,7 @@ class _MovieShowtimePageState extends State<MovieShowtimePage> {
               elevation: 5,
             ),
             child: Text(
-              showtime,
+              showtime.time,
               style: TextStyle(
                 fontSize: 16,
                 color: Colors.white,
@@ -200,7 +231,7 @@ class _MovieShowtimePageState extends State<MovieShowtimePage> {
                               const Icon(Icons.theaters,
                                   color: Colors.grey, size: 14),
                               const SizedBox(width: 4),
-                              Text("Regular 2D",
+                              Text("${widget.movie.dimensi}",
                                   style: TextStyle(color: Colors.white)),
                             ],
                           ),
@@ -258,8 +289,6 @@ class _MovieShowtimePageState extends State<MovieShowtimePage> {
                 ),
 
                 const SizedBox(height: 16),
-
-                // Showtimes section with styled buttons
                 Text(
                   'Showtimes',
                   style: TextStyle(color: Colors.white, fontSize: 18),
@@ -271,6 +300,177 @@ class _MovieShowtimePageState extends State<MovieShowtimePage> {
           ),
         ),
       ),
+    );
+  }
+
+  void _showTicketSelectionModal(String id, String time, String price) {
+    int idJadwal = int.parse(id);
+    print("Selected id: $id");
+    int seatCount = 1;
+    double ticketPrice = double.parse(price);
+    double totalPrice = ticketPrice * seatCount;
+
+    availableSeats = countSeat(idJadwal, widget.movie.id_film);
+
+    print("Available seats: $availableSeats");
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.black87,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setModalState) {
+            return Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      IconButton(
+                        icon: Icon(Icons.close, color: Colors.white),
+                        onPressed: () => Navigator.of(context).pop(),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(8.0),
+                        child: Image.asset(
+                          widget.movie.poster,
+                          height: 150,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              widget.movie.judul_film,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 30,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Text(
+                              "Time: $time",
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 18,
+                              ),
+                            ),
+                            Text(
+                              "Price: \Rp${price}",
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 18,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  FutureBuilder<int>(
+                    future: availableSeats,
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const CircularProgressIndicator();
+                      } else if (snapshot.hasError) {
+                        return Text(
+                          "Error fetching available seats",
+                          style: TextStyle(color: Colors.white),
+                        );
+                      } else if (snapshot.hasData) {
+                        int availableSeatCount = snapshot.data ?? 0;
+                        return Column(
+                          children: [
+                            Text(
+                              "Available Seats: $availableSeatCount",
+                              style: const TextStyle(
+                                  color: Colors.white, fontSize: 18),
+                            ),
+                            const SizedBox(height: 16),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                IconButton(
+                                  icon: Icon(Icons.remove, color: Colors.white),
+                                  onPressed: () {
+                                    if (seatCount > 1) {
+                                      setModalState(() {
+                                        seatCount--;
+                                        totalPrice = ticketPrice * seatCount;
+                                      });
+                                    }
+                                  },
+                                ),
+                                Text("$seatCount",
+                                    style: TextStyle(
+                                        color: Colors.white, fontSize: 18)),
+                                IconButton(
+                                  icon: Icon(Icons.add, color: Colors.white),
+                                  onPressed: () {
+                                    if (seatCount < 100) {
+                                      setModalState(() {
+                                        seatCount++;
+                                        totalPrice = ticketPrice * seatCount;
+                                      });
+                                    }
+                                  },
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 16),
+                            ElevatedButton(
+                              onPressed: () {
+                                Navigator.of(context).push(MaterialPageRoute(
+                                  builder: (context) => Payment(
+                                    movie: widget.movie,
+                                    ticketCount: seatCount,
+                                    ticketPrice: ticketPrice,
+                                    totalPrice: totalPrice,
+                                    selectedTime: time,
+                                    selectedCinemaFormat: widget.movie.dimensi,
+                                    selectedDate: selectedDate!,
+                                  ),
+                                ));
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.amber,
+                                padding: const EdgeInsets.symmetric(
+                                    vertical: 12, horizontal: 48),
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20)),
+                              ),
+                              child: const Text("CONTINUE",
+                                  style: TextStyle(color: Colors.black)),
+                            ),
+                          ],
+                        );
+                      } else {
+                        return const Text(
+                          "No data available",
+                          style: TextStyle(color: Colors.white),
+                        );
+                      }
+                    },
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
     );
   }
 }
