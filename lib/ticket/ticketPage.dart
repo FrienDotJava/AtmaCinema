@@ -32,17 +32,60 @@ class _TicketsPageState extends State<TicketsPage>
     _fetchTickets();
   }
 
+  Future<int> getUserId() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    int? idUser = prefs.getInt('id_user');
+    if (idUser == null) {
+      throw Exception('User ID not found. Please log in again.');
+    }
+    return idUser;
+  }
+
   Future<void> _fetchTickets() async {
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       token = prefs.getString('token');
-      int userId = 9;
+      int userId = await getUserId();
 
       List<Tiket> tickets =
           await TiketClient.fetchTicketsByUser(userId, token!);
 
+      print("Fetched Tickets: $tickets");
+
+      List<Tiket> onProgress = [];
+      List<Tiket> history = [];
+
+      for (var tiket in tickets) {
+        tiket.updateStatus();
+        print("Ticket: ${tiket.judulFilm}, Status: ${tiket.status}");
+
+        if (tiket.status == "on progress") {
+          onProgress.add(tiket);
+        } else if (tiket.status == "history") {
+          history.add(tiket);
+        }
+      }
+
+      onProgress.sort((a, b) {
+        DateTime now = DateTime.now();
+
+        DateTime dateA = DateTime.parse(
+          '${a.tanggal!.split('-').reversed.join('-')} ${a.jamTayang!}',
+        );
+
+        DateTime dateB = DateTime.parse(
+          '${b.tanggal!.split('-').reversed.join('-')} ${b.jamTayang!}',
+        );
+
+        return dateA.difference(now).compareTo(dateB.difference(now));
+      });
+
+      print("On Progress Tickets (Sorted): $onProgress");
+      print("History Tickets: ${history.length}");
+
       setState(() {
-        _onProgressTickets = tickets;
+        _onProgressTickets = onProgress;
+        _historyTickets = history;
         _isLoading = false;
       });
     } catch (e) {
@@ -185,7 +228,7 @@ class _TicketsPageState extends State<TicketsPage>
                   ),
                   child: Padding(
                     padding: const EdgeInsets.symmetric(
-                        vertical: 1.0, horizontal: 16.0),
+                        vertical: 4.0, horizontal: 16.0),
                     child: Row(
                       children: [
                         ClipRRect(
@@ -258,20 +301,83 @@ class _TicketsPageState extends State<TicketsPage>
                                 ],
                               ),
                               SizedBox(height: 6),
-                              Text(
-                                tiket.format ?? "Unknown",
-                                style: TextStyle(
-                                    color: Colors.white70, fontSize: 14),
-                              ),
-                              SizedBox(height: 16),
                               Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                  SizedBox(width: 16),
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Icon(Icons.chair_outlined,
+                                              color: Colors.white, size: 16),
+                                          SizedBox(width: 6),
+                                          Text(
+                                            (tiket.jumlah_kursi != null
+                                                    ? tiket.jumlah_kursi
+                                                        .toString()
+                                                    : "Unknown") +
+                                                " seat",
+                                            style: TextStyle(
+                                              color: Colors.white70,
+                                              fontSize: 14,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      SizedBox(height: 6),
+                                      Row(
+                                        children: [
+                                          Text(
+                                            tiket.format ?? "Unknown",
+                                            style: TextStyle(
+                                                color: Colors.white70,
+                                                fontSize: 14),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
                                   ElevatedButton(
                                     onPressed: () {
-                                      // Handle ticket details navigation
+                                      if (tiket.status == "history") {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => ReviewPage(
+                                                idFilm: tiket.id_film!,
+                                                poster: tiket.film!.poster),
+                                          ),
+                                        );
+                                      } else {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                MovieTicketDetails(
+                                              movie: tiket.film!,
+                                              ticketCount:
+                                                  tiket.jumlah_kursi ?? 1,
+                                              ticketPrice: tiket.harga ?? 0.0,
+                                              totalPrice:
+                                                  (tiket.jumlah_kursi ?? 1) *
+                                                      (tiket.harga ?? 0.0),
+                                              selectedTime:
+                                                  tiket.jamTayang ?? "Unknown",
+                                              selectedCinemaFormat:
+                                                  tiket.format ?? "Unknown",
+                                              selectedDate: DateTime.parse(
+                                                tiket.tanggal!
+                                                    .split('-')
+                                                    .reversed
+                                                    .join('-'),
+                                              ),
+                                            ),
+                                          ),
+                                        );
+                                      }
                                     },
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: Colors.white,
@@ -280,7 +386,11 @@ class _TicketsPageState extends State<TicketsPage>
                                         borderRadius: BorderRadius.circular(8),
                                       ),
                                     ),
-                                    child: Text("TICKET"),
+                                    child: Text(
+                                      tiket.status == "history"
+                                          ? "REVIEW"
+                                          : "TICKET",
+                                    ),
                                   ),
                                 ],
                               ),

@@ -74,9 +74,10 @@ class UserClient {
         var data = json.decode(response.body);
         if (data['status'] == true) {
           String token = data['data']['token'];
-
+          int idUser = data['data']['user']['id_user'];
           // Simpan token setelah login
           await saveToken(token);
+          await saveIdUser(idUser);
 
           // Kembalikan User object
           return User.fromRawJson(json.encode(data['data']['user']), token);
@@ -133,9 +134,8 @@ class UserClient {
 
     // Add the profile picture if available
     if (profilePicture != null) {
-      request.files.add(
-          await http.MultipartFile.fromPath('profile_picture', profilePicture.path)
-      );
+      request.files.add(await http.MultipartFile.fromPath(
+          'profile_picture', profilePicture.path));
     }
 
     // Add Authorization header
@@ -148,7 +148,8 @@ class UserClient {
         return true;
       } else {
         final responseBody = await response.stream.bytesToString();
-        print('Failed to update profile: ${response.statusCode} ${responseBody}');
+        print(
+            'Failed to update profile: ${response.statusCode} ${responseBody}');
         return false;
       }
     } catch (e) {
@@ -181,6 +182,11 @@ class UserClient {
   static Future<void> saveToken(String token) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString('token', token);
+  }
+
+  static Future<void> saveIdUser(int idUser) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('id_user', idUser);
   }
 
   //Cuma buat debug aja (pakai nek ngebug -> null)

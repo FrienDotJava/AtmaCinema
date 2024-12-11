@@ -5,13 +5,15 @@ import 'package:tubes/client/ReviewClient.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:tubes/client/UserClient.dart';
+import 'package:tubes/entity/Review.dart';
 import 'package:tubes/entity/User.dart';
 import 'package:tubes/client/FilmClient.dart';
 import 'package:tubes/entity/Film.dart';
 
 class ReviewPage extends StatefulWidget {
   final int idFilm;
-  const ReviewPage({super.key, required this.idFilm});
+  final String poster;
+  const ReviewPage({super.key, required this.idFilm, required this.poster});
 
   @override
   _ReviewPageState createState() => _ReviewPageState();
@@ -144,8 +146,8 @@ class _ReviewPageState extends State<ReviewPage> {
             children: [
               ClipRRect(
                 borderRadius: BorderRadius.circular(5.0),
-                child: Image.network(
-                  'https://image.tmdb.org/t/p/w500/RYMX2wcKCBAr24UyPD7xwmjaTn.jpg',
+                child: Image.asset(
+                  widget.poster,
                   height: 120,
                   fit: BoxFit.cover,
                 ),
