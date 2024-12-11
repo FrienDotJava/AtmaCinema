@@ -10,6 +10,9 @@ import 'package:tubes/client/FilmClient.dart';
 import 'package:tubes/entity/Film.dart';
 
 class ReviewPage extends StatefulWidget {
+  final int idFilm;
+  const ReviewPage({super.key, required this.idFilm});
+
   @override
   _ReviewPageState createState() => _ReviewPageState();
 }
@@ -17,8 +20,8 @@ class ReviewPage extends StatefulWidget {
 class _ReviewPageState extends State<ReviewPage> {
   int _rating = 0;
   final TextEditingController _reviewController = TextEditingController();
-  int? _idFilm; // Example film ID
-  int? _idUser; // Example user ID
+  int? _idUser;
+  int? _idFilm;
   String? _token;
 
   @override
@@ -38,7 +41,7 @@ class _ReviewPageState extends State<ReviewPage> {
         // Mengisi data pengguna ke variabel state dari data yang didapat (database)
         setState(() {
           _idUser = user.id_user;
-          _idFilm = 5;
+          _idFilm = widget.idFilm;
         });
       } else {
         // Handle error, jika data gagal diambil

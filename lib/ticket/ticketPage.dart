@@ -259,7 +259,9 @@ class _TicketsPageState extends State<TicketsPage>
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => ReviewPage(),
+                  builder: (context) => ReviewPage(
+                    idFilm: 5,
+                  ),
                 ),
               );
             },
