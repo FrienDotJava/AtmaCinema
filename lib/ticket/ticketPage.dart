@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 import 'package:tubes/review/inputReview.dart';
 import '../transaction/ticketDetails.dart';
+import 'package:tubes/entity/Tiket.dart';
+import 'package:tubes/client/TiketClient.dart';
 
 class TicketsPage extends StatefulWidget {
   const TicketsPage({Key? key}) : super(key: key);
+
   @override
   _TicketsPageState createState() => _TicketsPageState();
 }
@@ -15,12 +19,36 @@ class _TicketsPageState extends State<TicketsPage>
   late stt.SpeechToText _speech;
   bool _isListening = false;
   String _searchQuery = "";
+  List<Tiket> _onProgressTickets = [];
+  List<Tiket> _historyTickets = [];
+  bool _isLoading = true;
+  String? token;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
     _speech = stt.SpeechToText();
+    _fetchTickets();
+  }
+
+  Future<void> _fetchTickets() async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      token = prefs.getString('token');
+      int userId = 9;
+
+      List<Tiket> tickets =
+          await TiketClient.fetchTicketsByUser(userId, token!);
+
+      setState(() {
+        _onProgressTickets = tickets;
+        _isLoading = false;
+      });
+    } catch (e) {
+      print('Error fetching tickets: $e');
+      setState(() => _isLoading = false);
+    }
   }
 
   void _listen() async {
@@ -66,292 +94,205 @@ class _TicketsPageState extends State<TicketsPage>
           unselectedLabelColor: Colors.grey,
         ),
       ),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 6.0),
-            child: Container(
-              decoration: BoxDecoration(
-                color: const Color(0xFF1F1F1F),
-                borderRadius: BorderRadius.circular(24.0),
-                border: Border.all(color: Colors.grey, width: 1),
-              ),
-              child: Row(
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.search, color: Colors.white54),
-                    onPressed: () {},
-                  ),
-                  Expanded(
-                    child: TextField(
-                      onChanged: (value) {
-                        setState(() {
-                          _searchQuery = value;
-                        });
-                      },
-                      controller: TextEditingController(text: _searchQuery),
-                      decoration: const InputDecoration(
-                        border: InputBorder.none,
-                        hintText: 'Search movies...',
-                        hintStyle: TextStyle(color: Colors.white54),
-                      ),
-                      style: const TextStyle(color: Colors.white),
-                    ),
-                  ),
-                  IconButton(
-                    icon: Icon(
-                      _isListening ? Icons.mic : Icons.mic_none,
-                      color: Colors.white54,
-                    ),
-                    onPressed: _listen,
-                  ),
-                ],
-              ),
-            ),
-          ),
-          Expanded(
-            child: TabBarView(
-              controller: _tabController,
+      body: _isLoading
+          ? Center(child: CircularProgressIndicator())
+          : Column(
               children: [
-                _buildTicketList(),
-                _buildHistoryList(),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildTicketList() {
-    return ListView.builder(
-      itemCount: 1,
-      itemBuilder: (context, index) {
-        return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-          child: Container(
-            decoration: BoxDecoration(
-              color: Colors.black,
-              borderRadius: BorderRadius.circular(16.0),
-              border: Border.all(color: Colors.grey, width: 2.0),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(12.0),
-              child: Row(
-                children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
-                    child: Image.asset(
-                      'images/img_poster/avengers.jpg',
-                      width: 80,
-                      height: 120,
-                      fit: BoxFit.cover,
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 4.0, vertical: 6.0),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF1F1F1F),
+                      borderRadius: BorderRadius.circular(24.0),
+                      border: Border.all(color: Colors.grey, width: 1),
                     ),
-                  ),
-                  SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    child: Row(
                       children: [
-                        Text(
-                          "AVENGERS",
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
+                        IconButton(
+                          icon: const Icon(Icons.search, color: Colors.white54),
+                          onPressed: () {},
+                        ),
+                        Expanded(
+                          child: TextField(
+                            onChanged: (value) {
+                              setState(() {
+                                _searchQuery = value;
+                              });
+                            },
+                            controller:
+                                TextEditingController(text: _searchQuery),
+                            decoration: const InputDecoration(
+                              border: InputBorder.none,
+                              hintText: 'Search movies...',
+                              hintStyle: TextStyle(color: Colors.white54),
+                            ),
+                            style: const TextStyle(color: Colors.white),
                           ),
                         ),
-                        SizedBox(height: 8),
-                        Row(
-                          children: [
-                            Icon(Icons.location_on,
-                                color: Colors.white, size: 16),
-                            SizedBox(width: 4),
-                            Text(
-                              "ATMA Cinema, Studio 1",
-                              style: TextStyle(
-                                  color: Colors.white70, fontSize: 14),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 4),
-                        Row(
-                          children: [
-                            Icon(Icons.calendar_today,
-                                color: Colors.white, size: 16),
-                            SizedBox(width: 4),
-                            Text(
-                              "Sunday, 6 October 2024",
-                              style: TextStyle(
-                                  color: Colors.white70, fontSize: 14),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 4),
-                        Row(
-                          children: [
-                            Icon(Icons.access_time,
-                                color: Colors.white, size: 16),
-                            SizedBox(width: 4),
-                            Text(
-                              "11.00",
-                              style: TextStyle(
-                                  color: Colors.white70, fontSize: 14),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 4),
-                        Text(
-                          "Reguler 2D",
-                          style: TextStyle(color: Colors.white70, fontSize: 14),
-                        ),
-                        SizedBox(height: 12),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              "IN PROGRESS",
-                              style: TextStyle(
-                                color: Colors.amber,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 14,
-                              ),
-                            ),
-                            ElevatedButton(
-                              onPressed: () {
-                                // Navigator.push(
-                                //   context,
-                                //   MaterialPageRoute(
-                                //     builder: (context) => MovieTicketDetails(),
-                                //   ),
-                                // );
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.white,
-                                foregroundColor: Colors.black,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                              ),
-                              child: Text("TICKET"),
-                            ),
-                          ],
+                        IconButton(
+                          icon: Icon(
+                            _isListening ? Icons.mic : Icons.mic_none,
+                            color: Colors.white54,
+                          ),
+                          onPressed: _listen,
                         ),
                       ],
                     ),
                   ),
-                ],
-              ),
+                ),
+                Expanded(
+                  child: TabBarView(
+                    controller: _tabController,
+                    children: [
+                      _buildTicketList(_onProgressTickets, "IN PROGRESS"),
+                      _buildTicketList(_historyTickets, "HISTORY"),
+                    ],
+                  ),
+                ),
+              ],
             ),
-          ),
-        );
-      },
     );
   }
 
-  Widget _buildHistoryList() {
-    return ListView(
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-          child: GestureDetector(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => ReviewPage(
-                    idFilm: 5,
+  Widget _buildTicketList(List<Tiket> tickets, String statusLabel) {
+    return tickets.isEmpty
+        ? Center(
+            child: Text(
+              "No $statusLabel tickets found",
+              style: TextStyle(color: Colors.white70),
+            ),
+          )
+        : ListView.builder(
+            itemCount: tickets.length,
+            itemBuilder: (context, index) {
+              final tiket = tickets[index];
+              return Padding(
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 16.0, vertical: 12.0),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.black,
+                    borderRadius: BorderRadius.circular(16.0),
+                    border: Border.all(color: Colors.grey, width: 2.0),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black26,
+                        blurRadius: 6.0,
+                        offset: Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 1.0, horizontal: 16.0),
+                    child: Row(
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(12),
+                          child: Image.asset(
+                            tiket.poster ?? '',
+                            width: 115,
+                            height: 180,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) =>
+                                Icon(Icons.broken_image, size: 100),
+                          ),
+                        ),
+                        SizedBox(width: 16),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              SizedBox(height: 15),
+                              Text(
+                                tiket.judulFilm ?? "Unknown",
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              SizedBox(height: 8),
+                              Row(
+                                children: [
+                                  Icon(Icons.location_on,
+                                      color: Colors.white, size: 16),
+                                  SizedBox(width: 6),
+                                  Text(
+                                    "ATMA cinema, Studio " +
+                                        (tiket.noStudio != null
+                                            ? tiket.noStudio.toString()
+                                            : "Unknown"),
+                                    style: TextStyle(
+                                      color: Colors.white70,
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: 6),
+                              Row(
+                                children: [
+                                  Icon(Icons.calendar_today,
+                                      color: Colors.white, size: 16),
+                                  SizedBox(width: 6),
+                                  Text(
+                                    tiket.tanggal ?? "Unknown",
+                                    style: TextStyle(
+                                        color: Colors.white70, fontSize: 14),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: 6),
+                              Row(
+                                children: [
+                                  Icon(Icons.access_time,
+                                      color: Colors.white, size: 16),
+                                  SizedBox(width: 6),
+                                  Text(
+                                    tiket.jamTayang ?? "Unknown",
+                                    style: TextStyle(
+                                        color: Colors.white70, fontSize: 14),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: 6),
+                              Text(
+                                tiket.format ?? "Unknown",
+                                style: TextStyle(
+                                    color: Colors.white70, fontSize: 14),
+                              ),
+                              SizedBox(height: 16),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  SizedBox(width: 16),
+                                  ElevatedButton(
+                                    onPressed: () {
+                                      // Handle ticket details navigation
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.white,
+                                      foregroundColor: Colors.black,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                    ),
+                                    child: Text("TICKET"),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               );
             },
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.black,
-                borderRadius: BorderRadius.circular(16.0),
-                border: Border.all(color: Colors.grey, width: 2.0),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(12.0),
-                child: Row(
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(12),
-                      child: Image.asset(
-                        'images/img_poster/avengers.jpg',
-                        width: 80,
-                        height: 120,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                    SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "AVENGERS",
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                          ),
-                          SizedBox(height: 8),
-                          Row(
-                            children: [
-                              Icon(Icons.location_on,
-                                  color: Colors.white, size: 16),
-                              SizedBox(width: 4),
-                              Text(
-                                "ATMA Cinema, Studio 2",
-                                style: TextStyle(
-                                    color: Colors.white70, fontSize: 14),
-                              ),
-                            ],
-                          ),
-                          SizedBox(height: 4),
-                          Row(
-                            children: [
-                              Icon(Icons.calendar_today,
-                                  color: Colors.white, size: 16),
-                              SizedBox(width: 4),
-                              Text(
-                                "Saturday, 5 October 2024",
-                                style: TextStyle(
-                                    color: Colors.white70, fontSize: 14),
-                              ),
-                            ],
-                          ),
-                          SizedBox(height: 4),
-                          Row(
-                            children: [
-                              Icon(Icons.access_time,
-                                  color: Colors.white, size: 16),
-                              SizedBox(width: 4),
-                              Text(
-                                "20.00",
-                                style: TextStyle(
-                                    color: Colors.white70, fontSize: 14),
-                              ),
-                            ],
-                          ),
-                          SizedBox(height: 4),
-                          Text(
-                            "IMAX 3D",
-                            style:
-                                TextStyle(color: Colors.white70, fontSize: 14),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
+          );
   }
 }

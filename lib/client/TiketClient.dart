@@ -9,53 +9,35 @@ class TiketClient {
   static const String _baseUrl = '10.0.2.2:8000';
   static const String _endpoint = '/api/tiket';
 
-  /// Fetch tickets by user ID and compute the `status`
-
-  static Future<List<Tiket>> fetchByUser(
-      int? userId, String token, int? idFilm) async {
+  /// Fetch tickets by user ID and include related film data
+  static Future<List<Tiket>> fetchTicketsByUser(
+      int userId, String token) async {
     try {
-      // Step 1: Fetch Tikets
+      // Step 1: Fetch Tickets
       final response = await http.get(
         Uri.http(_baseUrl, '$_endpoint/user/$userId'),
         headers: {'Authorization': 'Bearer $token'},
       );
 
+      // Step 2: Check the response status
       if (response.statusCode != 200) {
-        print(Tiket);
         throw Exception('Failed to fetch tickets: ${response.reasonPhrase}');
       }
 
-      // Step 2: Map JSON response to Tiket objects
+      // Step 3: Decode JSON response
       Iterable jsonList = json.decode(response.body)['data'];
 
-      List<Tiket> tikets = [];
+      // Step 4: Map JSON data to Tiket objects
+      List<Tiket> tickets =
+          jsonList.map((data) => Tiket.fromJson(data)).toList();
 
-      for (var data in jsonList) {
-        Tiket tiket = Tiket.fromJson(data);
-
-        // Step 3: Fetch the film schedule for the specific film
-        Map<String, dynamic> jadwalData =
-            await FilmClient.getFilmSchedule(idFilm!, null);
-
-        // Assuming jadwalData contains the necessary information
-        Jadwaltayang jadwal = Jadwaltayang.fromJson(jadwalData);
-
-        // Default film duration to 120 minutes (2 hours)
-        int filmDuration = 120;
-
-        // Calculate the status
-        tiket.status = tiket.calculateStatus(jadwal, filmDuration);
-
-        tikets.add(tiket);
-      }
-
-      return tikets;
+      return tickets;
     } catch (e) {
       return Future.error('Error fetching tickets: $e');
     }
   }
 
-  static Future<Tiket> find(int id, String token, Jadwaltayang jadwal) async {
+  static Future<Tiket> find(int id, String token) async {
     try {
       final response = await http.get(
         Uri.http(_baseUrl, '$_endpoint/$id'),
@@ -69,11 +51,29 @@ class TiketClient {
       final jsonData = json.decode(response.body)['data'];
       Tiket tiket = Tiket.fromJson(jsonData);
 
+      // Fetch related JadwalTayang and Film data
+      var jadwalTayangData = jsonData['jadwal_tayang'];
+      if (jadwalTayangData != null) {
+        tiket.jamTayang = jadwalTayangData['jam_tayang'];
+        tiket.tanggal = jadwalTayangData['tanggal'];
+
+        // Fetch related Film data
+        var filmData = jadwalTayangData['film'];
+        if (filmData != null) {
+          tiket.judulFilm = filmData['judul_film'];
+          tiket.poster = filmData['poster'];
+          tiket.format = filmData['dimensi'];
+        }
+      }
+
       // Default film duration to 120 minutes (2 hours)
       int filmDuration = 120;
+      DateTime jamTayang = DateTime.parse(tiket.jamTayang!);
+      DateTime endTime = jamTayang.add(Duration(minutes: filmDuration));
 
       // Calculate and assign the status
-      tiket.status = tiket.calculateStatus(jadwal, filmDuration);
+      tiket.status =
+          DateTime.now().isBefore(endTime) ? "on progress" : "history";
 
       return tiket;
     } catch (e) {
@@ -86,7 +86,8 @@ class TiketClient {
       Map<String, dynamic> tiketData, String? token) async {
     try {
       print("Sending POST request to: $_baseUrl$_endpoint");
-      print("Headers: {Content-Type: application/json, Authorization: Bearer $token}");
+      print(
+          "Headers: {Content-Type: application/json, Authorization: Bearer $token}");
       print("Body: ${json.encode(tiketData)}");
       final response = await post(
         Uri.http(_baseUrl, _endpoint),
