@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:http/http.dart';
+import 'package:intl/intl.dart';
 import 'package:tubes/entity/Film.dart';
 
 class FilmClient {
@@ -40,10 +41,12 @@ class FilmClient {
   }
 
   // Fungsi untuk mengambil jadwal film berdasarkan ID film
-  static Future<Map<String, dynamic>> getFilmSchedule(int filmId) async {
-    final response = await get(Uri.http(url, '$endpoint/schedule/$filmId'));
-
-    if (response.statusCode == 200) {
+  static Future<Map<String, dynamic>> getFilmSchedule(int filmId, DateTime? date) async {
+    String formattedDate = DateFormat('dd-MM-yyyy').format(date!);
+    final response = await get(Uri.http(url, '$endpoint/schedule/$filmId/$formattedDate'));
+    print("Datetime: $date");
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      print(json.decode(response.body));
       return json.decode(response.body);
     } else {
       throw Exception('Failed to load film schedule');

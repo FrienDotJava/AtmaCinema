@@ -35,7 +35,7 @@ class TiketClient {
 
         // Step 3: Fetch the film schedule for the specific film
         Map<String, dynamic> jadwalData =
-            await FilmClient.getFilmSchedule(idFilm!);
+            await FilmClient.getFilmSchedule(idFilm!, null);
 
         // Assuming jadwalData contains the necessary information
         Jadwaltayang jadwal = Jadwaltayang.fromJson(jadwalData);

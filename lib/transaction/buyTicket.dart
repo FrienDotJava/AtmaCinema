@@ -54,7 +54,7 @@ class _MovieShowtimePageState extends State<MovieShowtimePage> {
   // Fungsi untuk memuat jadwal film dari API
   void _loadFilmSchedule() async {
     try {
-      var scheduleData = await FilmClient.getFilmSchedule(widget.movie.id_film);
+      var scheduleData = await FilmClient.getFilmSchedule(widget.movie.id_film, selectedDate);
       print("Schedule data received: $scheduleData");
       setState(() {
         filmSchedule = scheduleData; // Untuk nyimpan data jadwal film
@@ -261,6 +261,7 @@ class _MovieShowtimePageState extends State<MovieShowtimePage> {
                           setState(() {
                             selectedDateIndex = index;
                             selectedDate = date;
+                            _loadFilmSchedule();
                           });
                         },
                         child: Padding(
