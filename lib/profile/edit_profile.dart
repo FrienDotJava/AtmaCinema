@@ -25,6 +25,41 @@ class _EditProfileState extends State<EditProfile> {
   TextEditingController dobController = TextEditingController();
   Gender? _selectedGender;
   String? profilePicturePath;
+  String? _token;
+  User? user;
+  String userPic = "";
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData();
+  }
+  _initFormData() async {
+    nameController.text = user?.first_name ?? '';
+    lastNameController.text = user?.last_name ?? '';
+    phoneController.text = user?.no_telp ?? '';
+    dobController.text = user?.tanggal_lahir ?? '';
+    userPic = user?.profile_picture ?? '';
+    setState(() {
+      _selectedGender = user?.gender == 'Male' ? Gender.Male : Gender.Female;
+    });
+    print(_selectedGender);
+  }
+  _loadUserData() async {
+    _token = await UserClient.getToken(); // Mendapatkan token pengguna
+
+    if (_token != null) {
+      // Ambil data profil menggunakan UserClient
+      user = await UserClient.getProfile(_token!);
+      if (user != null) {
+        print("Success load user data");
+        _initFormData();
+      } else {
+          // Handle error, jika data gagal diambil
+          print('Failed to load user data');
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -88,10 +123,8 @@ class _EditProfileState extends State<EditProfile> {
           backgroundColor: Colors.white,
           backgroundImage: profilePicturePath != null
               ? FileImage(File(profilePicturePath!))
-              : null,
-          child: profilePicturePath == null
-              ? const Icon(Icons.person, size: 50, color: Colors.black)
-              : null,
+              : NetworkImage("http://10.0.2.2:8000/storage/" + userPic),
+              // : null,
         ),
         Positioned(
           right: 0,
@@ -288,13 +321,10 @@ class _EditProfileState extends State<EditProfile> {
     return ElevatedButton(
       onPressed: () async {
         // Check that all fields are filled
-        if (nameController.text.isEmpty || lastNameController.text.isEmpty || phoneController.text.isEmpty || dobController.text.isEmpty) {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Please fill in all fields')));
-          return;
-        }
 
         // Retrieve the token from SharedPreferences
         String? token = await UserClient.getToken();
+        User? user = await UserClient.getProfile(token!);
         if (token != null) {
           bool success = await UserClient.updateProfileWithImage(
             token,
@@ -308,7 +338,7 @@ class _EditProfileState extends State<EditProfile> {
 
           if (success) {
             ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Profile updated successfully')));
-            Navigator.pop(context); // Go back after successful update
+            Navigator.pop(context, true);
           } else {
             ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to update profile')));
           }

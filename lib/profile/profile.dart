@@ -192,11 +192,16 @@ class _ProfilePageState extends State<ProfilePage> {
           icon: Icons.edit,
           label: 'Edit Profile',
           color: Colors.grey[850],
-          onPressed: () {
-            Navigator.push(
+          onPressed: () async {
+            final result = await Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => EditProfile()),
             );
+            if (result != null && result == true) {
+              setState(() {
+                _loadUserData();
+              });
+            }
           },
         ),
         const SizedBox(height: 10),
