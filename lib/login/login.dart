@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tubes/home/home.dart';
 import 'package:tubes/register/register_email.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 
 import 'package:tubes/client/UserClient.dart';
 import 'package:tubes/entity/User.dart';
@@ -44,30 +43,6 @@ class _LoginPageState extends State<LoginPage> {
           ],
         ),
       ),
-    );
-  }
-
-  void showToast(String message) {
-    Fluttertoast.showToast(
-      msg: message,
-      toastLength: Toast.LENGTH_LONG,
-      gravity: ToastGravity.TOP,
-      timeInSecForIosWeb: 1,
-      backgroundColor: Colors.white,
-      textColor: Colors.green,
-      fontSize: 16.0,
-    );
-  }
-
-  void errorToast(String message) {
-    Fluttertoast.showToast(
-      msg: message,
-      toastLength: Toast.LENGTH_LONG,
-      gravity: ToastGravity.TOP,
-      timeInSecForIosWeb: 1,
-      backgroundColor: Colors.white,
-      textColor: Colors.red,
-      fontSize: 16.0,
     );
   }
 
@@ -301,7 +276,6 @@ class _LoginPageState extends State<LoginPage> {
 
             if (user.token != null && user.token!.isNotEmpty) {
               // Jika login berhasil dan token diterima, lanjutkan ke home
-              showToast('Login success');
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(builder: (context) => const homePage()),
@@ -311,7 +285,8 @@ class _LoginPageState extends State<LoginPage> {
               _showErrorDialog("Login failed. Invalid credentials.");
             }
           } catch (e) {
-            errorToast("Email or Password Invalid !!!");
+            // Tangani error jika ada masalah saat melakukan request
+            _showErrorDialog("Error: ${e.toString()}");
           }
         }
       },

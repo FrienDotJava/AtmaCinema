@@ -128,6 +128,10 @@ class _ListMovieViewState extends State<ListMovieView>
               ),
             ),
           ),
+          IconButton(
+            icon: const Icon(Icons.mic, color: Colors.white54),
+            onPressed: () {},
+          ),
         ],
       ),
     );
@@ -164,36 +168,43 @@ class _ListMovieViewState extends State<ListMovieView>
           ),
         ),
         backgroundColor: Colors.black,
-        bottom: TabBar(
-          controller: _tabController,
-          indicatorColor: Colors.white,
-          labelColor: Colors.white,
-          tabs: const [
-            Tab(
-              child: Text(
-                "Now Playing",
-                style: TextStyle(
-                  fontFamily: 'Poppins-Semibold',
-                  fontSize: 16,
-                ),
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(110.0),
+          child: Column(
+            children: [
+              _buildSearchBar(),
+              TabBar(
+                controller: _tabController,
+                indicatorColor: Colors.white,
+                labelColor: Colors.white,
+                tabs: const [
+                  Tab(
+                    child: Text(
+                      "Now Playing",
+                      style: TextStyle(
+                        fontFamily: 'Poppins-Semibold',
+                        fontSize: 16,
+                      ),
+                    ),
+                  ),
+                  Tab(
+                    child: Text(
+                      "Coming Soon",
+                      style: TextStyle(
+                        fontFamily: 'Poppins-Semibold',
+                        fontSize: 16,
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ),
-            Tab(
-              child: Text(
-                "Coming Soon",
-                style: TextStyle(
-                  fontFamily: 'Poppins-Semibold',
-                  fontSize: 16,
-                ),
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
       body: Column(
         children: [
           const SizedBox(height: 5),
-          _buildSearchBar(),
           const SizedBox(height: 5),
           Expanded(
             child: token == null
