@@ -1,14 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:tubes/profile/forgot_password/OTP.dart';
+import 'package:tubes/client/UserClient.dart';
+import 'package:tubes/profile/profile.dart';
 
-class ChangePasswordPage extends StatefulWidget {
-  const ChangePasswordPage({Key? key}) : super(key: key);
+class ForgotPasswordChangePage extends StatefulWidget {
+  final String oldPassword;
+
+  const ForgotPasswordChangePage({Key? key, required this.oldPassword})
+      : super(key: key);
 
   @override
-  State<ChangePasswordPage> createState() => _ChangePasswordPageState();
+  State<ForgotPasswordChangePage> createState() =>
+      _ForgotPasswordChangePageState();
 }
 
-class _ChangePasswordPageState extends State<ChangePasswordPage> {
+class _ForgotPasswordChangePageState extends State<ForgotPasswordChangePage> {
   bool isNewPasswordVisible = false;
   bool isConfirmPasswordVisible = false;
 
@@ -49,7 +54,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: const [
             Text(
-              "Change Password",
+              "Reset Password",
               style: TextStyle(
                 color: Colors.white,
                 fontFamily: 'Poppins-Bold',
@@ -95,6 +100,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          const SizedBox(height: 20),
           _buildGreyText("New Password"),
           _buildPasswordField(newPasswordController, "Enter a new password",
               isNewPasswordVisible, () {
@@ -112,26 +118,8 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
           }),
           const SizedBox(height: 30),
           _buildContinueButton(),
-          const SizedBox(height: 20),
-          Center(
-            child: TextButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const OTPPage()),
-                );
-              },
-              child: const Text(
-                "Forgot Password?",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontFamily: 'Poppins-Regular',
-                  decoration: TextDecoration.underline,
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(height: 220),
+          const SizedBox(height: 150),
+          const SizedBox(height: 150),
         ],
       ),
     );
@@ -175,9 +163,44 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
 
   Widget _buildContinueButton() {
     return ElevatedButton(
-      onPressed: () {
-        debugPrint("New Password: ${newPasswordController.text}");
-        debugPrint("Confirm Password: ${confirmPasswordController.text}");
+      onPressed: () async {
+        String newPassword = newPasswordController.text.trim();
+        String confirmPassword = confirmPasswordController.text.trim();
+
+        // Validasi input
+        if (newPassword.isEmpty || confirmPassword.isEmpty) {
+          _showSnackBar("All fields are required.");
+          return;
+        }
+
+        if (newPassword != confirmPassword) {
+          _showSnackBar("New password and confirmation do not match.");
+          return;
+        }
+
+        try {
+          String? token = await UserClient.getToken();
+          if (token == null) {
+            _showSnackBar("User not logged in. Please log in first.");
+            return;
+          }
+
+          bool success = await UserClient.changePassword(
+              token, widget.oldPassword, newPassword);
+          if (success) {
+            _showSnackBar("Password reset successfully.", success: true);
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const ProfilePage(),
+              ),
+            );
+          } else {
+            _showSnackBar("Failed to reset password.");
+          }
+        } catch (e) {
+          _showSnackBar("An error occurred: $e");
+        }
       },
       style: ElevatedButton.styleFrom(
         shape: RoundedRectangleBorder(
@@ -188,12 +211,21 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
         minimumSize: const Size.fromHeight(50),
       ),
       child: const Text(
-        "CONTINUE",
+        "RESET PASSWORD",
         style: TextStyle(
           color: Colors.black,
           fontFamily: 'Poppins-SemiBold',
           fontSize: 16,
         ),
+      ),
+    );
+  }
+
+  void _showSnackBar(String message, {bool success = false}) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: success ? Colors.green : Colors.red,
       ),
     );
   }

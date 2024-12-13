@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tubes/profile/change_password.dart';
 import 'package:tubes/profile/forgot_password/change_password.dart';
 
 class OTPPage extends StatefulWidget {
@@ -13,6 +14,9 @@ class _OTPPageState extends State<OTPPage> {
   String? otpErrorText;
   late Size mediaSize;
 
+  // Tambahkan state untuk menentukan tampilan
+  bool showResetPasswordPage = false;
+
   @override
   Widget build(BuildContext context) {
     mediaSize = MediaQuery.of(context).size;
@@ -21,13 +25,26 @@ class _OTPPageState extends State<OTPPage> {
       decoration: const BoxDecoration(color: Colors.black),
       child: Scaffold(
         backgroundColor: Colors.transparent,
-        body: Column(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            _buildBottom(),
-          ],
-        ),
+        body: showResetPasswordPage
+            ? _buildResetPasswordPage() // Tampilan Reset Password
+            : _buildOTPVerificationPage(), // Tampilan OTP
       ),
+    );
+  }
+
+  // Halaman OTP Verification
+  Widget _buildOTPVerificationPage() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+        _buildBottom(),
+      ],
+    );
+  }
+
+  Widget _buildResetPasswordPage() {
+    return ForgotPasswordChangePage(
+      oldPassword: "default_password",
     );
   }
 
@@ -97,7 +114,7 @@ class _OTPPageState extends State<OTPPage> {
         Center(
           child: TextButton(
             onPressed: () {
-              // buat resend
+              // Buat resend
             },
             child: const Text(
               "Didn't receive code? Resend Code",
@@ -173,13 +190,8 @@ class _OTPPageState extends State<OTPPage> {
           } else {
             otpErrorText = null;
             debugPrint("Entered OTP: ${otpController.text}");
-            // Navigate to ChangePasswordPage
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const ChangePasswordPage(),
-              ),
-            );
+            // Alihkan ke halaman reset password
+            showResetPasswordPage = true;
           }
         });
       },

@@ -198,6 +198,31 @@ class UserClient {
     }
   }
 
+  static Future<bool> resetPassword(String otpToken, String newPassword) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl$apiPath/user/reset-password'),
+        headers: {
+          'Authorization': 'Bearer $otpToken',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'new_password': newPassword,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        return true;
+      } else {
+        print('Failed to reset password: ${response.body}');
+        return false;
+      }
+    } catch (e) {
+      print('Error resetting password: $e');
+      return false;
+    }
+  }
+
   static Future<void> saveToken(String token) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString('token', token);
