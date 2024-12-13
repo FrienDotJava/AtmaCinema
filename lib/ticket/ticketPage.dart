@@ -122,68 +122,90 @@ class _TicketsPageState extends State<TicketsPage>
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
-        title: Text("Tickets", style: TextStyle(color: Colors.white)),
+        title: Text(
+          "Tickets",
+          style: TextStyle(
+            color: Colors.white,
+            fontFamily: 'Poppins-Medium',
+            fontSize: 24,
+          ),
+        ),
         backgroundColor: Colors.black,
         elevation: 0,
         automaticallyImplyLeading: false,
-        bottom: TabBar(
-          controller: _tabController,
-          tabs: [
-            Tab(text: "On Progress"),
-            Tab(text: "History"),
-          ],
-          indicatorColor: Colors.white,
-          labelColor: Colors.white,
-          unselectedLabelColor: Colors.grey,
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(100.0),
+          child: Column(
+            children: [
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF0A2038),
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                  child: Row(
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.search, color: Colors.white54),
+                        onPressed: () {},
+                      ),
+                      Expanded(
+                        child: TextField(
+                          // controller: _searchController,
+                          onChanged: (query) {
+                            // _performSearch(query);
+                          },
+                          decoration: const InputDecoration(
+                            border: InputBorder.none,
+                            hintText: 'Search for transaction...',
+                            hintStyle: TextStyle(color: Colors.white54),
+                          ),
+                          style: const TextStyle(color: Colors.white),
+                        ),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.mic, color: Colors.white54),
+                        onPressed: () {},
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              TabBar(
+                controller: _tabController,
+                indicatorColor: Colors.white,
+                labelColor: Colors.white,
+                tabs: const [
+                  Tab(
+                    child: Text(
+                      "On Progress",
+                      style: TextStyle(
+                        fontFamily: 'Poppins-Semibold',
+                        fontSize: 16,
+                      ),
+                    ),
+                  ),
+                  Tab(
+                    child: Text(
+                      "History",
+                      style: TextStyle(
+                        fontFamily: 'Poppins-Semibold',
+                        fontSize: 16,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
       body: _isLoading
           ? Center(child: CircularProgressIndicator())
           : Column(
               children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 4.0, vertical: 6.0),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF1F1F1F),
-                      borderRadius: BorderRadius.circular(24.0),
-                      border: Border.all(color: Colors.grey, width: 1),
-                    ),
-                    child: Row(
-                      children: [
-                        IconButton(
-                          icon: const Icon(Icons.search, color: Colors.white54),
-                          onPressed: () {},
-                        ),
-                        Expanded(
-                          child: TextField(
-                            onChanged: (value) {
-                              setState(() {
-                                _searchQuery = value;
-                              });
-                            },
-                            controller:
-                                TextEditingController(text: _searchQuery),
-                            decoration: const InputDecoration(
-                              border: InputBorder.none,
-                              hintText: 'Search movies...',
-                              hintStyle: TextStyle(color: Colors.white54),
-                            ),
-                            style: const TextStyle(color: Colors.white),
-                          ),
-                        ),
-                        IconButton(
-                          icon: Icon(
-                            _isListening ? Icons.mic : Icons.mic_none,
-                            color: Colors.white54,
-                          ),
-                          onPressed: _listen,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
                 Expanded(
                   child: TabBarView(
                     controller: _tabController,
@@ -380,12 +402,14 @@ class _TicketsPageState extends State<TicketsPage>
                                       }
                                     },
                                     style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.white,
-                                      foregroundColor: Colors.black,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                    ),
+                                        backgroundColor:
+                                            const Color(0xFF0A2038),
+                                        foregroundColor: Colors.white,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(8),
+                                        ),
+                                        fixedSize: Size(100, 10)),
                                     child: Text(
                                       tiket.status == "history"
                                           ? "REVIEW"

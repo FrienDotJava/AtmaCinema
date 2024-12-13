@@ -39,7 +39,12 @@ class _FnBPageState extends State<FnBPage> with SingleTickerProviderStateMixin {
         _drinkItems = MakananMinumanClient.fetchByKategori('minuman', token!);
       });
     } else {
-      print('Token not found');
+      // print('Token not found');
+      setState(() {
+        _bundleItems = Future.value([]);
+        _foodItems = Future.value([]);
+        _drinkItems = Future.value([]);
+      });
     }
   }
 
@@ -77,11 +82,11 @@ class _FnBPageState extends State<FnBPage> with SingleTickerProviderStateMixin {
         automaticallyImplyLeading: false,
         backgroundColor: Colors.black,
         title: const Text(
-          'FnB',
+          "FnB",
           style: TextStyle(
             color: Colors.white,
+            fontFamily: 'Poppins-Medium',
             fontSize: 24,
-            fontWeight: FontWeight.bold,
           ),
         ),
         bottom: PreferredSize(
@@ -93,9 +98,8 @@ class _FnBPageState extends State<FnBPage> with SingleTickerProviderStateMixin {
                     const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
                 child: Container(
                   decoration: BoxDecoration(
-                    color: const Color(0xFF1F1F1F),
-                    borderRadius: BorderRadius.circular(24.0),
-                    border: Border.all(color: Colors.white, width: 1),
+                    color: const Color(0xFF0A2038),
+                    borderRadius: BorderRadius.circular(30),
                   ),
                   child: Row(
                     children: [
@@ -111,7 +115,7 @@ class _FnBPageState extends State<FnBPage> with SingleTickerProviderStateMixin {
                           },
                           decoration: const InputDecoration(
                             border: InputBorder.none,
-                            hintText: 'Search...',
+                            hintText: 'Search for FnB...',
                             hintStyle: TextStyle(color: Colors.white54),
                           ),
                           style: const TextStyle(color: Colors.white),
@@ -130,9 +134,33 @@ class _FnBPageState extends State<FnBPage> with SingleTickerProviderStateMixin {
                 indicatorColor: Colors.white,
                 labelColor: Colors.white,
                 tabs: const [
-                  Tab(text: 'Bundle'),
-                  Tab(text: 'Food'),
-                  Tab(text: 'Drink'),
+                  Tab(
+                    child: Text(
+                      "Bundle",
+                      style: TextStyle(
+                        fontFamily: 'Poppins-Semibold',
+                        fontSize: 16,
+                      ),
+                    ),
+                  ),
+                  Tab(
+                    child: Text(
+                      "Food",
+                      style: TextStyle(
+                        fontFamily: 'Poppins-Semibold',
+                        fontSize: 16,
+                      ),
+                    ),
+                  ),
+                  Tab(
+                    child: Text(
+                      "Drink",
+                      style: TextStyle(
+                        fontFamily: 'Poppins-Semibold',
+                        fontSize: 16,
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ],
@@ -140,17 +168,22 @@ class _FnBPageState extends State<FnBPage> with SingleTickerProviderStateMixin {
         ),
       ),
       body: Container(
-        decoration: const BoxDecoration(
-          color: Colors.black,
-        ),
-        child: TabBarView(
-          controller: _tabController,
-          children: [
-            _buildFutureBuilder(_bundleItems),
-            _buildFutureBuilder(_foodItems),
-            _buildFutureBuilder(_drinkItems),
-          ],
-        ),
+        color: Colors.black,
+        child: token == null
+            ? Center(
+                child: Container(
+                  padding: const EdgeInsets.all(20),
+                  child: CircularProgressIndicator(),
+                ),
+              )
+            : TabBarView(
+                controller: _tabController,
+                children: [
+                  _buildFutureBuilder(_bundleItems),
+                  _buildFutureBuilder(_foodItems),
+                  _buildFutureBuilder(_drinkItems),
+                ],
+              ),
       ),
     );
   }
