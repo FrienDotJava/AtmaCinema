@@ -102,6 +102,7 @@ class _PaymentState extends State<Payment> {
               selectedTime: widget.selectedTime,
               selectedCinemaFormat: widget.selectedCinemaFormat,
               selectedDate: widget.selectedDate,
+              selectedMethod: _selectedPaymentMethod.toString(),
             ),
           ),
         );
