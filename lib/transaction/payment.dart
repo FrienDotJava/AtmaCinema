@@ -79,14 +79,10 @@ class _PaymentState extends State<Payment> {
   }
 
   Future<void> _saveTransaksi() async {
-    try{
+    try {
       int? id_transaksi = await TransaksiClient.storeTransaksi(
-          _idUser,
-          widget.totalPrice,
-          "1",
-          _token
-      );
-      if(id_transaksi != null) {
+          _idUser, widget.totalPrice, "1", _token);
+      if (id_transaksi != null) {
         final Map<String, dynamic> tiketData = {
           'id_transaksi': id_transaksi,
           'id_jadwal': widget.idJadwal,
@@ -314,8 +310,8 @@ class _PaymentState extends State<Payment> {
               const SizedBox(height: 12),
               //ini button untuk konfirmasi pembayaran
               ElevatedButton(
-                onPressed: _saveTransaksi,
-
+                onPressed:
+                    _selectedPaymentMethod == null ? null : _saveTransaksi,
                 child: Text(
                   "CONFIRM PAYMENT Rp ${widget.totalPrice.toStringAsFixed(3)}",
                   style: const TextStyle(color: Colors.black),
@@ -324,7 +320,7 @@ class _PaymentState extends State<Payment> {
                   backgroundColor: Colors.white,
                   minimumSize: const Size.fromHeight(50),
                 ),
-              ),
+              )
             ],
           ),
         ),

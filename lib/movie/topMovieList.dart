@@ -42,7 +42,7 @@ class TopMovieList extends StatelessWidget {
                   return MovieItem(
                     posterUrl: movie.poster,
                     title: movie.judul_film,
-                    rating: 2, // masih make dummy
+                    rating: movie.rating ?? 0,
                     duration: '${movie.durasi} mnt',
                     ageRating: movie.rating_umur,
                     format: movie.dimensi,

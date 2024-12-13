@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tubes/profile/profile.dart';
-import 'package:tubes/movie/movie_list.dart';
+import 'package:tubes/movie/movieDetail.dart';
 import 'package:tubes/movie/topMovieList.dart';
 import 'package:tubes/news/news_list.dart';
 import 'package:tubes/news/news_detail.dart';
@@ -230,14 +230,27 @@ class _MyHomeViewState extends State<MyHomeView> {
               itemCount: movies.length,
               itemBuilder: (context, index) {
                 Film movie = movies[index];
-                return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                  child: MovieCard(
-                    imagePath: movie.poster ?? 'images/film1.jpg',
-                    title: movie.judul_film,
-                    duration: movie.durasi.toString() + ' mnt' ?? 'N/A',
-                    ageRating: movie.rating_umur ?? 'N/A',
-                    format: movie.dimensi ?? 'N/A',
+                return GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => MovieDetailPage(
+                          movie: movie,
+                          isComingSoon: false,
+                        ),
+                      ),
+                    );
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                    child: MovieCard(
+                      imagePath: movie.poster ?? 'images/film1.jpg',
+                      title: movie.judul_film,
+                      duration: movie.durasi.toString() + ' mnt' ?? 'N/A',
+                      ageRating: movie.rating_umur ?? 'N/A',
+                      format: movie.dimensi ?? 'N/A',
+                    ),
                   ),
                 );
               },
@@ -250,7 +263,6 @@ class _MyHomeViewState extends State<MyHomeView> {
     );
   }
 
-  // _buildComingSoonList() now takes data from the API response
   Widget _buildComingSoonList() {
     return FutureBuilder<List<Film>>(
       future: comingSoonMovies,
@@ -268,9 +280,22 @@ class _MyHomeViewState extends State<MyHomeView> {
               itemCount: movies.length,
               itemBuilder: (context, index) {
                 Film movie = movies[index];
-                return ComingSoonCard(
-                  imagePath: movie.poster,
-                  title: movie.judul_film,
+                return GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => MovieDetailPage(
+                          movie: movie,
+                          isComingSoon: true,
+                        ),
+                      ),
+                    );
+                  },
+                  child: ComingSoonCard(
+                    imagePath: movie.poster,
+                    title: movie.judul_film,
+                  ),
                 );
               },
             ),
@@ -641,7 +666,7 @@ Widget buildTopMoviesSection(BuildContext context) {
                         imagePath: movie.poster ?? 'images/default_poster.jpg',
                         title: movie.judul_film,
                         duration: '${movie.durasi} mins',
-                        rating: '${movie.rating_umur}',
+                        rating: '${movie.rating ?? 0}/5',
                         ageRating: movie.rating_umur ?? 'N/A',
                         format: movie.dimensi ?? 'N/A',
                       );

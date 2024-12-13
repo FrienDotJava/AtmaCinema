@@ -15,7 +15,7 @@ class FilmClient {
       final response = await get(Uri.https(url, '$endpoint/status/$status'),
           headers: {'Authorization': 'Bearer $token'}); //Buat ngambil token
       //Wajib karena semua fungsi di backend butuh token -> auth sanctum
-
+      print("Raw API Response: ${response.statusCode} - ${response.body}");
       if (response.statusCode != 200) {
         throw Exception(response.reasonPhrase);
       }

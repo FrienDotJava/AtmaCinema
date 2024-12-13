@@ -15,6 +15,7 @@ class Film {
   String cast;
   String poster;
   String status;
+  double? rating;
 
   Film({
     required this.id_film,
@@ -31,6 +32,7 @@ class Film {
     required this.cast,
     required this.poster,
     required this.status,
+    this.rating,
   });
 
   factory Film.fromRawJson(String str) => Film.fromJson(json.decode(str));
@@ -49,6 +51,9 @@ class Film {
         cast: json["cast"],
         poster: json["poster"],
         status: json["status"],
+        rating: json["reviews_avg_rating_review"] != null
+            ? double.tryParse(json["reviews_avg_rating_review"].toString())
+            : null,
       );
 
   String toRawJson() => json.encode(toJson());
@@ -67,5 +72,6 @@ class Film {
         "cast": cast,
         "poster": poster,
         "status": status,
+        "rating": rating,
       };
 }
