@@ -40,6 +40,7 @@ class MovieDetailPage extends StatelessWidget {
                       child: Image.asset(
                         movie.poster,
                         height: 200,
+                        width: 150,
                         fit: BoxFit.cover,
                       ),
                     ),

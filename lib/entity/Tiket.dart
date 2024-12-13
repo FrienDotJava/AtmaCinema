@@ -51,6 +51,7 @@ class Tiket {
         format: json["jadwal_tayang"]?["film"]?["dimensi"],
         noStudio: json["jadwal_tayang"]?["studio"]?["nomor_studio"],
         id_film: json["jadwal_tayang"]?["id_film"],
+        // film: Film.fromJson(json["jadwal_tayang"]["film"]),
         harga: json["jadwal_tayang"]?["harga"] != null
             ? double.tryParse(json["jadwal_tayang"]["harga"].toString())
             : null,

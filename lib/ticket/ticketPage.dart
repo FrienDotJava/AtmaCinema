@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 import 'package:tubes/review/inputReview.dart';
+import '../client/FilmClient.dart';
+import '../entity/Film.dart';
 import '../transaction/ticketDetails.dart';
 import 'package:tubes/entity/Tiket.dart';
 import 'package:tubes/client/TiketClient.dart';
@@ -379,7 +381,24 @@ class _TicketsPageState extends State<TicketsPage>
                                           MaterialPageRoute(
                                             builder: (context) =>
                                                 MovieTicketDetails(
-                                              movie: tiket.film!,
+                                              movie: tiket.film ?? Film(
+                                                id_film: tiket.id_film!,
+                                                judul_film: tiket.judulFilm!,
+                                                durasi: 0,
+                                                rating_umur: "N/A",
+                                                dimensi: "2D",
+                                                tanggal_rilis: "0000-00-00",
+                                                genre: "Unknown",
+                                                sinopsis: "No description available.",
+                                                producer: "Unknown",
+                                                director: "Unknown",
+                                                writers: "Unknown",
+                                                cast: "Unknown",
+                                                poster: tiket.poster!,
+                                                status: "Unknown",
+                                                rating: null,  // Rating can be null
+                                              )
+                                                  ,
                                               ticketCount:
                                                   tiket.jumlah_kursi ?? 1,
                                               ticketPrice: tiket.harga ?? 0.0,

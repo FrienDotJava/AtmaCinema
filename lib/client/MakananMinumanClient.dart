@@ -60,10 +60,14 @@ class MakananMinumanClient {
       }
 
       final decodedResponse = json.decode(response.body);
+      print("Response:");
       print(decodedResponse);
 
-      Iterable list = decodedResponse['data'];
-      return list.map((e) => Makananminuman.fromJson(e)).toList();
+      List<Makananminuman> items = decodedResponse.map<Makananminuman>((e) {
+        return Makananminuman.fromJson(e);
+      }).toList();
+
+      return items;
     } catch (e) {
       return Future.error('Error searching items: $e');
     }

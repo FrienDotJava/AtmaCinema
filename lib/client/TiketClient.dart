@@ -9,16 +9,14 @@ import 'JadwalTayangClient.dart';
 
 class TiketClient {
   // Update the base URL
-  static const String _baseUrl =
-      'floralwhite-elephant-198508.hostingersite.com';
+  static const String _baseUrl = 'https://floralwhite-elephant-198508.hostingersite.com';
   static const String _endpoint = '/api/tiket';
 
   /// Fetch tickets by user ID and include related film data
-  static Future<List<Tiket>> fetchTicketsByUser(
-      int userId, String token) async {
+  static Future<List<Tiket>> fetchTicketsByUser(int userId, String token) async {
     try {
-      final response = await http.get(
-        Uri.https(_baseUrl, '$_endpoint/user/$userId'),
+      final response = await get(
+        Uri.parse('$_baseUrl$_endpoint/user/$userId'),
         headers: {'Authorization': 'Bearer $token'},
       );
 
@@ -91,15 +89,14 @@ class TiketClient {
   }
 
   /// Create a new ticket
-  static Future<Tiket> create(
-      Map<String, dynamic> tiketData, String? token) async {
+  static Future<Tiket> create(Map<String, dynamic> tiketData, String? token) async {
     try {
       print("Sending POST request to: $_baseUrl$_endpoint");
-      print(
-          "Headers: {Content-Type: application/json, Authorization: Bearer $token}");
+      print("Headers: {Content-Type: application/json, Authorization: Bearer $token}");
       print("Body: ${json.encode(tiketData)}");
+
       final response = await post(
-        Uri.https(_baseUrl, _endpoint),
+        Uri.parse('$_baseUrl$_endpoint'),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
@@ -107,16 +104,28 @@ class TiketClient {
         body: json.encode(tiketData),
       );
 
+      // Check for a successful response
       if (response.statusCode != 201 && response.statusCode != 200) {
         throw Exception('Failed to create ticket: ${response.reasonPhrase}');
       }
 
-      final jsonData = json.decode(response.body)['data'];
-      return Tiket.fromJson(jsonData);
+      // Parse the response body
+      var responseBody = json.decode(response.body);
+
+      // Check if 'data' exists in the response body
+      if (responseBody.containsKey('data') && responseBody['data'] != null) {
+        var jsonData = responseBody['data'];
+
+        print("Ticket Data: $jsonData");
+        return Tiket.fromJson(jsonData);
+      } else {
+        throw Exception('Missing data in response');
+      }
     } catch (e) {
       return Future.error('Error creating ticket: $e');
     }
   }
+
 
   /// Update an existing ticket by ID
   static Future<Tiket> update(
