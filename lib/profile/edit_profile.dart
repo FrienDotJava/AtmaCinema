@@ -4,6 +4,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tubes/entity/User.dart';
+import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 
 import '../client/UserClient.dart';
 
@@ -34,6 +35,7 @@ class _EditProfileState extends State<EditProfile> {
     super.initState();
     _loadUserData();
   }
+
   _initFormData() async {
     nameController.text = user?.first_name ?? '';
     lastNameController.text = user?.last_name ?? '';
@@ -45,6 +47,7 @@ class _EditProfileState extends State<EditProfile> {
     });
     print(_selectedGender);
   }
+
   _loadUserData() async {
     _token = await UserClient.getToken(); // Mendapatkan token pengguna
 
@@ -55,8 +58,8 @@ class _EditProfileState extends State<EditProfile> {
         print("Success load user data");
         _initFormData();
       } else {
-          // Handle error, jika data gagal diambil
-          print('Failed to load user data');
+        // Handle error, jika data gagal diambil
+        print('Failed to load user data');
       }
     }
   }
@@ -124,7 +127,7 @@ class _EditProfileState extends State<EditProfile> {
           backgroundImage: profilePicturePath != null
               ? FileImage(File(profilePicturePath!))
               : NetworkImage("http://10.0.2.2:8000/storage/" + userPic),
-              // : null,
+          // : null,
         ),
         Positioned(
           right: 0,
@@ -164,7 +167,8 @@ class _EditProfileState extends State<EditProfile> {
                 title: const Text('Take a Picture'),
                 onTap: () async {
                   Navigator.pop(context);
-                  final imagePath = await Navigator.pushNamed(context, '/camera');
+                  final imagePath =
+                      await Navigator.pushNamed(context, '/camera');
                   if (imagePath != null && mounted) {
                     setState(() {
                       profilePicturePath = imagePath as String;
@@ -320,9 +324,6 @@ class _EditProfileState extends State<EditProfile> {
   Widget _buildRegisterButton() {
     return ElevatedButton(
       onPressed: () async {
-        // Check that all fields are filled
-
-        // Retrieve the token from SharedPreferences
         String? token = await UserClient.getToken();
         User? user = await UserClient.getProfile(token!);
         if (token != null) {
@@ -333,27 +334,71 @@ class _EditProfileState extends State<EditProfile> {
             phoneController.text,
             _selectedGender?.toString().split('.').last ?? '',
             dobController.text,
-            profilePicturePath != null ? XFile(profilePicturePath!) : null, // Send the image if available
+            profilePicturePath != null ? XFile(profilePicturePath!) : null,
           );
 
           if (success) {
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Profile updated successfully')));
+            final overlay = Overlay.of(context);
+            final overlayEntry = OverlayEntry(
+              builder: (context) => Positioned(
+                top: 50.0,
+                left: 0,
+                right: 0,
+                child: Material(
+                  color: Colors.transparent,
+                  child: AwesomeSnackbarContent(
+                    title: 'Update Success',
+                    message: 'Profile updated successfully!',
+                    contentType: ContentType.success,
+                    inMaterialBanner: true,
+                  ),
+                ),
+              ),
+            );
+
+            overlay.insert(overlayEntry);
+
+            Future.delayed(Duration(seconds: 3), () {
+              overlayEntry.remove();
+            });
+
             Navigator.pop(context, true);
           } else {
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to update profile')));
+            final overlay = Overlay.of(context);
+            final overlayEntry = OverlayEntry(
+              builder: (context) => Positioned(
+                top: 50.0, // You can adjust the position here
+                left: 0,
+                right: 0,
+                child: Material(
+                  color: Colors.transparent,
+                  child: AwesomeSnackbarContent(
+                    title: 'Update Profile Failed',
+                    message: 'Failed to update profile. Please try again.',
+                    contentType: ContentType.failure,
+                    inMaterialBanner: true,
+                  ),
+                ),
+              ),
+            );
+
+            overlay.insert(overlayEntry);
+
+            Future.delayed(Duration(seconds: 3), () {
+              overlayEntry.remove();
+            });
           }
         }
       },
       style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.white24, // Set the color
+        backgroundColor: Colors.white24,
       ),
       child: const Text(
-          'Update Profile',
+        'Update Profile',
         style: TextStyle(color: Colors.white),
       ),
     );
   }
-
 
   Future<void> _saveUserData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
