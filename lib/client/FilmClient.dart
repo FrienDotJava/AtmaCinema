@@ -5,13 +5,14 @@ import 'package:intl/intl.dart';
 import 'package:tubes/entity/Film.dart';
 
 class FilmClient {
-  static final String url = '10.0.2.2:8000';
+  // Update the base URL
+  static final String url = 'floralwhite-elephant-198508.hostingersite.com';
   static final String endpoint = '/api/film';
 
   // Fungsi untuk mengambil data film berdasarkan status (Now Playing atau Coming Soon)
   static Future<List<Film>> fetchByStatus(String status, String token) async {
     try {
-      final response = await get(Uri.http(url, '$endpoint/status/$status'),
+      final response = await get(Uri.https(url, '$endpoint/status/$status'),
           headers: {'Authorization': 'Bearer $token'}); //Buat ngambil token
       //Wajib karena semua fungsi di backend butuh token -> auth sanctum
 
@@ -28,7 +29,7 @@ class FilmClient {
 
   static Future<Map<String, dynamic>> fetchStudioByFilm(int filmId) async {
     try {
-      final response = await get(Uri.http(url, '$endpoint/studio/$filmId'));
+      final response = await get(Uri.https(url, '$endpoint/studio/$filmId'));
 
       if (response.statusCode != 200) {
         throw Exception(response.reasonPhrase);
@@ -41,9 +42,11 @@ class FilmClient {
   }
 
   // Fungsi untuk mengambil jadwal film berdasarkan ID film
-  static Future<Map<String, dynamic>> getFilmSchedule(int filmId, DateTime? date) async {
+  static Future<Map<String, dynamic>> getFilmSchedule(
+      int filmId, DateTime? date) async {
     String formattedDate = DateFormat('dd-MM-yyyy').format(date!);
-    final response = await get(Uri.http(url, '$endpoint/schedule/$filmId/$formattedDate'));
+    final response =
+        await get(Uri.https(url, '$endpoint/schedule/$filmId/$formattedDate'));
     print("Datetime: $date");
     if (response.statusCode == 200 || response.statusCode == 201) {
       print(json.decode(response.body));
@@ -56,7 +59,7 @@ class FilmClient {
   // Fungsi untuk mengambil detail film berdasarkan ID
   static Future<Film> find(int id) async {
     try {
-      var response = await get(Uri.http(url, '$endpoint/$id'));
+      var response = await get(Uri.https(url, '$endpoint/$id'));
 
       if (response.statusCode != 200) {
         throw Exception(response.reasonPhrase);
@@ -76,7 +79,7 @@ class FilmClient {
       String query, String status, String token) async {
     try {
       final response = await get(
-        Uri.http(url, '$endpoint/search', {'query': query, 'status': status}),
+        Uri.https(url, '$endpoint/search', {'query': query, 'status': status}),
         headers: {'Authorization': 'Bearer $token'},
       );
 

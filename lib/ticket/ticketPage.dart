@@ -348,7 +348,7 @@ class _TicketsPageState extends State<TicketsPage>
                                           MaterialPageRoute(
                                             builder: (context) => ReviewPage(
                                                 idFilm: tiket.id_film!,
-                                                poster: tiket.film!.poster),
+                                                poster: tiket.poster!),
                                           ),
                                         );
                                       } else {

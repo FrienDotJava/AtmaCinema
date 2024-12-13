@@ -5,14 +5,14 @@ import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class UserClient {
-  static final String url = 'http://10.0.2.2:8000';
-  static final String endpoint = '/api';
+  static final String baseUrl =
+      'https://floralwhite-elephant-198508.hostingersite.com';
+  static final String apiPath = '/api';
 
-  // Fungsi untuk mendaftarkan email pengguna
   static Future<bool> registerEmail(String email) async {
     try {
       final response = await http.post(
-        Uri.parse('$url/api/register/email'),
+        Uri.parse('$baseUrl$apiPath/register/email'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'email': email}),
       );
@@ -29,13 +29,10 @@ class UserClient {
     }
   }
 
-  // Fungsi untuk mengirim data registrasi pengguna
   static Future<bool> registerUser(User user) async {
-    final Uri apiUrl = Uri.parse('$url$endpoint/register/data');
-
     try {
       final response = await http.post(
-        apiUrl,
+        Uri.parse('$baseUrl$apiPath/register/data'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           'first_name': user.first_name,
@@ -61,11 +58,9 @@ class UserClient {
   }
 
   static Future<User> login(String email, String password) async {
-    final Uri apiUrl = Uri.parse('$url/api/login');
-
     try {
       final response = await http.post(
-        apiUrl,
+        Uri.parse('$baseUrl$apiPath/login'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({'email': email, 'password': password}),
       );
@@ -75,11 +70,10 @@ class UserClient {
         if (data['status'] == true) {
           String token = data['data']['token'];
           int idUser = data['data']['user']['id_user'];
-          // Simpan token setelah login
+
           await saveToken(token);
           await saveIdUser(idUser);
 
-          // Kembalikan User object
           return User.fromRawJson(json.encode(data['data']['user']), token);
         } else {
           throw Exception('Invalid credentials');
@@ -93,12 +87,10 @@ class UserClient {
   }
 
   static Future<User?> getProfile(String token) async {
-    final Uri apiUrl = Uri.parse('$url/api/user/profile');
     try {
       final response = await http.get(
-        apiUrl,
-        headers: {'Authorization': 'Bearer $token'}, //Buat ngambil token
-        //Wajib karena semua fungsi di backend butuh token -> auth sanctum
+        Uri.parse('$baseUrl$apiPath/user/profile'),
+        headers: {'Authorization': 'Bearer $token'},
       );
 
       if (response.statusCode == 200) {
@@ -120,25 +112,25 @@ class UserClient {
       String no_telp,
       String gender,
       String tanggal_lahir,
-      XFile? profilePicture // Expecting the image file
-      ) async {
-    final Uri apiUrl = Uri.parse('$url/api/user/profile');
-    var request = http.MultipartRequest('POST', apiUrl);
+      XFile? profilePicture) async {
+    var request = http.MultipartRequest(
+      'POST',
+      Uri.parse('$baseUrl$apiPath/user/profile'),
+    );
 
-    // Add user data
     request.fields['first_name'] = first_name;
     request.fields['last_name'] = last_name;
     request.fields['no_telp'] = no_telp;
     request.fields['gender'] = gender;
     request.fields['tanggal_lahir'] = tanggal_lahir;
 
-    // Add the profile picture if available
     if (profilePicture != null) {
       request.files.add(await http.MultipartFile.fromPath(
-          'profile_picture', profilePicture.path));
+        'profile_picture',
+        profilePicture.path,
+      ));
     }
 
-    // Add Authorization header
     request.headers['Authorization'] = 'Bearer $token';
 
     try {
@@ -148,8 +140,7 @@ class UserClient {
         return true;
       } else {
         final responseBody = await response.stream.bytesToString();
-        print(
-            'Failed to update profile: ${response.statusCode} ${responseBody}');
+        print('Failed to update profile: ${response.statusCode} $responseBody');
         return false;
       }
     } catch (e) {
@@ -159,10 +150,9 @@ class UserClient {
   }
 
   static Future<String?> logout(String token) async {
-    final Uri apiUrl = Uri.parse('$url/api/logout');
     try {
       final response = await http.post(
-        apiUrl,
+        Uri.parse('$baseUrl$apiPath/logout'),
         headers: {'Authorization': 'Bearer $token'},
       );
 
@@ -189,7 +179,6 @@ class UserClient {
     await prefs.setInt('id_user', idUser);
   }
 
-  //Cuma buat debug aja (pakai nek ngebug -> null)
   static Future<String?> getToken() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('token');

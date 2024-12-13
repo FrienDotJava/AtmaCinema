@@ -3,18 +3,19 @@ import 'package:http/http.dart';
 import 'package:tubes/entity/Review.dart';
 
 class ReviewClient {
-  static final String url = '10.0.2.2:8000';
+  static final String baseUrl =
+      'https://floralwhite-elephant-198508.hostingersite.com';
   static final String endpoint = '/api/review';
 
   static Future<ResponseReview> fetchReview(int idFilm, String? token) async {
     try {
       final response = await get(
-        Uri.http(url, '$endpoint/$idFilm'),
+        Uri.parse('$baseUrl$endpoint/$idFilm'),
         headers: {'Authorization': 'Bearer $token'},
       );
 
       if (response.statusCode != 200) {
-        throw Exception(response.reasonPhrase);
+        throw Exception('Failed to fetch reviews: ${response.reasonPhrase}');
       }
 
       final jsonResponse = json.decode(response.body);
@@ -22,7 +23,7 @@ class ReviewClient {
 
       return ResponseReview.fromJson(data);
     } catch (e) {
-      print(e.toString());
+      print('Error fetching reviews: ${e.toString()}');
       return Future.error(e.toString());
     }
   }
@@ -31,7 +32,7 @@ class ReviewClient {
       String description, String? token) async {
     try {
       final response = await post(
-        Uri.http(url, endpoint),
+        Uri.parse('$baseUrl$endpoint'),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',

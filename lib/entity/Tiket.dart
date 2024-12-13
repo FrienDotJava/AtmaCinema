@@ -50,25 +50,7 @@ class Tiket {
         poster: json["jadwal_tayang"]?["film"]?["poster"],
         format: json["jadwal_tayang"]?["film"]?["dimensi"],
         noStudio: json["jadwal_tayang"]?["studio"]?["nomor_studio"],
-        id_film: json["jadwal_tayang"]?["film"]?["id_film"],
-        film: json["jadwal_tayang"]?["film"] != null
-            ? Film(
-                id_film: json["jadwal_tayang"]["film"]["id_film"],
-                judul_film: json["jadwal_tayang"]["film"]["judul_film"],
-                durasi: json["jadwal_tayang"]["film"]["durasi"],
-                rating_umur: json["jadwal_tayang"]["film"]["rating_umur"],
-                dimensi: json["jadwal_tayang"]["film"]["dimensi"],
-                tanggal_rilis: json["jadwal_tayang"]["film"]["tanggal_rilis"],
-                genre: json["jadwal_tayang"]["film"]["genre"],
-                sinopsis: json["jadwal_tayang"]["film"]["sinopsis"],
-                producer: json["jadwal_tayang"]["film"]["producer"],
-                director: json["jadwal_tayang"]["film"]["director"],
-                writers: json["jadwal_tayang"]["film"]["writers"],
-                cast: json["jadwal_tayang"]["film"]["cast"],
-                poster: json["jadwal_tayang"]["film"]["poster"],
-                status: json["jadwal_tayang"]["film"]["status"],
-              )
-            : null,
+        id_film: json["jadwal_tayang"]?["id_film"],
         harga: json["jadwal_tayang"]?["harga"] != null
             ? double.tryParse(json["jadwal_tayang"]["harga"].toString())
             : null,
@@ -90,7 +72,6 @@ class Tiket {
         "format": format,
         "noStudio": noStudio,
         "id_film": id_film,
-        "film": film?.toJson(),
         "harga": harga
       };
 

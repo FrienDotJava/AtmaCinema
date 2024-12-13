@@ -3,38 +3,39 @@ import 'package:http/http.dart';
 import 'package:tubes/entity/MakananMinuman.dart';
 
 class MakananMinumanClient {
-  static final String url = '10.0.2.2:8000';
+  static final String baseUrl =
+      'https://floralwhite-elephant-198508.hostingersite.com';
   static final String endpoint = '/api/makanan_minuman';
 
   static Future<List<Makananminuman>> fetchByKategori(
       String kategori, String token) async {
     try {
       final response = await get(
-        Uri.http(url, '$endpoint/kategori/$kategori'),
+        Uri.parse('$baseUrl$endpoint/kategori/$kategori'),
         headers: {'Authorization': 'Bearer $token'},
       );
 
       if (response.statusCode != 200) {
-        throw Exception(response.reasonPhrase);
+        throw Exception(
+            'Failed to fetch by kategori: ${response.reasonPhrase}');
       }
 
       final decodedResponse = json.decode(response.body);
-      print(decodedResponse); // Log the entire response body
+      print(decodedResponse);
 
       Iterable list = decodedResponse['data'];
-
       return list.map((e) => Makananminuman.fromJson(e)).toList();
     } catch (e) {
-      return Future.error(e.toString());
+      return Future.error('Error fetching by kategori: $e');
     }
   }
 
   static Future<Makananminuman> find(int id) async {
     try {
-      var response = await get(Uri.http(url, '$endpoint/$id'));
+      final response = await get(Uri.parse('$baseUrl$endpoint/$id'));
 
       if (response.statusCode != 200) {
-        throw Exception(response.reasonPhrase);
+        throw Exception('Failed to find item: ${response.reasonPhrase}');
       }
 
       final jsonResponse = json.decode(response.body);
@@ -42,7 +43,7 @@ class MakananMinumanClient {
 
       return Makananminuman.fromJson(data);
     } catch (e) {
-      return Future.error(e.toString());
+      return Future.error('Error finding item: $e');
     }
   }
 
@@ -50,23 +51,21 @@ class MakananMinumanClient {
       String query, String kategori, String token) async {
     try {
       final response = await get(
-        Uri.http(
-            url, '$endpoint/search', {'query': query, 'category': kategori}),
+        Uri.parse('$baseUrl$endpoint/search?query=$query&category=$kategori'),
         headers: {'Authorization': 'Bearer $token'},
       );
 
       if (response.statusCode != 200) {
-        throw Exception(response.reasonPhrase);
+        throw Exception('Failed to search items: ${response.reasonPhrase}');
       }
 
       final decodedResponse = json.decode(response.body);
       print(decodedResponse);
 
-      Iterable list = decodedResponse;
-
+      Iterable list = decodedResponse['data'];
       return list.map((e) => Makananminuman.fromJson(e)).toList();
     } catch (e) {
-      return Future.error(e.toString());
+      return Future.error('Error searching items: $e');
     }
   }
 }

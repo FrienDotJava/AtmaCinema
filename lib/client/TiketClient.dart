@@ -5,32 +5,40 @@ import 'package:http/http.dart';
 import 'package:tubes/entity/Tiket.dart';
 import 'package:tubes/entity/JadwalTayang.dart';
 import 'FilmClient.dart';
+import 'JadwalTayangClient.dart';
 
 class TiketClient {
-  static const String _baseUrl = '10.0.2.2:8000';
+  // Update the base URL
+  static const String _baseUrl =
+      'floralwhite-elephant-198508.hostingersite.com';
   static const String _endpoint = '/api/tiket';
 
   /// Fetch tickets by user ID and include related film data
   static Future<List<Tiket>> fetchTicketsByUser(
       int userId, String token) async {
     try {
-      // Step 1: Fetch Tickets
       final response = await http.get(
-        Uri.http(_baseUrl, '$_endpoint/user/$userId'),
+        Uri.https(_baseUrl, '$_endpoint/user/$userId'),
         headers: {'Authorization': 'Bearer $token'},
       );
 
-      // Step 2: Check the response status
+      // Add this line here to inspect the raw JSON coming from the server
+      print("Raw API Response: ${response.body}");
+
       if (response.statusCode != 200) {
         throw Exception('Failed to fetch tickets: ${response.reasonPhrase}');
       }
 
-      // Step 3: Decode JSON response
       Iterable jsonList = json.decode(response.body)['data'];
+      print("Parsed Tickets JSON List: $jsonList");
 
-      // Step 4: Map JSON data to Tiket objects
-      List<Tiket> tickets =
-          jsonList.map((data) => Tiket.fromJson(data)).toList();
+      List<Tiket> tickets = jsonList.map((data) {
+        print("Mapping ticket data: $data");
+        print("jadwal_tayang: ${data["jadwal_tayang"]}");
+        print("film object: ${data["jadwal_tayang"]?["film"]}");
+        print("judul_film: ${data["jadwal_tayang"]?["film"]?["judul_film"]}");
+        return Tiket.fromJson(data);
+      }).toList();
 
       return tickets;
     } catch (e) {
@@ -41,7 +49,7 @@ class TiketClient {
   static Future<Tiket> find(int id, String token) async {
     try {
       final response = await http.get(
-        Uri.http(_baseUrl, '$_endpoint/$id'),
+        Uri.https(_baseUrl, '$_endpoint/$id'),
         headers: {'Authorization': 'Bearer $token'},
       );
 
@@ -91,7 +99,7 @@ class TiketClient {
           "Headers: {Content-Type: application/json, Authorization: Bearer $token}");
       print("Body: ${json.encode(tiketData)}");
       final response = await post(
-        Uri.http(_baseUrl, _endpoint),
+        Uri.https(_baseUrl, _endpoint),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
@@ -115,7 +123,7 @@ class TiketClient {
       int id, Map<String, dynamic> tiketData, String token) async {
     try {
       final response = await http.put(
-        Uri.http(_baseUrl, '$_endpoint/$id'),
+        Uri.https(_baseUrl, '$_endpoint/$id'),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
@@ -138,7 +146,7 @@ class TiketClient {
   static Future<void> delete(int id, String token) async {
     try {
       final response = await http.delete(
-        Uri.http(_baseUrl, '$_endpoint/$id'),
+        Uri.https(_baseUrl, '$_endpoint/$id'),
         headers: {'Authorization': 'Bearer $token'},
       );
 
