@@ -6,8 +6,11 @@ import 'package:intl/intl.dart';
 import '../transaction/ticketDetails.dart';
 import '../transaction/invoice_pdf.dart';
 import 'package:tubes/entity/Film.dart';
+import 'package:tubes/entity/User.dart';
+import 'package:tubes/client/UserClient.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class PaymentConfirmation extends StatelessWidget {
+class PaymentConfirmation extends StatefulWidget {
   final Film movie;
   final int ticketCount;
   final double ticketPrice;
@@ -15,6 +18,7 @@ class PaymentConfirmation extends StatelessWidget {
   final String selectedTime;
   final String selectedCinemaFormat;
   final DateTime selectedDate;
+  final String selectedMethod;
 
   const PaymentConfirmation({
     Key? key,
@@ -25,7 +29,33 @@ class PaymentConfirmation extends StatelessWidget {
     required this.selectedTime,
     required this.selectedCinemaFormat,
     required this.selectedDate,
+    required this.selectedMethod,
   }) : super(key: key);
+
+  @override
+  _PaymentConfirmationState createState() => _PaymentConfirmationState();
+}
+
+class _PaymentConfirmationState extends State<PaymentConfirmation> {
+  String? token;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadToken();
+  }
+
+  void _loadToken() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    token = prefs.getString('token'); // Mengambil token dari SharedPreferences
+    print(token);
+
+    if (token != null) {
+    } else {
+      // Kalau token tidak ada  / null, maka print pesan error dan mundur ke halaman login
+      print('Token not found');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -59,13 +89,13 @@ class PaymentConfirmation extends StatelessWidget {
                     context,
                     MaterialPageRoute(
                       builder: (context) => MovieTicketDetails(
-                        movie: movie,  // Pass the movie object
-                        ticketCount: ticketCount,
-                        ticketPrice: ticketPrice,
-                        totalPrice: totalPrice,
-                        selectedTime: selectedTime,
-                        selectedCinemaFormat: selectedCinemaFormat,
-                        selectedDate: selectedDate,
+                        movie: widget.movie, // Pass the movie object
+                        ticketCount: widget.ticketCount,
+                        ticketPrice: widget.ticketPrice,
+                        totalPrice: widget.totalPrice,
+                        selectedTime: widget.selectedTime,
+                        selectedCinemaFormat: widget.selectedCinemaFormat,
+                        selectedDate: widget.selectedDate,
                       ),
                     ),
                   );
@@ -85,7 +115,17 @@ class PaymentConfirmation extends StatelessWidget {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => InvoicePage(),
+                      builder: (context) => InvoicePage(
+                        movie: widget.movie,
+                        ticketCount: widget.ticketCount,
+                        ticketPrice: widget.ticketPrice,
+                        totalPrice: widget.totalPrice,
+                        selectedTime: widget.selectedTime,
+                        selectedCinemaFormat: widget.selectedCinemaFormat,
+                        selectedDate: widget.selectedDate,
+                        selectedMethod: widget.selectedMethod,
+                        token: token.toString(),
+                      ),
                     ),
                   );
                 },
@@ -101,7 +141,7 @@ class PaymentConfirmation extends StatelessWidget {
                   ClipRRect(
                     borderRadius: BorderRadius.circular(8.0),
                     child: Image.asset(
-                      movie.poster,
+                      widget.movie.poster,
                       height: 150,
                       fit: BoxFit.cover,
                     ),
@@ -112,7 +152,7 @@ class PaymentConfirmation extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          movie.judul_film,
+                          widget.movie.judul_film,
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 20,
@@ -175,7 +215,7 @@ class PaymentConfirmation extends StatelessWidget {
                         const Icon(Icons.calendar_today, color: Colors.white),
                         const SizedBox(width: 8),
                         Text(
-                          DateFormat('d MMM yyyy').format(selectedDate),
+                          DateFormat('d MMM yyyy').format(widget.selectedDate),
                           style: const TextStyle(
                               color: Colors.white, fontSize: 16),
                         ),
@@ -187,7 +227,7 @@ class PaymentConfirmation extends StatelessWidget {
                         const Icon(Icons.access_time, color: Colors.white),
                         const SizedBox(width: 8),
                         Text(
-                          selectedTime,
+                          widget.selectedTime,
                           style: const TextStyle(
                               color: Colors.white, fontSize: 16),
                         ),
@@ -199,7 +239,7 @@ class PaymentConfirmation extends StatelessWidget {
                         const Icon(Icons.chair, color: Colors.white),
                         const SizedBox(width: 8),
                         Text(
-                          selectedCinemaFormat,
+                          widget.selectedCinemaFormat,
                           style: const TextStyle(
                               color: Colors.white, fontSize: 16),
                         ),
@@ -213,11 +253,11 @@ class PaymentConfirmation extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    "Ticket(s): ${ticketCount} x Rp ${ticketPrice.toStringAsFixed(3)}",
+                    "Ticket(s): ${widget.ticketCount} x Rp ${widget.ticketPrice.toStringAsFixed(3)}",
                     style: const TextStyle(color: Colors.white, fontSize: 16),
                   ),
                   Text(
-                    "Rp ${totalPrice.toStringAsFixed(3)}",
+                    "Rp ${widget.totalPrice.toStringAsFixed(3)}",
                     style: const TextStyle(color: Colors.white, fontSize: 16),
                   ),
                 ],
@@ -235,7 +275,7 @@ class PaymentConfirmation extends StatelessWidget {
                         fontWeight: FontWeight.bold),
                   ),
                   Text(
-                    "Rp ${totalPrice.toStringAsFixed(3)}",
+                    "Rp ${widget.totalPrice.toStringAsFixed(3)}",
                     style: const TextStyle(
                         color: Colors.white,
                         fontSize: 16,
