@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tubes/profile/forgot_password/OTP.dart';
+import 'package:tubes/client/UserClient.dart';
 
 class ChangePasswordPage extends StatefulWidget {
   const ChangePasswordPage({Key? key}) : super(key: key);
@@ -185,10 +186,44 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
 
   Widget _buildContinueButton() {
     return ElevatedButton(
-      onPressed: () {
-        debugPrint("Old Password: ${oldPasswordController.text}");
-        debugPrint("New Password: ${newPasswordController.text}");
-        debugPrint("Confirm Password: ${confirmPasswordController.text}");
+      onPressed: () async {
+        String oldPassword = oldPasswordController.text.trim();
+        String newPassword = newPasswordController.text.trim();
+        String confirmPassword = confirmPasswordController.text.trim();
+
+        // Validasi input
+        if (oldPassword.isEmpty ||
+            newPassword.isEmpty ||
+            confirmPassword.isEmpty) {
+          _showSnackBar("All fields are required.");
+          return;
+        }
+
+        if (newPassword != confirmPassword) {
+          _showSnackBar("New password and confirmation do not match.");
+          return;
+        }
+
+        try {
+          // Ambil token
+          String? token = await UserClient.getToken();
+          if (token == null) {
+            _showSnackBar("User not logged in. Please log in first.");
+            return;
+          }
+
+          // Ganti password
+          bool success =
+              await UserClient.changePassword(token, oldPassword, newPassword);
+          if (success) {
+            _showSnackBar("Password changed successfully.", success: true);
+            Navigator.pop(context); // Kembali ke halaman sebelumnya
+          } else {
+            _showSnackBar("Failed to change password.");
+          }
+        } catch (e) {
+          _showSnackBar("An error occurred: $e");
+        }
       },
       style: ElevatedButton.styleFrom(
         shape: RoundedRectangleBorder(
@@ -205,6 +240,15 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
           fontFamily: 'Poppins-SemiBold',
           fontSize: 16,
         ),
+      ),
+    );
+  }
+
+  void _showSnackBar(String message, {bool success = false}) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: success ? Colors.green : Colors.red,
       ),
     );
   }

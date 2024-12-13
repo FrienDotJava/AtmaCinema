@@ -169,6 +169,35 @@ class UserClient {
     }
   }
 
+  static Future<bool> changePassword(
+      String token, String oldPassword, String newPassword) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl$apiPath/user/changePassword'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'password': oldPassword,
+          'new_password': newPassword,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        // Asumsikan jika 200 berarti success
+        return true;
+      } else {
+        // Cetak pesan error dari server untuk debugging
+        print('Failed to change password: ${response.body}');
+        return false;
+      }
+    } catch (e) {
+      print('Error changing password: $e');
+      return false;
+    }
+  }
+
   static Future<void> saveToken(String token) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString('token', token);
