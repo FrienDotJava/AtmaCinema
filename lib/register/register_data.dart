@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tubes/login/login.dart';
@@ -41,6 +43,18 @@ class _RegisterDataState extends State<RegisterData> {
       email = prefs.getString('email');
       isLoading = false;
     });
+  }
+
+  void showToast(String message) {
+    Fluttertoast.showToast(
+      msg: message,
+      toastLength: Toast.LENGTH_LONG,
+      gravity: ToastGravity.TOP,
+      timeInSecForIosWeb: 1,
+      backgroundColor: Colors.white,
+      textColor: Colors.green,
+      fontSize: 16.0,
+    );
   }
 
   @override
@@ -413,55 +427,82 @@ class _RegisterDataState extends State<RegisterData> {
           return;
         }
 
-        // Melakukan create / register user dari input yang diberikan
-        final user = User(
-          first_name: firstNameController.text,
-          last_name: lastNameController.text,
-          email: email!,
-          password: passwordController.text,
-          no_telp: phoneController.text,
-          gender: _selectedGender == Gender.man ? 'male' : 'female',
-          tanggal_lahir: dobController.text,
-        );
-
-        try {
-          // Melakukan request ke API untuk register user baru dengan data yang diberikan
-          bool success = await UserClient.registerUser(user);
-
-          // Jika registrasi berhasil, alihkan ke halaman login
-          if (success) {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (context) => const LoginPage()),
-            );
-          } else {
-            // Jika registrasi gagal, bakal nampilkan pesan error
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Registration failed!')),
-            );
-          }
-        } catch (e) {
-          // Cuma exception aja kalau Sum Ting Wong
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Error: ${e.toString()}')),
-          );
-        }
+        // Tampilkan dialog konfirmasi
+        _showConfirmationDialog(context);
       },
-      style: ElevatedButton.styleFrom(
-        shape: const StadiumBorder(),
-        backgroundColor: Colors.white,
-        elevation: 20,
-        shadowColor: Colors.black,
-        minimumSize: const Size.fromHeight(50),
-      ),
-      child: const Text(
-        "Register",
-        style: TextStyle(
-          color: Colors.black,
-          fontFamily: 'Poppins-Semibold',
-          fontSize: 16,
-        ),
-      ),
+      child: const Text('Register'),
     );
+  }
+
+  // Fungsi untuk menampilkan dialog konfirmasi
+  void _showConfirmationDialog(BuildContext context) {
+    Alert(
+      context: context,
+      type: AlertType.info,
+      title: "Registration Confirmation",
+      desc: "Are You Sure Want To Register ?",
+      buttons: [
+        DialogButton(
+          child: const Text(
+            "Ya",
+            style: TextStyle(color: Colors.white, fontSize: 20),
+          ),
+          onPressed: () {
+            // Jika pengguna memilih "Ya", lanjutkan proses registrasi
+            _registerUser();
+            Navigator.pop(context);
+          },
+          color: Colors.green,
+        ),
+        DialogButton(
+          child: const Text(
+            "Tidak",
+            style: TextStyle(color: Colors.white, fontSize: 20),
+          ),
+          onPressed: () {
+            // Jika pengguna memilih "Tidak", tutup dialog
+            Navigator.pop(context);
+          },
+          color: Colors.red,
+        ),
+      ],
+    ).show();
+  }
+
+  // Fungsi untuk melakukan registrasi user
+  Future<void> _registerUser() async {
+    final user = User(
+      first_name: firstNameController.text,
+      last_name: lastNameController.text,
+      email: email!,
+      password: passwordController.text,
+      no_telp: phoneController.text,
+      gender: _selectedGender == Gender.man ? 'male' : 'female',
+      tanggal_lahir: dobController.text,
+    );
+    try {
+      // Melakukan request ke API untuk register user baru dengan data yang diberikan
+      bool success = await UserClient.registerUser(user);
+
+      // Jika registrasi berhasil, alihkan ke halaman login
+      if (success) {
+        showToast('Registration successful!');
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const LoginPage()),
+        );
+      } else {
+        // Jika registrasi gagal, bakal nampilkan pesan error
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Registration failed!')),
+        );
+      }
+    } catch (e) {
+      // Cuma exception aja kalau Sum Ting Wong
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: ${e.toString()}')),
+      );
+    }
   }
 }
