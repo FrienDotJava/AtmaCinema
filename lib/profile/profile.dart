@@ -104,11 +104,12 @@ class _ProfilePageState extends State<ProfilePage> {
                     );
                   } else if (snapshot.hasData && snapshot.data != null) {
                     //Menampilkan gambar kalau path ditemukan
+                    print("\t\t ${snapshot.data}");
                     return CircleAvatar(
                       radius: 50,
                       backgroundColor: Colors.white,
                       backgroundImage: NetworkImage(
-                          "http://10.0.2.2:8000/storage/" + snapshot.data!),
+                          "https://floralwhite-elephant-198508.hostingersite.com/storage/app/public/" + snapshot.data!),
                     );
                   } else {
                     //Jika tidak ada profule picture, tampilkan icon default

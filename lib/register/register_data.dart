@@ -199,7 +199,7 @@ class _RegisterDataState extends State<RegisterData> {
             _buildGenderField(),
             const SizedBox(height: 30),
             _buildRegisterButton(),
-            const SizedBox(height: 20),
+            const SizedBox(height: 1),
           ],
         ),
       ),
