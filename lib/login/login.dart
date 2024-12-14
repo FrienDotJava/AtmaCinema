@@ -4,6 +4,7 @@ import 'package:tubes/register/register_email.dart';
 
 import 'package:tubes/client/UserClient.dart';
 import 'package:tubes/entity/User.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -43,6 +44,30 @@ class _LoginPageState extends State<LoginPage> {
           ],
         ),
       ),
+    );
+  }
+
+  void showToast(String message) {
+    Fluttertoast.showToast(
+      msg: message,
+      toastLength: Toast.LENGTH_LONG,
+      gravity: ToastGravity.TOP,
+      timeInSecForIosWeb: 1,
+      backgroundColor: Colors.white,
+      textColor: Colors.green,
+      fontSize: 16.0,
+    );
+  }
+
+  void errorToast(String message) {
+    Fluttertoast.showToast(
+      msg: message,
+      toastLength: Toast.LENGTH_LONG,
+      gravity: ToastGravity.TOP,
+      timeInSecForIosWeb: 1,
+      backgroundColor: Colors.white,
+      textColor: Colors.red,
+      fontSize: 16.0,
     );
   }
 
@@ -275,6 +300,7 @@ class _LoginPageState extends State<LoginPage> {
             User user = await UserClient.login(email, password);
 
             if (user.token != null && user.token!.isNotEmpty) {
+              showToast("Login Success !!!");
               // Jika login berhasil dan token diterima, lanjutkan ke home
               Navigator.pushReplacement(
                 context,
@@ -282,11 +308,11 @@ class _LoginPageState extends State<LoginPage> {
               );
             } else {
               // Jika token kosong, tampilkan error
-              _showErrorDialog("Login failed. Invalid credentials.");
+              errorToast("Email or Password is Incorrect !!!");
             }
           } catch (e) {
             // Tangani error jika ada masalah saat melakukan request
-            _showErrorDialog("Error: ${e.toString()}");
+            errorToast("Email or Password is Incorrect !!!");
           }
         }
       },
