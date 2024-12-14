@@ -34,7 +34,7 @@ class NotifDetail extends StatelessWidget {
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [Color(0xFF000000), Color(0xFF000B6D)],
+              colors: [Color(0xFF000000), Colors.black],
               stops: [0.3, 0.7],
             ),
           ),

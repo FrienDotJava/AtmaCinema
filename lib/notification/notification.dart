@@ -29,8 +29,8 @@ class NotifList extends StatelessWidget {
         child: ListView(
           children: [
             NotifItem(
-              imagePath: 'images/bg2.jpg',
-              title: 'Buy 1 Get 1 Ticket',
+              imagePath: 'images/bg4.jpg',
+              title: 'E-Voucher Discount up to Rp 500.000',
             ),
             NotifItem(
               imagePath: 'images/bg2.jpg',
@@ -41,7 +41,7 @@ class NotifList extends StatelessWidget {
               title: 'Advance Ticket Sale Avengers: Endgame',
             ),
             NotifItem(
-              imagePath: 'images/bg2.jpg',
+              imagePath: 'images/img_poster/Mufasa.jpg',
               title: 'Get 50% Cashback with BCA',
             ),
           ],

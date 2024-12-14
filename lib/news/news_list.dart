@@ -29,31 +29,31 @@ class NewsList extends StatelessWidget {
         child: ListView(
           children: [
             NewsItem(
-              imagePath: 'images/bg2.jpg',
+              imagePath: 'images/img_poster/age_of_ultron.jpg',
               title: 'Spider-Man: Way Back Home Confirmed for 2025 Release!',
             ),
             NewsItem(
-              imagePath: 'images/bg2.jpg',
+              imagePath: 'images/img_poster/avengers.jpg',
               title: 'Robert Downey Jr. Officially Returns as Iron Man!',
             ),
             NewsItem(
-              imagePath: 'images/bg2.jpg',
+              imagePath: 'images/img_poster/endgame.jpg',
               title: 'Chris Evans Wields the Shield Again!',
             ),
             NewsItem(
-              imagePath: 'images/bg2.jpg',
-              title: 'Scarlet Witch Shines in Avengers Endgame!',
+              imagePath: 'images/img_poster/Mufasa.jpg',
+              title: 'Chris Evans Wields the Shield Again!',
             ),
             NewsItem(
-              imagePath: 'images/bg2.jpg',
+              imagePath: 'images/img_poster/kraven.jpeg',
               title: 'Doctor Strange: The Key to Avengers Victory!',
             ),
             NewsItem(
-              imagePath: 'images/bg2.jpg',
+              imagePath: 'images/img_poster/moana-2.jpeg',
               title: 'Thanos: From Iconic Villain to Controversial Hero!',
             ),
             NewsItem(
-              imagePath: 'images/bg2.jpg',
+              imagePath: 'images/img_poster/moana-3.jpeg',
               title: 'Spider-Man: Way Back Home Confirmed for 2025 Release!',
             ),
             NewsItem(
@@ -61,19 +61,19 @@ class NewsList extends StatelessWidget {
               title: 'Robert Downey Jr. Officially Returns as Iron Man!',
             ),
             NewsItem(
-              imagePath: 'images/bg2.jpg',
+              imagePath: 'images/img_poster/Mufasa.jpg',
               title: 'Chris Evans Wields the Shield Again!',
             ),
             NewsItem(
-              imagePath: 'images/bg2.jpg',
-              title: 'Scarlet Witch Shines in Avengers Endgame!',
+              imagePath: 'images/img_poster/Heretic.jpg',
+              title: 'Robert Downey Jr. Officially Returns as Iron Man!',
             ),
             NewsItem(
-              imagePath: 'images/bg2.jpg',
+              imagePath: 'images/bg3.jpg',
               title: 'Doctor Strange: The Key to Avengers Victory!',
             ),
             NewsItem(
-              imagePath: 'images/bg2.jpg',
+              imagePath: 'images/bg5.jpg',
               title: 'Thanos: From Iconic Villain to Controversial Hero!',
             ),
           ],

@@ -8,6 +8,7 @@ import 'package:tubes/notification/notification.dart';
 import 'package:tubes/client/FilmClient.dart';
 import 'package:tubes/entity/Film.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'home.dart';
 
 class MyHomeView extends StatefulWidget {
   final Function({required bool nowPlaying}) navigateToMovies;
@@ -61,10 +62,8 @@ class _MyHomeViewState extends State<MyHomeView> {
             IconButton(
               icon: const Icon(Icons.person_2, size: 36),
               onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const ProfilePage()),
-                );
+                (context.findAncestorStateOfType<homePageState>())
+                    ?.changeTab(4);
               },
               color: Colors.white,
             ),
