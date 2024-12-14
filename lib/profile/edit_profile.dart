@@ -29,6 +29,7 @@ class _EditProfileState extends State<EditProfile> {
   String? _token;
   User? user;
   String userPic = "";
+  bool remove = false;
 
   @override
   void initState() {
@@ -37,6 +38,7 @@ class _EditProfileState extends State<EditProfile> {
   }
 
   _initFormData() async {
+    //Mengisi form dengan data user yang sekarang aktif
     nameController.text = user?.first_name ?? '';
     lastNameController.text = user?.last_name ?? '';
     phoneController.text = user?.no_telp ?? '';
@@ -88,6 +90,7 @@ class _EditProfileState extends State<EditProfile> {
             },
           ),
         ),
+        // Struktur utama
         body: SingleChildScrollView(
           child: Center(
             child: Padding(
@@ -124,10 +127,12 @@ class _EditProfileState extends State<EditProfile> {
         CircleAvatar(
           radius: 50,
           backgroundColor: Colors.white,
+          //Memasukkan gambar untuk profile picture
           backgroundImage: profilePicturePath != null
+          //Jika user sudah memasukkan gambar baru, gambar tsb dimasukkan
               ? FileImage(File(profilePicturePath!))
-              : NetworkImage("http://10.0.2.2:8000/storage/" + userPic),
-          // : null,
+          //Jika belum, yang ditampilkan adalah gambar yang ada di database
+              : remove ? NetworkImage("https://floralwhite-elephant-198508.hostingersite.com/storage/app/public/profile_pictures/default-profile.jpg") : NetworkImage("https://floralwhite-elephant-198508.hostingersite.com/storage/app/public/" + userPic),
         ),
         Positioned(
           right: 0,
@@ -163,10 +168,12 @@ class _EditProfileState extends State<EditProfile> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
+              //Pilihan 1: Ambil gambar dari kamera
               ListTile(
                 title: const Text('Take a Picture'),
                 onTap: () async {
                   Navigator.pop(context);
+                  //Memanggil page camera dan returnkan path dari gambar yang baru difoto
                   final imagePath =
                       await Navigator.pushNamed(context, '/camera');
                   if (imagePath != null && mounted) {
@@ -176,6 +183,7 @@ class _EditProfileState extends State<EditProfile> {
                   }
                 },
               ),
+              //Pilihan 1: Ambil gambar dari galeri
               ListTile(
                 title: const Text('Choose from Gallery'),
                 onTap: () async {
@@ -183,6 +191,7 @@ class _EditProfileState extends State<EditProfile> {
                   await _openGallery();
                 },
               ),
+              //Pilihan 1: Menghilangkan profile picture
               ListTile(
                 title: const Text('Remove Profile Picture'),
                 onTap: () {
@@ -211,11 +220,11 @@ class _EditProfileState extends State<EditProfile> {
   void _removeProfilePicture() {
     setState(() {
       profilePicturePath = null;
+      remove = true;
     });
   }
 
-  Widget _buildInputField(String label, TextEditingController controller,
-      {bool isPhone = false}) {
+  Widget _buildInputField(String label, TextEditingController controller, {bool isPhone = false}) {
     return TextField(
       controller: controller,
       style: const TextStyle(color: Colors.white),
