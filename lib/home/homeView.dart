@@ -4,6 +4,7 @@ import 'package:tubes/movie/movieDetail.dart';
 import 'package:tubes/movie/topMovieList.dart';
 import 'package:tubes/news/news_list.dart';
 import 'package:tubes/news/news_detail.dart';
+import 'package:tubes/notification/notification.dart';
 import 'package:tubes/client/FilmClient.dart';
 import 'package:tubes/entity/Film.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -69,7 +70,12 @@ class _MyHomeViewState extends State<MyHomeView> {
             ),
             IconButton(
               icon: const Icon(Icons.notifications, size: 36),
-              onPressed: () {},
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const NotifList()),
+                );
+              },
               color: Colors.white,
             ),
           ],
