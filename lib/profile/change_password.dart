@@ -55,8 +55,8 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
               "Change Password",
               style: TextStyle(
                 color: Colors.white,
-                fontFamily: 'Poppins-Bold',
-                fontSize: 28,
+                fontFamily: 'Poppins-Semibold',
+                fontSize: 24,
               ),
             ),
           ],

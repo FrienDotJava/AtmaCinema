@@ -42,7 +42,8 @@ class MovieTicketDetails extends StatelessWidget {
               ClipRRect(
                 borderRadius: BorderRadius.circular(12),
                 child: Image.asset(
-                  movie.poster,  // Use the movie poster URL from the 'Film' object
+                  movie
+                      .poster, // Use the movie poster URL from the 'Film' object
                   width: 200,
                   height: 250,
                   fit: BoxFit.cover,
@@ -50,7 +51,7 @@ class MovieTicketDetails extends StatelessWidget {
               ),
               SizedBox(height: 16),
               Text(
-                movie.judul_film,  // Display movie title
+                movie.judul_film, // Display movie title
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
@@ -58,7 +59,7 @@ class MovieTicketDetails extends StatelessWidget {
               ),
               SizedBox(height: 8),
               Text(
-                "ATMA Cinema, Studio 1",  // Display selected cinema format
+                "ATMA Cinema, Studio 1", // Display selected cinema format
                 style: TextStyle(
                   fontSize: 16,
                   color: Colors.grey[600],
@@ -68,7 +69,8 @@ class MovieTicketDetails extends StatelessWidget {
               Column(
                 children: [
                   Text(
-                    DateFormat('EEEE, dd MMMM yyyy').format(selectedDate), // Display selected date
+                    DateFormat('EEEE, dd MMMM yyyy')
+                        .format(selectedDate), // Display selected date
                     style: TextStyle(
                       fontSize: 16,
                       color: Colors.grey[800],
@@ -76,7 +78,7 @@ class MovieTicketDetails extends StatelessWidget {
                   ),
                   SizedBox(height: 4),
                   Text(
-                    selectedTime,  // Display selected time
+                    selectedTime, // Display selected time
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
@@ -88,14 +90,14 @@ class MovieTicketDetails extends StatelessWidget {
               Column(
                 children: [
                   Text(
-                    "Seats: $ticketCount",  // Display ticket count
+                    "Seats: $ticketCount", // Display ticket count
                     style: TextStyle(
                       fontSize: 16,
                     ),
                   ),
                   SizedBox(height: 8),
                   Text(
-                    "Total: Rp${totalPrice.toStringAsFixed(2)}",  // Display total price
+                    "Total: Rp${totalPrice.toStringAsFixed(2)}", // Display total price
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
@@ -103,12 +105,11 @@ class MovieTicketDetails extends StatelessWidget {
                   ),
                 ],
               ),
-              SizedBox(height: 24),
+              SizedBox(height: 30),
               BarcodeWidget(
-                barcode: Barcode.code128(),  // Example barcode type
-                data: "CODEBOOKING1",  // Example barcode data (could be dynamic)
-                width: 200,
-                height: 80,
+                barcode: Barcode.qrCode(), // Example barcode type
+                data: "CODEBOOKING1", // Example barcode data (could be dynamic)
+                width: 500,
                 color: Colors.black,
               ),
             ],
