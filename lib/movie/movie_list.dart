@@ -88,6 +88,8 @@ class _ListMovieViewState extends State<ListMovieView>
           onResult: (result) {
             setState(() {
               _searchQuery = result.recognizedWords;
+              _searchController.text = _searchQuery;
+              _performSearch(_searchController.text);
             });
           },
         );
@@ -129,8 +131,8 @@ class _ListMovieViewState extends State<ListMovieView>
             ),
           ),
           IconButton(
-            icon: const Icon(Icons.mic, color: Colors.white54),
-            onPressed: () {},
+            icon: Icon(_isListening ? Icons.mic_off : Icons.mic),
+            onPressed: _listen,
           ),
         ],
       ),

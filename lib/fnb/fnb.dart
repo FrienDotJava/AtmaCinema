@@ -3,6 +3,7 @@ import 'package:tubes/client/MakananMinumanClient.dart';
 import 'package:tubes/entity/MakananMinuman.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
+import 'package:speech_to_text/speech_to_text.dart' as stt;
 
 class FnBPage extends StatefulWidget {
   const FnBPage({Key? key}) : super(key: key);
@@ -20,12 +21,18 @@ class _FnBPageState extends State<FnBPage> with SingleTickerProviderStateMixin {
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
 
+  late stt.SpeechToText _speech;
+  bool _isListening = false;
+  String _spokenText = '';
+
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
     _loadItems();
     _tabController.addListener(_onTabChanged);
+
+    _speech = stt.SpeechToText();
   }
 
   void _loadItems() async {
@@ -72,6 +79,42 @@ class _FnBPageState extends State<FnBPage> with SingleTickerProviderStateMixin {
         return 'minuman';
       default:
         return 'bundle';
+    }
+  }
+
+  void _startListening() async {
+    bool available = await _speech.initialize(
+      onStatus: (status) => print('Speech status: $status'),
+      onError: (error) => print('Speech error: $error'),
+    );
+    if (available) {
+      setState(() {
+        _isListening = true;
+      });
+      _speech.listen(
+        onResult: (result) {
+          setState(() {
+            _spokenText = result.recognizedWords;
+            _searchController.text = _spokenText; // Update search text with recognized speech
+            _performSearch(_searchController.text);
+          });
+        },
+      );
+    }
+  }
+
+  void _stopListening() async {
+    await _speech.stop();
+    setState(() {
+      _isListening = false;
+    });
+  }
+
+  void _toggleListening() {
+    if (_isListening) {
+      _stopListening();
+    } else {
+      _startListening();
     }
   }
 
@@ -122,8 +165,8 @@ class _FnBPageState extends State<FnBPage> with SingleTickerProviderStateMixin {
                         ),
                       ),
                       IconButton(
-                        icon: const Icon(Icons.mic, color: Colors.white54),
-                        onPressed: () {},
+                        icon: Icon(_isListening ? Icons.mic_off : Icons.mic),
+                        onPressed: _toggleListening,
                       ),
                     ],
                   ),
