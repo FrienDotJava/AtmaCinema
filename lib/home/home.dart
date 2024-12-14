@@ -22,6 +22,10 @@ class homePageState extends State<homePage> {
     });
   }
 
+  void changeTab(int index) {
+    _onItemTapped(index);
+  }
+
   void navigateToMovies({required bool nowPlaying}) {
     setState(() {
       _selectedIndex = 1;

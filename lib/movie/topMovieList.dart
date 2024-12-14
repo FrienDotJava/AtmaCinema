@@ -26,26 +26,31 @@ class TopMovieList extends StatelessWidget {
       body: Container(
         color: Colors.black,
         child: FutureBuilder<List<Film>>(
-          future: _fetchNowPlayingMovies(), // Fetch data
+          future: _fetchNowPlayingMovies(), // Fetch movie data
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(child: CircularProgressIndicator());
             } else if (snapshot.hasError) {
               return Center(child: Text('Error: ${snapshot.error}'));
             } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-              return const Center(child: Text('No movies found'));
+              return const Center(
+                child: Text(
+                  'No movies found',
+                  style: TextStyle(color: Colors.white),
+                ),
+              );
             } else {
               return ListView.builder(
                 itemCount: snapshot.data!.length,
                 itemBuilder: (context, index) {
                   final movie = snapshot.data![index];
-                  return MovieItem(
-                    posterUrl: movie.poster,
+                  return MovieListCard(
+                    imagePath: movie.poster ?? 'images/default_poster.jpg',
                     title: movie.judul_film,
-                    rating: movie.rating ?? 0,
                     duration: '${movie.durasi} mnt',
-                    ageRating: movie.rating_umur,
-                    format: movie.dimensi,
+                    rating: '${movie.rating ?? 0}/5',
+                    ageRating: movie.rating_umur ?? 'N/A',
+                    format: movie.dimensi ?? 'N/A',
                   );
                 },
               );
@@ -64,99 +69,103 @@ class TopMovieList extends StatelessWidget {
   }
 }
 
-class MovieItem extends StatelessWidget {
-  final String posterUrl;
+class MovieListCard extends StatelessWidget {
+  final String imagePath;
   final String title;
-  final double rating;
   final String duration;
+  final String rating;
   final String ageRating;
   final String format;
 
-  const MovieItem({
+  const MovieListCard({
     super.key,
-    required this.posterUrl,
+    required this.imagePath,
     required this.title,
-    required this.rating,
     required this.duration,
+    required this.rating,
     required this.ageRating,
     required this.format,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 16.0),
-        decoration: BoxDecoration(
-          color: const Color(0xFF0E1D39),
-          borderRadius: BorderRadius.circular(16.0),
-        ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            ClipRRect(
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(16.0),
-                bottomLeft: Radius.circular(16.0),
-              ),
-              child: Image.asset(
-                posterUrl,
-                width: 120,
-                height: 160,
-                fit: BoxFit.cover,
-              ),
+    return Container(
+      margin: const EdgeInsets.only(left: 30.0, bottom: 10.0, top: 16.0),
+      child: Row(
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(12.0),
+            child: Image.asset(
+              imagePath,
+              fit: BoxFit.cover,
+              width: 120,
+              height: 150,
             ),
-            Expanded(
-              child: Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(12.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Text(
-                        title,
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 23,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      const SizedBox(height: 8.0),
-                      Text(
-                        '$duration • $ageRating • $format',
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          color: Colors.white70,
-                          fontSize: 16,
-                        ),
-                      ),
-                      const SizedBox(height: 8.0),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Icon(
-                            Icons.star,
-                            color: Colors.yellow,
-                            size: 16,
-                          ),
-                          const SizedBox(width: 4.0),
-                          Text(
-                            '$rating/5',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 18,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
-              ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    MovieTag(text: duration),
+                    const SizedBox(width: 8),
+                    MovieTag(text: ageRating),
+                    const SizedBox(width: 8),
+                    MovieTag(text: format),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    const Icon(Icons.star, color: Colors.yellow, size: 16),
+                    const SizedBox(width: 4),
+                    Text(
+                      rating,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
-          ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class MovieTag extends StatelessWidget {
+  final String text;
+
+  const MovieTag({super.key, required this.text});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+      decoration: BoxDecoration(
+        color: const Color(0xFF1F1F1F),
+        borderRadius: BorderRadius.circular(10.0),
+      ),
+      child: Text(
+        text,
+        style: const TextStyle(
+          fontSize: 12,
+          color: Colors.white,
         ),
       ),
     );

@@ -34,7 +34,7 @@ class NewsDetail extends StatelessWidget {
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [Color(0xFF000000), Color(0xFF000B6D)],
+              colors: [Color(0xFF000000), Colors.black],
               stops: [0.3, 0.7],
             ),
           ),
@@ -71,7 +71,7 @@ class NewsDetail extends StatelessWidget {
               ClipRRect(
                 borderRadius: BorderRadius.circular(10.0),
                 child: Image.asset(
-                  'images/bg3.jpg',
+                  'images/img_poster/Mufasa.jpg',
                   fit: BoxFit.cover,
                   width: double.infinity,
                   height: 200,
@@ -89,7 +89,7 @@ class NewsDetail extends StatelessWidget {
               ClipRRect(
                 borderRadius: BorderRadius.circular(10.0),
                 child: Image.asset(
-                  'images/bg2.jpg',
+                  'images/img_poster/infinity_war.jpg',
                   fit: BoxFit.cover,
                   width: double.infinity,
                   height: 200,
